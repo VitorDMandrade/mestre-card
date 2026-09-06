@@ -10,6 +10,7 @@ import { RadarSection } from './study/RadarSection';
 import { LabSection } from './study/LabSection';
 import { RecallSection } from './study/RecallSection';
 import { ArcadeEngine } from './arcade/ArcadeEngine';
+import { ErrorBoundary } from './ErrorBoundary';
 
 interface StudyViewProps {
   card: MestreCardData;
@@ -93,33 +94,45 @@ export const StudyView: FC<StudyViewProps> = ({ card, onBack }) => {
       />
 
       <div className="max-w-6xl mx-auto px-4 pb-20 space-y-12">
-        <TheorySection card={card} />
+        <ErrorBoundary fallbackTitle="Erro na Seção de Teoria">
+          <TheorySection card={card} />
+        </ErrorBoundary>
         
-        <StructureSection card={card} />
+        <ErrorBoundary fallbackTitle="Erro na Seção de Estrutura">
+          <StructureSection card={card} />
+        </ErrorBoundary>
         
-        <RadarSection card={card} soundEnabled={soundEnabled} />
+        <ErrorBoundary fallbackTitle="Erro na Seção de Radar">
+          <RadarSection card={card} soundEnabled={soundEnabled} />
+        </ErrorBoundary>
         
-        <LabSection 
-          questions={card.sec05_lab?.questions || []}
-          bossFight={card.sec05_lab?.bossFight}
-          isHardcore={isHardcore}
-          soundEnabled={soundEnabled}
-          onApplyDamage={handleDamage}
-        />
+        <ErrorBoundary fallbackTitle="Erro no Laboratório Tático">
+          <LabSection 
+            questions={card.sec05_lab?.questions || []}
+            bossFight={card.sec05_lab?.bossFight}
+            isHardcore={isHardcore}
+            soundEnabled={soundEnabled}
+            onApplyDamage={handleDamage}
+          />
+        </ErrorBoundary>
         
-        <RecallSection card={card} />
+        <ErrorBoundary fallbackTitle="Erro na Matriz de Recall">
+          <RecallSection card={card} />
+        </ErrorBoundary>
 
         {/* Arcade Sub-engine */}
-        <ArcadeEngine 
-          card={card} 
-          onSessionSaved={loadTelemetry}
-          isHardcore={isHardcore}
-          hp={hp}
-          soundEnabled={soundEnabled}
-          onToggleSound={() => setSoundEnabled(!soundEnabled)}
-          onToggleHardcore={toggleHardcore}
-          onApplyDamage={handleDamage}
-        />
+        <ErrorBoundary fallbackTitle="Erro no Arcade Revisional">
+          <ArcadeEngine 
+            card={card} 
+            onSessionSaved={loadTelemetry}
+            isHardcore={isHardcore}
+            hp={hp}
+            soundEnabled={soundEnabled}
+            onToggleSound={() => setSoundEnabled(!soundEnabled)}
+            onToggleHardcore={toggleHardcore}
+            onApplyDamage={handleDamage}
+          />
+        </ErrorBoundary>
       </div>
     </div>
   );

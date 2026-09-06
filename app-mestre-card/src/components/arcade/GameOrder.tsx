@@ -87,7 +87,8 @@ export const GameOrder = ({ orderData, soundEnabled, onDamage, onComplete }: Gam
         <div className="text-5xl mb-3">🧩</div>
         <div className="text-amber-400 font-black text-xl">SEQUÊNCIA DOMINADA!</div>
         <div className="text-sm font-mono text-gray-400 mt-2">
-          Tentativas necessárias: <span className="text-white font-bold">{attempts}</span>
+          <span>Tentativas necessárias: </span>
+          <span className="text-white font-bold">{attempts}</span>
         </div>
       </div>
     );

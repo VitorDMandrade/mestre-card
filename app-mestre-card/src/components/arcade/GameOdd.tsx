@@ -115,7 +115,8 @@ export const GameOdd = ({ oddData, soundEnabled, onDamage, onComplete }: GameOdd
         <div className="text-5xl mb-3">🕵️</div>
         <div className="text-purple-400 font-black text-xl">INFILTRAÇÃO CONTIDA!</div>
         <div className="text-sm font-mono text-gray-400 mt-2">
-          Intrusos Detectados: <span className="text-emerald-400 font-bold">{hits}/{oddData.length}</span>
+          <span>Intrusos Detectados: </span>
+          <span className="text-emerald-400 font-bold">{hits}/{oddData.length}</span>
         </div>
       </div>
     );

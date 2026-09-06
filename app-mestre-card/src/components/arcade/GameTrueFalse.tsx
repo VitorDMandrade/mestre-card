@@ -128,7 +128,8 @@ export const GameTrueFalse = ({ tfData, soundEnabled, onDamage, onComplete }: Ga
         <div className="text-5xl mb-3">⚡</div>
         <div className="text-red-400 font-black text-xl">PRESSÃO SOBREVIVIDA!</div>
         <div className="text-sm font-mono text-gray-400 mt-2">
-          Tempo Total Poupado: <span className="text-emerald-400 font-bold">{totalTimeSaved}s</span>
+          <span>Tempo Total Poupado: </span>
+          <span className="text-emerald-400 font-bold">{totalTimeSaved}s</span>
         </div>
       </div>
     );

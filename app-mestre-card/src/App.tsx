@@ -4,6 +4,7 @@ import type { MestreCardData } from './types/mestre-card';
 import { sanitizeAndParseJSON, validateImportPayload, exportFullBackup } from './lib/importer';
 import { Dashboard } from './components/Dashboard';
 import { StudyView } from './components/StudyView';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import 'katex/dist/katex.min.css';
 
 function App() {
@@ -102,25 +103,27 @@ function App() {
   const activeCard = activeCardId ? cards.find(c => c.id === activeCardId) : null;
 
   return (
-    <div className="min-h-screen py-8">
-      {currentView === 'dashboard' && (
-        <Dashboard 
-          cards={cards}
-          historyMap={historyMap}
-          onSelectCard={handleSelectCard}
-          onDeleteCard={handleDeleteCard}
-          onImportCard={handleImportCard}
-          onExportBackup={handleExportBackup}
-        />
-      )}
-      
-      {currentView === 'study' && activeCard && (
-        <StudyView 
-          card={activeCard}
-          onBack={handleBackToDashboard}
-        />
-      )}
-    </div>
+    <ErrorBoundary fallbackTitle="Falha de Execução no MestreCard">
+      <div className="min-h-screen py-8">
+        {currentView === 'dashboard' && (
+          <Dashboard 
+            cards={cards}
+            historyMap={historyMap}
+            onSelectCard={handleSelectCard}
+            onDeleteCard={handleDeleteCard}
+            onImportCard={handleImportCard}
+            onExportBackup={handleExportBackup}
+          />
+        )}
+        
+        {currentView === 'study' && activeCard && (
+          <StudyView 
+            card={activeCard}
+            onBack={handleBackToDashboard}
+          />
+        )}
+      </div>
+    </ErrorBoundary>
   );
 }
 

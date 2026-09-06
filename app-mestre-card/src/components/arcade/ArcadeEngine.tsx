@@ -9,6 +9,7 @@ import { RadarChart } from './RadarChart';
 import { calculateTRIScore } from '../../lib/tri-engine';
 import type { TRICalculationInput, TRIScoreResult } from '../../lib/tri-engine';
 import { db } from '../../lib/db';
+import { ErrorBoundary } from '../ErrorBoundary';
 
 interface ArcadeEngineProps {
   card: MestreCardData;
@@ -210,62 +211,64 @@ export const ArcadeEngine = ({
             <button 
               key={t.id}
               onClick={() => setActiveTab(t.id as any)}
-              className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-all border ${
+              className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-all border inline-flex items-center gap-1.5 ${
                 isActive 
                   ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.5)] transform -translate-y-px' 
                   : 'bg-slate-800 text-gray-400 border-slate-700 hover:bg-slate-700'
               }`}
             >
-              {isDone && <span className="mr-1">✅</span>}
-              {t.label}
+              <span className={isDone ? 'inline' : 'hidden'} aria-hidden="true">✅</span>
+              <span>{t.label}</span>
             </button>
           );
         })}
       </div>
 
-      {/* Viewport */}
-      <div>
-        {activeTab === 'g1' && (
-          <GameTimeline 
-            questions={questionsData || []} 
-            soundEnabled={soundEnabled} 
-            onDamage={onApplyDamage}
-            onComplete={handleG1Complete}
-          />
-        )}
-        {activeTab === 'g2' && (
-          <GameMatch 
-            matchData={mappedMatchData} 
-            soundEnabled={soundEnabled} 
-            onDamage={onApplyDamage}
-            onComplete={handleG2Complete}
-          />
-        )}
-        {activeTab === 'g3' && (
-          <GameTrueFalse 
-            tfData={tfData || []} 
-            soundEnabled={soundEnabled} 
-            onDamage={onApplyDamage}
-            onComplete={handleG3Complete}
-          />
-        )}
-        {activeTab === 'g4' && (
-          <GameOrder 
-            orderData={mappedOrderData} 
-            soundEnabled={soundEnabled} 
-            onDamage={onApplyDamage}
-            onComplete={handleG4Complete}
-          />
-        )}
-        {activeTab === 'g5' && (
-          <GameOdd 
-            oddData={mappedOddData} 
-            soundEnabled={soundEnabled} 
-            onDamage={onApplyDamage}
-            onComplete={handleG5Complete}
-          />
-        )}
-      </div>
+      {/* Viewport protegido por ErrorBoundary */}
+      <ErrorBoundary fallbackTitle="Interrupção no Motor do Arcade">
+        <div>
+          {activeTab === 'g1' && (
+            <GameTimeline 
+              questions={questionsData || []} 
+              soundEnabled={soundEnabled} 
+              onDamage={onApplyDamage}
+              onComplete={handleG1Complete}
+            />
+          )}
+          {activeTab === 'g2' && (
+            <GameMatch 
+              matchData={mappedMatchData} 
+              soundEnabled={soundEnabled} 
+              onDamage={onApplyDamage}
+              onComplete={handleG2Complete}
+            />
+          )}
+          {activeTab === 'g3' && (
+            <GameTrueFalse 
+              tfData={tfData || []} 
+              soundEnabled={soundEnabled} 
+              onDamage={onApplyDamage}
+              onComplete={handleG3Complete}
+            />
+          )}
+          {activeTab === 'g4' && (
+            <GameOrder 
+              orderData={mappedOrderData} 
+              soundEnabled={soundEnabled} 
+              onDamage={onApplyDamage}
+              onComplete={handleG4Complete}
+            />
+          )}
+          {activeTab === 'g5' && (
+            <GameOdd 
+              oddData={mappedOddData} 
+              soundEnabled={soundEnabled} 
+              onDamage={onApplyDamage}
+              onComplete={handleG5Complete}
+            />
+          )}
+        </div>
+      </ErrorBoundary>
 
       {/* Final Score Modal */}
       {triResult && (
