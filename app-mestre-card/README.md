@@ -27,4 +27,6 @@ Agilize sua revisão sem tocar no mouse durante os confrontos diretos:
 
 ## Registro de Decisões de Arquitetura (ADR)
 - **[ADR-17] 2026-09-06**: Vetada a expansão de features v1.1.0; arbitrada a publicação estática da v1.0.0 com roteamento SPA universal (`_redirects` e `vercel.json`) para instalação PWA em dispositivos móveis e início imediato da rotina de estudos.
+- **[ADR-19] 2026-09-06**: Adoção do GitHub Pages como canal principal de hospedagem; injeção de base relativa ('./') no Vite, emissão de 404.html para roteamento SPA e provisionamento de CI/CD nativo via .github/workflows/deploy.yml.
+
 
