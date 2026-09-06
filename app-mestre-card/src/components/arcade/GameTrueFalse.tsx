@@ -12,9 +12,10 @@ interface GameTrueFalseProps {
   soundEnabled: boolean;
   onDamage: (amount: number) => void;
   onComplete: (timeSaved: number) => void;
+  onError?: (error: { prompt: string; userWrongAnswer: string; explanation: string }) => void;
 }
 
-export const GameTrueFalse = ({ tfData, soundEnabled, onDamage, onComplete }: GameTrueFalseProps) => {
+export const GameTrueFalse = ({ tfData, soundEnabled, onDamage, onComplete, onError }: GameTrueFalseProps) => {
   const [hasStarted, setHasStarted] = useState(false);
   const [step, setStep] = useState(0);
   const [timeLeft, setTimeLeft] = useState(15);
@@ -111,6 +112,11 @@ export const GameTrueFalse = ({ tfData, soundEnabled, onDamage, onComplete }: Ga
       playDamageSound(soundEnabled);
       setShowFeedback(false);
       onDamage(20);
+      onError?.({
+        prompt: currentQ.statement,
+        userWrongAnswer: answer === null ? 'Tempo Esgotado' : (answer ? 'Verdadeiro' : 'Falso'),
+        explanation: currentQ.feedback
+      });
       setPunishTime(5); // 5s lockout
     }
   };

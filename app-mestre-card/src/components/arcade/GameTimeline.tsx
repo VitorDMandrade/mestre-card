@@ -16,6 +16,7 @@ interface GameTimelineProps {
   soundEnabled: boolean;
   onDamage: (amount: number) => void;
   onComplete: (results: { hit: boolean; difficulty: string }[]) => void;
+  onError?: (error: { prompt: string; userWrongAnswer: string; explanation: string }) => void;
 }
 
 // Fisher-Yates shuffle
@@ -28,7 +29,7 @@ function shuffleArray<T>(array: T[]): T[] {
   return newArr;
 }
 
-export const GameTimeline = ({ questions, soundEnabled, onDamage, onComplete }: GameTimelineProps) => {
+export const GameTimeline = ({ questions, soundEnabled, onDamage, onComplete, onError }: GameTimelineProps) => {
   const [step, setStep] = useState(0);
   const [streak, setStreak] = useState(0);
   const [results, setResults] = useState<{ hit: boolean; difficulty: string }[]>([]);
@@ -146,6 +147,11 @@ export const GameTimeline = ({ questions, soundEnabled, onDamage, onComplete }: 
       }
       setStreak(Math.max(0, streak - 2));
       onDamage(20);
+      onError?.({
+        prompt: currentQ.question,
+        userWrongAnswer: opt.text,
+        explanation: opt.feedback
+      });
       setPunishTime(10);
     }
   };

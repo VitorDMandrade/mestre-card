@@ -17,9 +17,10 @@ interface GameOddProps {
   soundEnabled: boolean;
   onDamage: (amount: number) => void;
   onComplete: (hits: number) => void;
+  onError?: (error: { prompt: string; userWrongAnswer: string; explanation: string }) => void;
 }
 
-export const GameOdd = ({ oddData, soundEnabled, onDamage, onComplete }: GameOddProps) => {
+export const GameOdd = ({ oddData, soundEnabled, onDamage, onComplete, onError }: GameOddProps) => {
   const [step, setStep] = useState(0);
   const [hits, setHits] = useState(0);
   
@@ -97,6 +98,12 @@ export const GameOdd = ({ oddData, soundEnabled, onDamage, onComplete }: GameOdd
     } else {
       playSound(false, soundEnabled);
       onDamage(20);
+      const actualOdd = currentQ.options.find(o => o.isOdd);
+      onError?.({
+        prompt: currentQ.theme,
+        userWrongAnswer: opt.text,
+        explanation: actualOdd ? actualOdd.explanation : opt.explanation
+      });
       setPunishTime(5);
     }
   };

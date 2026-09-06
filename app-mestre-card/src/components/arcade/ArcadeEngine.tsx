@@ -22,6 +22,13 @@ interface ArcadeEngineProps {
   onApplyDamage: (amount: number) => void;
 }
 
+export interface SessionErrorLog {
+  game: 'G1' | 'G3' | 'G5';
+  prompt: string;
+  userWrongAnswer: string;
+  explanation: string;
+}
+
 export const ArcadeEngine = ({ 
   card, 
   onSessionSaved,
@@ -39,6 +46,19 @@ export const ArcadeEngine = ({
   const [g3TimeSaved, setG3TimeSaved] = useState(0);
   const [g4Attempts, setG4Attempts] = useState(0);
   const [g5Hits, setG5Hits] = useState(0);
+
+  // Session error telemetry (Caderno de Erros)
+  const [sessionErrors, setSessionErrors] = useState<SessionErrorLog[]>([]);
+  const [prevCardId, setPrevCardId] = useState(card.id);
+
+  if (card.id !== prevCardId) {
+    setPrevCardId(card.id);
+    setSessionErrors([]);
+  }
+
+  const recordError = useCallback((error: SessionErrorLog) => {
+    setSessionErrors(prev => [...prev, error]);
+  }, []);
 
   const [gamesStatus, setGamesStatus] = useState({ g1: false, g2: false, g3: false, g4: false, g5: false });
   const [triResult, setTriResult] = useState<TRIScoreResult | null>(null);
@@ -233,6 +253,7 @@ export const ArcadeEngine = ({
               soundEnabled={soundEnabled} 
               onDamage={onApplyDamage}
               onComplete={handleG1Complete}
+              onError={(err) => recordError({ game: 'G1', ...err })}
             />
           )}
           {activeTab === 'g2' && (
@@ -249,6 +270,7 @@ export const ArcadeEngine = ({
               soundEnabled={soundEnabled} 
               onDamage={onApplyDamage}
               onComplete={handleG3Complete}
+              onError={(err) => recordError({ game: 'G3', ...err })}
             />
           )}
           {activeTab === 'g4' && (
@@ -265,6 +287,7 @@ export const ArcadeEngine = ({
               soundEnabled={soundEnabled} 
               onDamage={onApplyDamage}
               onComplete={handleG5Complete}
+              onError={(err) => recordError({ game: 'G5', ...err })}
             />
           )}
         </div>
@@ -272,8 +295,8 @@ export const ArcadeEngine = ({
 
       {/* Final Score Modal */}
       {triResult && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 animate-fade-in backdrop-blur-sm">
-          <div className="bg-slate-900 border-2 border-blue-500 p-8 rounded-2xl text-center max-w-md w-full shadow-[0_0_30px_rgba(59,130,246,0.3)]">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 animate-fade-in backdrop-blur-sm overflow-y-auto">
+          <div className="bg-slate-900 border-2 border-blue-500 p-6 sm:p-8 rounded-2xl text-center max-w-lg w-full shadow-[0_0_30px_rgba(59,130,246,0.3)] my-6 max-h-[90vh] overflow-y-auto scrollbar-thin">
             <h2 className="text-3xl font-black text-white mb-2 tracking-tight">SCORE TRI FINAL</h2>
             <div className="text-6xl font-black text-blue-400 mb-4 tracking-tighter shadow-blue-500/20 drop-shadow-lg">
               {triResult.score}
@@ -293,9 +316,47 @@ export const ArcadeEngine = ({
               <RadarChart values={triResult.axes} size={280} />
             </div>
 
+            {/* Caderno de Erros da Sessão / Repescagem Imediata */}
+            {sessionErrors.length > 0 ? (
+              <details className="mb-6 text-left border border-red-500/40 bg-red-950/20 rounded-xl p-3.5 space-y-3">
+                <summary className="cursor-pointer text-xs font-mono font-bold text-red-400 hover:text-red-300 transition-colors select-none flex items-center justify-between">
+                  <span>🚨 CADERNO DE ERROS DA SESSÃO ({sessionErrors.length} FALHAS DETECTADAS)</span>
+                  <span className="text-[10px] text-red-400/80 font-mono">EXPANDIR ▼</span>
+                </summary>
+                <div className="mt-3 space-y-3 max-h-60 overflow-y-auto pr-1 scrollbar-thin">
+                  {sessionErrors.map((err, idx) => (
+                    <div key={idx} className="p-3 rounded-lg bg-slate-950/80 border border-red-900/50 space-y-1.5 text-xs font-mono">
+                      <div className="flex items-center justify-between text-[10px] text-slate-400">
+                        <span className="px-1.5 py-0.5 rounded bg-red-950 border border-red-800 text-red-300 font-bold">
+                          {err.game === 'G1' ? 'G1: MORTE SÚBITA' : err.game === 'G3' ? 'G3: PRESSÃO TRI' : 'G5: O INFILTRADO'}
+                        </span>
+                        <span>FALHA #{idx + 1}</span>
+                      </div>
+                      <p className="text-slate-200 font-sans text-xs font-semibold leading-relaxed">
+                        {err.prompt}
+                      </p>
+                      <div className="text-[11px] bg-red-950/40 border-l-2 border-l-red-500 pl-2 py-1 text-red-300">
+                        <span className="font-bold text-red-400">Sua Escolha: </span>
+                        <span>{err.userWrongAnswer}</span>
+                      </div>
+                      <div className="text-[11px] bg-emerald-950/30 border-l-2 border-l-emerald-500 pl-2 py-1 text-emerald-300">
+                        <span className="font-bold text-emerald-400">Correção Tática: </span>
+                        <span>{err.explanation}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </details>
+            ) : (
+              <div className="mb-6 p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 font-mono text-xs font-bold flex items-center justify-center gap-2">
+                <span>🛡️</span>
+                <span>SESSÃO IMPECÁVEL // ZERO ERROS DETECTADOS</span>
+              </div>
+            )}
+
             <button 
               onClick={() => setTriResult(null)}
-              className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold w-full transition-colors uppercase tracking-widest text-sm"
+              className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold w-full transition-colors uppercase tracking-widest text-sm cursor-pointer"
             >
               FECHAR RELATÓRIO
             </button>

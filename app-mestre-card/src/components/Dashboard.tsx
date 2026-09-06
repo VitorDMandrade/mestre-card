@@ -51,6 +51,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
   const [jsonInput, setJsonInput] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<SubjectCategory>('TODOS');
+  const [triFilter, setTriFilter] = useState<'all' | 'critical' | 'average' | 'mastered' | 'pending'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isProcessingFile, setIsProcessingFile] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -101,14 +102,54 @@ export const Dashboard: React.FC<DashboardProps> = ({
     return counts;
   }, [cards]);
 
-  // Filtered cards by Category & Search query
+  // Dynamic counter for TRI status
+  const triCounts = useMemo(() => {
+    const counts = {
+      all: cards.length,
+      critical: 0,
+      average: 0,
+      mastered: 0,
+      pending: 0
+    };
+    for (const card of cards) {
+      const score = historyMap[card.id];
+      if (score === undefined || score === null) {
+        counts.pending++;
+      } else if (score < 600) {
+        counts.critical++;
+      } else if (score < 800) {
+        counts.average++;
+      } else {
+        counts.mastered++;
+      }
+    }
+    return counts;
+  }, [cards, historyMap]);
+
+  // Filtered cards by Category, TRI Range & Search query
   const filteredCards = useMemo(() => {
     return cards.filter(card => {
+      // 1. Categoria
       if (selectedCategory !== 'TODOS') {
         const cat = resolveCategory(card.topic, card.title);
         if (cat !== selectedCategory) return false;
       }
 
+      // 2. Faixa TRI
+      if (triFilter !== 'all') {
+        const score = historyMap[card.id];
+        if (triFilter === 'pending') {
+          if (score !== undefined && score !== null) return false;
+        } else if (triFilter === 'critical') {
+          if (score === undefined || score === null || score >= 600) return false;
+        } else if (triFilter === 'average') {
+          if (score === undefined || score === null || score < 600 || score >= 800) return false;
+        } else if (triFilter === 'mastered') {
+          if (score === undefined || score === null || score < 800) return false;
+        }
+      }
+
+      // 3. Termo de busca
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         const titleNorm = (card.title || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -120,7 +161,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       }
       return true;
     });
-  }, [cards, selectedCategory, searchQuery]);
+  }, [cards, selectedCategory, triFilter, searchQuery, historyMap]);
 
   return (
     <div className="max-w-7xl mx-auto flex flex-col gap-6">
@@ -318,6 +359,55 @@ export const Dashboard: React.FC<DashboardProps> = ({
             );
           })}
         </div>
+
+        {/* TRI Vulnerability & Status Micro-chips Bar */}
+        <div className="flex items-center gap-2 overflow-x-auto pt-2 border-t border-slate-800/80 scrollbar-thin">
+          <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider pl-1 hidden sm:inline">
+            STATUS TRI:
+          </span>
+          {[
+            { id: 'all', label: 'Todos', count: triCounts.all, color: 'slate' },
+            { id: 'critical', label: '🚨 Críticos (<600)', count: triCounts.critical, color: 'red' },
+            { id: 'average', label: '🎯 Na Média (600-799)', count: triCounts.average, color: 'amber' },
+            { id: 'mastered', label: '⚡ Dominados (≥800)', count: triCounts.mastered, color: 'emerald' },
+            { id: 'pending', label: '⏳ Pendentes', count: triCounts.pending, color: 'slate' },
+          ].map(chip => {
+            const isSelected = triFilter === chip.id;
+            let activeStyle = '';
+            let inactiveStyle = '';
+
+            if (chip.color === 'red') {
+              activeStyle = 'bg-red-950/70 text-red-300 border-red-500 shadow-[0_0_12px_rgba(239,68,68,0.25)]';
+              inactiveStyle = 'text-red-400 border-slate-800 hover:border-red-500/60 hover:text-red-300';
+            } else if (chip.color === 'amber') {
+              activeStyle = 'bg-amber-950/70 text-amber-300 border-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.25)]';
+              inactiveStyle = 'text-amber-400 border-slate-800 hover:border-amber-500/60 hover:text-amber-300';
+            } else if (chip.color === 'emerald') {
+              activeStyle = 'bg-emerald-950/70 text-emerald-300 border-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.25)]';
+              inactiveStyle = 'text-emerald-400 border-slate-800 hover:border-emerald-500/60 hover:text-emerald-300';
+            } else {
+              activeStyle = 'bg-slate-800 text-slate-200 border-slate-600 shadow-sm';
+              inactiveStyle = 'text-slate-400 border-slate-800 hover:border-slate-700 hover:text-slate-300';
+            }
+
+            return (
+              <button
+                key={chip.id}
+                onClick={() => setTriFilter(chip.id as any)}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-mono font-bold whitespace-nowrap transition-all border ${
+                  isSelected ? activeStyle : inactiveStyle
+                } bg-slate-900/40`}
+              >
+                <span>{chip.label}</span>
+                <span className={`px-1.5 py-0.2 rounded text-[10px] ${
+                  isSelected ? 'bg-white/10' : 'bg-slate-800/80 text-slate-500'
+                }`}>
+                  {chip.count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Grid Tático */}
@@ -330,10 +420,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <div className="col-span-full py-12 text-center border border-dashed border-slate-700/50 rounded-2xl bg-slate-950/40 p-6 flex flex-col items-center justify-center gap-3">
             <div className="text-3xl">🎯</div>
             <p className="text-slate-400 font-mono text-sm">
-              [ NENHUM CARD ENCONTRADO PARA ESTA BUSCA OU CATEGORIA ]
+              [ NENHUM CARD ENCONTRADO PARA ESTA BUSCA OU FILTRO ]
             </p>
             <button
-              onClick={() => { setSelectedCategory('TODOS'); setSearchQuery(''); }}
+              onClick={() => { setSelectedCategory('TODOS'); setSearchQuery(''); setTriFilter('all'); }}
               className="px-4 py-2 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-bold transition-colors"
             >
               LIMPAR FILTROS
