@@ -47,7 +47,13 @@ O JSON gerado deve satisfazer rigorosamente as seguintes especificações quanti
 - `blocks`: Exatamente **4 a 5 blocos teóricos completos e aprofundados**, cobrindo a totalidade da matéria, propriedades críticas, convenções e exceções de banca:
   - `number`: 1, 2, 3...
   - `title`: Título técnico e cirúrgico.
-  - `content`: Texto encorpado de **1 a 2 parágrafos densos e minuciosos** (sem superficialidade, trazendo o encadeamento formal dos conceitos e termos técnicos).
+  - `content`: Texto encorpado estruturado em **F-Pattern** com alto contraste cognitivo:
+    - **Teto Estrito de 4 Linhas**: Proibido blocos com parágrafos de mais de 4 linhas corridas.
+    - **Negritos Táticos Nucleares**: Destaque com `**negrito**` estritamente os 2 a 3 conceitos operacionais mais críticos por bloco (nomes, leis, termos-chave, equações), permitindo leitura dinâmica imediata.
+    - **Tríade de Estruturação Interna de Cada Bloco**:
+      1. *Premissa Central* (1 frase sintética com o conceito nuclear em negrito).
+      2. *Encadeamento & Evidências* (desenvolvimento denso, com fatos, mecanismos e KaTeX).
+      3. *Ponto de Inflexão / Cuidado de Prova* (micro-conclusão prática desarmando pegadinhas recorrentes).
   - `highlight`: Chip de destaque tático em alto contraste (ex: `"Aço / Eletricidade / Petróleo"` ou `"Ocupação Efetiva // Fronteiras Artificiais"`).
 - `triagePatterns`: Exatamente **3 Padrões de Questões de Banca** (Rotas A, B e C), contendo:
   - `id`: `"route-a"`, `"route-b"`, `"route-c"`.
@@ -89,13 +95,14 @@ Adapte **OBRIGATORIAMENTE** a natureza desta seção à matéria:
   - `id`: `"lab-01"`, `"lab-02"`, `"lab-03"`, `"lab-04"`.
   - `enunciado`: Texto-base denso, autêntico e contextualizado.
   - `options`: 4 alternativas completas e desafiadoras (A, B, C, D), com uma correta (`isCorrect: true`).
-  - `resolution.distractorAnalysis`: **Análise cirúrgica distrator por distrator** (explicando minuciosamente o erro de cada uma das 3 alternativas incorretas).
+  - `resolution.distractorAnalysis`: **Análise cirúrgica distrator por distrator padronizada**. Formate OBRIGATORIAMENTE cada distrator incorreto no padrão:
+    `• [Alternativa X] ❌ Erro: <O que a banca falseou ou induziu> ➔ Correção: <A verdade científica, autor ou justificativa teórica>`.
   - `resolution.technicalVerdict`: Veredito técnico detalhado e fundamentação da alternativa correta.
 - `hardcoreQuestions`: Exatamente **2 questões de Aprofundamento Conteudista / Nível 2ª Fase (FUVEST, UNICAMP, ITA)**:
   - `id`: `"lab-hc-01"`, `"lab-hc-02"`.
   - `enunciado`: Enunciado altamente analítico, interdisciplinar, exigindo domínio fino de exceções teóricas e dedução avançada.
   - `options`: 4 alternativas de altíssimo rigor (A, B, C, D) com armadilhas conceituais refinadas.
-  - `resolution.distractorAnalysis`: Desmontagem cirúrgica de cada distrator de 2ª fase.
+  - `resolution.distractorAnalysis`: Desmontagem cirúrgica de cada distrator de 2ª fase seguindo rigorosamente o padrão `• [Alternativa X] ❌ Erro: ... ➔ Correção: ...`.
   - `resolution.technicalVerdict`: Fundamentação técnica aprofundada com rigor conceitual máximo.
 - `bossFight`: **1 Desafio de Elite (Padrão 2ª Fase Medicina / ITA / Fuvest)**:
   - `title`: Título do desafio de alto nível.
