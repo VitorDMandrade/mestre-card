@@ -148,7 +148,7 @@ Implementação obrigatória das 5 matrizes completas, **com 6 a 8 ITENS COMPLET
       {
         "number": number,
         "title": string,
-        "content": string, // 1 a 2 parágrafos densos com KaTeX
+        "content": string, // Texto em F-Pattern (teto de 4 linhas, 2 a 3 negritos nucleares, tríade interna) com KaTeX
         "highlight": string // Chip de alto contraste
       }
     ], // 4 a 5 blocos
@@ -207,7 +207,7 @@ Implementação obrigatória das 5 matrizes completas, **com 6 a 8 ITENS COMPLET
           { "letter": "A" | "B" | "C" | "D", "text": string, "isCorrect": boolean }
         ],
         "resolution": {
-          "distractorAnalysis": string, // Análise cirúrgica de cada alternativa incorreta
+          "distractorAnalysis": string, // Padrão obrigatório: • [Alternativa X] ❌ Erro: ... ➔ Correção: ...
           "technicalVerdict": string
         }
       }
@@ -220,7 +220,7 @@ Implementação obrigatória das 5 matrizes completas, **com 6 a 8 ITENS COMPLET
           { "letter": "A" | "B" | "C" | "D", "text": string, "isCorrect": boolean }
         ],
         "resolution": {
-          "distractorAnalysis": string,
+          "distractorAnalysis": string, // Padrão obrigatório: • [Alternativa X] ❌ Erro: ... ➔ Correção: ...
           "technicalVerdict": string
         }
       }
