@@ -37,22 +37,31 @@ export const GameTimeline = ({ questions, soundEnabled, onDamage, onComplete }: 
   const [punishTime, setPunishTime] = useState<number | null>(null);
   const [isFinished, setIsFinished] = useState(false);
 
-  useEffect(() => {
-    if (step < questions.length) {
-      setShuffledOptions(shuffleArray(questions[step].options));
-      setAnsweredIdx(null);
-    } else if (questions.length > 0 && step === questions.length) {
+  const nextQuestion = () => {
+    setAnsweredIdx(null);
+    setPunishTime(null);
+    if (step + 1 >= questions.length) {
       setIsFinished(true);
       onComplete(results);
+    } else {
+      setStep(s => s + 1);
     }
-  }, [step, questions, onComplete]);
+  };
+
+  useEffect(() => {
+    if (questions.length > 0 && step < questions.length) {
+      const q = questions[step];
+      const opts = Array.isArray(q?.options) ? q.options : [];
+      setShuffledOptions(shuffleArray(opts));
+      setAnsweredIdx(null);
+    }
+  }, [step, questions]);
 
   // Lockout timer
   useEffect(() => {
     if (punishTime === null) return;
     if (punishTime <= 0) {
-      setPunishTime(null);
-      setStep(s => s + 1);
+      nextQuestion();
       return;
     }
     const timer = setTimeout(() => {
@@ -68,13 +77,9 @@ export const GameTimeline = ({ questions, soundEnabled, onDamage, onComplete }: 
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
 
       if (e.code === 'Space') {
-        if (punishTime !== null) {
+        if (punishTime !== null || answeredIdx !== null) {
           e.preventDefault();
-          setPunishTime(null);
-          setStep(s => s + 1);
-        } else if (answeredIdx !== null) {
-          e.preventDefault();
-          setStep(s => s + 1);
+          nextQuestion();
         }
       }
 
@@ -87,7 +92,7 @@ export const GameTimeline = ({ questions, soundEnabled, onDamage, onComplete }: 
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [answeredIdx, punishTime, isFinished, shuffledOptions.length]);
+  }, [answeredIdx, punishTime, isFinished, shuffledOptions.length, step, questions.length, results]);
 
   if (questions.length === 0) {
     return (
@@ -97,7 +102,7 @@ export const GameTimeline = ({ questions, soundEnabled, onDamage, onComplete }: 
     );
   }
 
-  if (isFinished) {
+  if (isFinished || step >= questions.length) {
     return (
       <div className="bg-slate-950 p-5 rounded-xl border border-blue-500/30 min-h-[300px] flex flex-col items-center justify-center">
         <div className="text-5xl mb-3">🏆</div>
@@ -106,7 +111,7 @@ export const GameTimeline = ({ questions, soundEnabled, onDamage, onComplete }: 
     );
   }
 
-  const currentQ = questions[step];
+  const currentQ = questions[step] || { question: '', difficulty: 'Média', options: [] };
   const progress = (step / questions.length) * 100;
 
   const handleOptionClick = (idx: number) => {
@@ -151,7 +156,7 @@ export const GameTimeline = ({ questions, soundEnabled, onDamage, onComplete }: 
             Liberando em <span className="text-xl font-mono text-white">{punishTime}s</span>
           </p>
           <button 
-            onClick={() => { setPunishTime(null); setStep(s => s + 1); }}
+            onClick={() => { setPunishTime(null); nextQuestion(); }}
             className="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded font-bold text-xs transition-colors"
           >
             Continuar Agora (Espaço) ➔
@@ -209,7 +214,7 @@ export const GameTimeline = ({ questions, soundEnabled, onDamage, onComplete }: 
                       {opt.isCorrect ? '✅ ' : '❌ '}{opt.feedback}
                       {opt.isCorrect && (
                         <button 
-                          onClick={() => setStep(s => s + 1)}
+                          onClick={() => nextQuestion()}
                           className="block mt-3 bg-emerald-600 hover:bg-emerald-500 px-4 py-2 rounded text-white text-xs transition-colors"
                         >
                           Avançar ➔ (Espaço)

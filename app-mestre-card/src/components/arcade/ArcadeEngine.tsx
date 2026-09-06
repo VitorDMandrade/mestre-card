@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { MestreCardData } from '../../types/mestre-card';
 import { GameTimeline } from './GameTimeline';
 import { GameMatch } from './GameMatch';
@@ -63,29 +63,29 @@ export const ArcadeEngine = ({
 
 
 
-  const handleG1Complete = (results: { hit: boolean; difficulty: string }[]) => {
+  const handleG1Complete = useCallback((results: { hit: boolean; difficulty: string }[]) => {
     setG1Results(results);
     setGamesStatus(prev => ({ ...prev, g1: true }));
-  };
+  }, []);
 
-  const handleG2Complete = () => {
+  const handleG2Complete = useCallback(() => {
     setGamesStatus(prev => ({ ...prev, g2: true }));
-  };
+  }, []);
 
-  const handleG3Complete = (timeSaved: number) => {
+  const handleG3Complete = useCallback((timeSaved: number) => {
     setG3TimeSaved(timeSaved);
     setGamesStatus(prev => ({ ...prev, g3: true }));
-  };
+  }, []);
 
-  const handleG4Complete = (attempts: number) => {
+  const handleG4Complete = useCallback((attempts: number) => {
     setG4Attempts(attempts);
     setGamesStatus(prev => ({ ...prev, g4: true }));
-  };
+  }, []);
 
-  const handleG5Complete = (hits: number) => {
+  const handleG5Complete = useCallback((hits: number) => {
     setG5Hits(hits);
     setGamesStatus(prev => ({ ...prev, g5: true }));
-  };
+  }, []);
 
   const calculateFinalScore = async () => {
     const input: TRICalculationInput = {
@@ -123,22 +123,25 @@ export const ArcadeEngine = ({
 
   const { questionsData, matchData, tfData, orderData, oddData } = card.sec07_arcade || {};
 
-  const mappedMatchData = (matchData || []).map((m, i) => ({
+  const safeMatchData = Array.isArray(matchData) ? matchData : [];
+  const mappedMatchData = safeMatchData.map((m, i) => ({
     id: String(i),
     term: m.left,
     definition: m.right
   }));
 
-  const mappedOrderData = (orderData?.[0]?.steps || []).map((s, i) => ({
+  const safeOrderData = Array.isArray(orderData) ? orderData : [];
+  const mappedOrderData = (safeOrderData[0]?.steps || []).map((s, i) => ({
     id: String(i),
     step: s,
     explanation: ''
   }));
 
-  const mappedOddData = oddData?.map(o => ({
+  const safeOddData = Array.isArray(oddData) ? oddData : (oddData ? [oddData] : []);
+  const mappedOddData = safeOddData.map((o: any) => ({
     theme: o.question,
     options: o.options
-  })) || [];
+  }));
 
   return (
     <section id="sec-arcade" className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-[0_0_25px_-4px_rgba(56,189,248,0.25)] scroll-mt-20">

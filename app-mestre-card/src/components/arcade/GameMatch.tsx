@@ -44,16 +44,14 @@ export const GameMatch = ({ matchData, soundEnabled, onDamage, onComplete }: Gam
       if (selectedLeft === selectedRight) {
         // Match!
         playSound(true, soundEnabled);
-        setMatchedIds(prev => {
-          const next = new Set(prev);
-          next.add(selectedLeft);
-          
-          if (next.size === matchData.length && matchData.length > 0) {
-            setIsFinished(true);
-            onComplete();
-          }
-          return next;
-        });
+        const newMatched = new Set(matchedIds);
+        newMatched.add(selectedLeft);
+        setMatchedIds(newMatched);
+        
+        if (newMatched.size === matchData.length && matchData.length > 0) {
+          setIsFinished(true);
+          onComplete();
+        }
         setSelectedLeft(null);
         setSelectedRight(null);
       } else {

@@ -1,0 +1,1759 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mestre Card V16 - História: Imperialismo no Século XIX</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;0,800;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    :root {
+      --bg-main: #06090e;
+      --card-bg: rgba(13, 17, 23, 0.7);
+      --border-glow: rgba(56, 189, 248, 0.15);
+    }
+    body { 
+      background-color: var(--bg-main); 
+      color: #cbd5e1; 
+      font-family: 'Plus Jakarta Sans', sans-serif; 
+      background-image: 
+        radial-gradient(circle at 15% 10%, rgba(56, 189, 248, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 90%, rgba(99, 102, 241, 0.06) 0%, transparent 45%),
+        radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 28px 28px;
+      background-attachment: fixed;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.85);
+      pointer-events: none;
+      z-index: 50;
+    }
+    ::selection {
+      background: rgba(56, 189, 248, 0.3);
+      color: #38bdf8;
+      text-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+    }
+    .glass-card {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.75) 0%, rgba(9, 13, 22, 0.85) 100%);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 
+        inset 0 1px 1px 0 rgba(255, 255, 255, 0.12),
+        0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-card:hover {
+      border-color: rgba(56, 189, 248, 0.35);
+      box-shadow: 
+        inset 0 1px 2px 0 rgba(56, 189, 248, 0.3),
+        0 15px 35px -10px rgba(14, 165, 233, 0.15);
+      transform: translateY(-2px);
+    }
+    .text-gradient-cyan {
+      background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .glow-cyan { box-shadow: 0 0 25px -4px rgba(56, 189, 248, 0.25); }
+    .glow-emerald { box-shadow: 0 0 25px -4px rgba(16, 185, 129, 0.25); }
+    .glow-amber { box-shadow: 0 0 25px -4px rgba(245, 158, 11, 0.25); }
+    details { transition: all 0.2s ease; }
+    details summary { 
+      cursor: pointer; 
+      list-style: none; 
+      position: relative; 
+      user-select: none; 
+    }
+    details summary::-webkit-details-marker { display: none; }
+    details summary::after {
+      content: '›';
+      position: absolute;
+      right: 1.25rem;
+      top: 50%;
+      transform: translateY(-50%) rotate(0deg);
+      font-size: 1.35rem;
+      font-weight: 800;
+      transition: transform 0.2s ease, color 0.2s ease;
+      color: #64748b;
+    }
+    details[open] summary::after {
+      transform: translateY(-50%) rotate(90deg);
+      color: #38bdf8;
+    }
+    details[open] {
+      border-color: rgba(56, 189, 248, 0.4);
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.05) 0%, rgba(15, 23, 42, 0.9) 100%);
+      box-shadow: inset 3px 0 0 0 #38bdf8, 0 8px 24px -6px rgba(14, 165, 233, 0.15);
+    }
+    .tab-btn {
+      background: #0b1120;
+      border: 1px solid #1e293b;
+      box-shadow: 0 2px 0 0 #0f172a;
+      transition: all 0.15s ease;
+    }
+    .tab-btn:hover {
+      background: #1e293b;
+      border-color: #334155;
+      transform: translateY(-1px);
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%) !important;
+      border-color: #38bdf8 !important;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.4), inset 0 1px 0 rgba(255,255,255,0.2) !important;
+      transform: translateY(1px);
+    }
+    button, details summary, .tab-btn {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-main); }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #334155; }
+    .tactical-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(56, 189, 248, 0.4) 50%, transparent 100%);
+      border: none;
+      margin: 1.5rem 0;
+    }
+  </style>
+</head>
+<body class="p-4 md:p-8 max-w-5xl mx-auto space-y-8">
+
+  <!-- HUD TÁTICO SUPERIOR -->
+  <header class="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/80 -mx-4 md:-mx-8 px-4 md:px-8 py-3 mb-8 flex justify-between items-center flex-wrap gap-3">
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/90 border border-slate-700/60 shadow-inner">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span id="hud-badge" class="text-xs font-mono font-bold tracking-wider uppercase text-slate-300">Sessão Tática Ativa</span>
+      </div>
+      <div id="hud-history-box" class="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/90 border border-slate-800 text-[11px] font-mono text-slate-400">
+        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+        <span id="hud-last-score">Sem registro prévio</span>
+        <button onclick="clearCardStorage()" title="Resetar Progresso" class="text-slate-500 hover:text-red-400 transition-colors ml-1 text-xs">↺</button>
+      </div>
+      <div class="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-mono text-blue-400">
+        <span>Arcade:</span>
+        <b id="hud-count" class="text-white font-black">0/5</b>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 mr-2">
+        <button id="btn-hardcore" onclick="toggleHardcoreMode()" class="px-3 py-1 rounded-full bg-slate-900/90 border border-slate-700 text-xs font-mono text-slate-400 hover:border-red-500/50 hover:text-red-300 transition-all flex items-center gap-1.5">
+          <span id="hardcore-icon">🛡️</span>
+          <span id="hardcore-label">Modo Normal</span>
+        </button>
+
+        <div id="hud-hp-box" class="hidden items-center gap-2 px-3 py-1 rounded-full bg-red-950/40 border border-red-500/40 text-xs font-mono">
+          <span class="text-red-400 font-bold">HP:</span>
+          <div class="w-20 bg-slate-800 rounded-full h-2 overflow-hidden border border-red-900/60">
+            <div id="hp-bar-fill" class="bg-gradient-to-r from-red-600 to-rose-500 h-full transition-all duration-300" style="width: 100%;"></div>
+          </div>
+          <span id="hp-val" class="text-white font-bold">100</span>
+        </div>
+      </div>
+
+      <nav class="hidden lg:flex items-center gap-1 text-xs font-mono text-slate-400 mr-2">
+        <a href="#sec-teoria" class="px-2.5 py-1 rounded hover:text-cyan-400 hover:bg-slate-900 transition-colors">Teoria</a>
+        <a href="#sec-estrutura" class="px-2.5 py-1 rounded hover:text-cyan-400 hover:bg-slate-900 transition-colors">Estrutura</a>
+        <a href="#sec-lab" class="px-2.5 py-1 rounded hover:text-cyan-400 hover:bg-slate-900 transition-colors">Laboratório</a>
+        <a href="#sec-recall" class="px-2.5 py-1 rounded hover:text-cyan-400 hover:bg-slate-900 transition-colors">Recall</a>
+        <a href="#sec-arcade" class="px-2.5 py-1 rounded hover:text-cyan-400 hover:bg-slate-900 transition-colors">Arcade</a>
+      </nav>
+      <button onclick="calcFinalScore(true)" class="bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white px-3.5 py-1.5 rounded-xl font-bold text-xs font-mono shadow-lg shadow-sky-500/20 transition-all">
+        📊 Score TRI
+      </button>
+    </div>
+    <div class="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-cyan-500 via-sky-400 to-indigo-500 transition-all duration-150" id="scroll-progress" style="width: 0%;"></div>
+  </header>
+
+  <!-- SEC.01 // HEADER TRI & MATRIZ DE COMPETÊNCIAS -->
+  <section class="glass-card rounded-2xl p-6 md:p-8 border border-slate-800 glow-cyan">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-mono text-xs font-bold tracking-wider uppercase">História Geral // Ciências Humanas</span>
+          <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-xs font-bold tracking-wider uppercase">Incidência TRI: Altíssima (~16% de História Geral)</span>
+        </div>
+        <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Imperialismo e Neocolonialismo no Século XIX</h1>
+        <p class="text-slate-400 text-sm mt-1">A expansão do capitalismo monopolista-financeiro, a partilha da África e da Ásia, o darwinismo social e as raízes da Grande Guerra.</p>
+      </div>
+      <div class="flex flex-wrap gap-1.5">
+        <span class="px-2 py-1 rounded bg-slate-800/80 border border-slate-700 text-slate-300 font-mono text-[11px] font-bold">H1 - Identidade & Alteridade</span>
+        <span class="px-2 py-1 rounded bg-slate-800/80 border border-slate-700 text-slate-300 font-mono text-[11px] font-bold">H8 - Conflitos e Cidadania</span>
+        <span class="px-2 py-1 rounded bg-slate-800/80 border border-slate-700 text-slate-300 font-mono text-[11px] font-bold">H11 - Estruturas de Poder & Estado</span>
+        <span class="px-2 py-1 rounded bg-slate-800/80 border border-slate-700 text-slate-300 font-mono text-[11px] font-bold">H15 - Geopolítica & Território</span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
+      <div class="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800">
+        <div class="text-[11px] font-mono font-bold text-cyan-400 uppercase mb-1">Eixo 01 // Capitalismo Monopolista</div>
+        <div class="text-xs text-slate-300 font-semibold">2ª Revolução Industrial, fusão bancário-industrial, trustes, cartéis e superprodução de capitais.</div>
+      </div>
+      <div class="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800">
+        <div class="text-[11px] font-mono font-bold text-sky-400 uppercase mb-1">Eixo 02 // A Partilha da África</div>
+        <div class="text-xs text-slate-300 font-semibold">Conferência de Berlim, princípio da ocupação efetiva, fronteiras artificiais e o horror no Congo.</div>
+      </div>
+      <div class="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800">
+        <div class="text-[11px] font-mono font-bold text-indigo-400 uppercase mb-1">Eixo 03 // A Submissão da Ásia</div>
+        <div class="text-xs text-slate-300 font-semibold">Guerras do Ópio na China, Tratados Desiguais, Revolta dos Sipaios na Índia e a Restauração Meiji.</div>
+      </div>
+      <div class="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800">
+        <div class="text-[11px] font-mono font-bold text-emerald-400 uppercase mb-1">Eixo 04 // Aparelho Ideológico</div>
+        <div class="text-xs text-slate-300 font-semibold">Darwinismo social, missão civilizadora, "Fardo do Homem Branco" e racismo pseudocientífico.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEC.02 // DOSSIÊ TEÓRICO CIRÚRGICO & ÁRVORE DE TRIAGEM -->
+  <section id="sec-teoria" class="glass-card rounded-2xl p-6 md:p-8 border border-slate-800 scroll-mt-20">
+    <div class="flex items-center gap-3 mb-6 pb-2 border-b border-slate-800/80">
+      <span class="px-2.5 py-1 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-mono text-xs font-bold tracking-widest">SEC.02 // DOSSIÊ CIRÚRGICO</span>
+      <h2 class="text-xl font-extrabold text-white tracking-tight flex items-center gap-2"><span>🌍</span> Dossiê Teórico & Árvore de Triagem</h2>
+    </div>
+
+    <!-- BLOCOS TEÓRICOS DENSOS -->
+    <div class="space-y-4 mb-8">
+      <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800/90 space-y-2">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <span class="w-5 h-5 rounded bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xs font-mono">01</span>
+            A Base Material: 2ª Revolução Industrial e Capitalismo Financeiro
+          </h3>
+          <span class="font-mono text-cyan-300 bg-cyan-950/50 border border-cyan-500/30 px-1.5 py-0.5 rounded text-[11px] font-bold shadow-[0_0_8px_rgba(56,189,248,0.15)]">Aço / Eletricidade / Petróleo</span>
+        </div>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          A partir de 1870, a transição da tecnologia do vapor e ferro para a química pesada, o dínamo elétrico, o motor a combustão e o aço Bessemer desencadeou um salto produtivo sem precedentes. O capitalismo concorrencial liberal cedeu lugar ao <span class="text-amber-300 font-bold">capitalismo monopolista e financeiro</span> (fusão do capital industrial com o bancário). Corporações formaram <span class="text-cyan-300 font-bold">trustes</span> (fusão de empresas sob controle único), <span class="text-cyan-300 font-bold">cartéis</span> (acordos secretos de preços e cotas) e <span class="text-cyan-300 font-bold">holdings</span> (controle acionário majoritário). A saturação dos mercados metropolitanos e a queda da taxa de lucro geraram uma necessidade compulsória de exportar capitais acumulados, garantir fontes exclusivas de matérias-primas estratégicas (cobre, borracha, petróleo, carvão e algodão) e assegurar mercados consumidores cativos sem concorrência tarifária.
+        </p>
+      </div>
+
+      <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800/90 space-y-2">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <span class="w-5 h-5 rounded bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xs font-mono">02</span>
+            A Partilha da África e a Conferência de Berlim (1884-1885)
+          </h3>
+          <span class="font-mono text-cyan-300 bg-cyan-950/50 border border-cyan-500/30 px-1.5 py-0.5 rounded text-[11px] font-bold shadow-[0_0_8px_rgba(56,189,248,0.15)]">Ocupação Efetiva // Fronteiras Artificiais</span>
+        </div>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Para arbitrar os choques entre as potências e regular a corrida espoliativa (a "corrida para a África"), o chanceler alemão Otto von Bismarck convocou a <span class="text-cyan-300 font-bold">Conferência de Berlim (1884-1885)</span>. O encontro aboliu o velho "direito histórico de descoberta" e consagrou o <span class="text-emerald-300 font-bold">princípio da ocupação efetiva</span>: uma nação só garantia soberania se mantivesse forças militares, administração burocrática e infraestrutura econômica no território reivindicado. As potências desenharam fronteiras geométricas artificiais com réguas sobre mapas de gabinete, rompendo laços étnicos ancestrais e agrupando sob a mesma tutela grupos historicamente rivais (raiz de conflitos contemporâneos como o genocídio em Ruanda). O caso mais hediondo foi o <span class="text-red-400 font-bold">Estado Livre do Congo</span>, propriedade pessoal do rei Leopoldo II da Bélgica, onde o trabalho compulsório na extração de borracha e marfim culminou em milhões de mortes e mutilações sistemáticas.
+        </p>
+      </div>
+
+      <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800/90 space-y-2">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <span class="w-5 h-5 rounded bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xs font-mono">03</span>
+            A Subjugação da Ásia: Guerras do Ópio e a Dominação Britânica na Índia
+          </h3>
+          <span class="font-mono text-cyan-300 bg-cyan-950/50 border border-cyan-500/30 px-1.5 py-0.5 rounded text-[11px] font-bold shadow-[0_0_8px_rgba(56,189,248,0.15)]">Tratados Desiguais // Sipaios // Boxers</span>
+        </div>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Na <strong>China</strong> da dinastia Qing, o comércio era superavitário para os chineses (chá, seda e porcelana pagos em prata). Para reverter a balança, os mercadores britânicos introduziram ilegalmente toneladas de ópio cultivado na Índia. A queima de estoques do narcótico pelas autoridades chinesas em Cantão desencadeou as <span class="text-amber-300 font-bold">Guerras do Ópio (1839-1842 e 1856-1860)</span>. Derrotada militarmente pela tecnologia a vapor inglesa, a China foi submetida aos <span class="text-cyan-300 font-bold">Tratados Desiguais (Tratado de Nanquim, 1842)</span>: abertura forçada de portos ao livre-comércio, cessão de Hong Kong à Grã-Bretanha, extraterritorialidade jurídica para europeus e controle das alfândegas. No final do século, o país foi fatiado em "áreas de influência", culminando na violenta <span class="text-red-400 font-bold">Guerra dos Boxers (1899-1901)</span> contra a presença ocidental. Na <strong>Índia</strong>, administrada pela Companhia Britânica das Índias Orientais, a revolta nacionalista armada dos soldados nativos (<span class="text-sky-300 font-bold">Revolta dos Sipaios, 1857</span>) foi violentamente esmagada, levando a Coroa Britânica a assumir a administração direta da colônia, coroando a rainha Vitória como Imperatriz da Índia em 1876 ("a joia da coroa").
+        </p>
+      </div>
+
+      <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800/90 space-y-2">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <span class="w-5 h-5 rounded bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xs font-mono">04</span>
+            A Exceção Asiática: A Restauração Meiji e o Imperialismo Japonês
+          </h3>
+          <span class="font-mono text-cyan-300 bg-cyan-950/50 border border-cyan-500/30 px-1.5 py-0.5 rounded text-[11px] font-bold shadow-[0_0_8px_rgba(56,189,248,0.15)]">1868 // Zaibatsus // Industrialização Dirigida</span>
+        </div>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Enquanto a China era fatiada e a Índia colonizada, o Japão respondeu de forma singular à pressão imperialista ocidental (inaugurada pelas canhoneiras do comodoro Matthew Perry em 1853). A <span class="text-cyan-300 font-bold">Restauração Meiji (1868)</span> aboliu o xogunato feudal Tokugawa, centralizou o poder político na figura do imperador Mutsuhito e empreendeu uma revolução industrial acelerada e dirigida pelo Estado. O governo financiou ferrovias, telégrafos, indústria naval e siderurgia, repassando essas fábricas a preços subsidiados a oligopólios familiares privados (<span class="text-amber-300 font-bold">zaibatsus</span> como Mitsubishi e Mitsui). Com território insular exíguo e carência extrema de ferro e carvão, o Japão militarizou-se e ingressou no seleto clube dos impérios mundiais, derrotando a China na Guerra Sino-Japonesa (1894-1895) e humilhando o Império Russo na Guerra Russo-Japonesa (1904-1905), anexando a península da Coreia em 1910.
+        </p>
+      </div>
+
+      <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800/90 space-y-2">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <span class="w-5 h-5 rounded bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xs font-mono">05</span>
+            O Aparelho Ideológico e a Antessala da Primeira Guerra Mundial
+          </h3>
+          <span class="font-mono text-cyan-300 bg-cyan-950/50 border border-cyan-500/30 px-1.5 py-0.5 rounded text-[11px] font-bold shadow-[0_0_8px_rgba(56,189,248,0.15)]">Spencer // Kipling // Paz Armada</span>
+        </div>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          A pilhagem colonial exigiu uma couraça ideológica moral. A burguesia europeia apropriou-se das teses evolutivas de Charles Darwin para forjar o <span class="text-red-400 font-bold">Darwinismo Social</span> (Herbert Spencer), postulando falsamente que as raças humanas estavam em estágios distintos de evolução biológica, cabendo à civilização branca europeia (ápice do progresso) tutelar as raças "inferiores". Na literatura, Rudyard Kipling sintetizou essa mentalidade no poema <span class="text-amber-300 font-bold">"O Fardo do Homem Branco"</span> (1899), apresentando o massacre como um sacrifício humanitário e civilizador. Esse apetite territorial gerou choques diretos entre as metrópoles: o Incidente de Fachoda (1898 - Grã-Bretanha vs França no Sudão) e as Crises Marroquinas (1905 e 1911 - Alemanha vs França). As disputas por fatias do mercado mundial inauguraram o período da <span class="text-cyan-300 font-bold">Paz Armada</span> e das alianças secretas, raiz primária do conflito generalizado de 1914.
+        </p>
+      </div>
+    </div>
+
+    <!-- ÁRVORE DE TRIAGEM TÁTICA -->
+    <div class="bg-slate-950/90 rounded-xl p-5 border border-slate-800">
+      <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <div>
+          <span class="text-xs font-mono font-bold text-cyan-400 uppercase tracking-wider">Triagem em 15 Segundos</span>
+          <h3 class="text-base font-bold text-white">Reconhecimento de Padrão da Banca</h3>
+        </div>
+        <div class="flex gap-1.5 bg-slate-900 p-1 rounded-lg border border-slate-800 text-xs font-mono">
+          <button onclick="switchBranch(this, 'route-pa', 'route-pb'); document.getElementById('route-pc').classList.add('hidden');" class="px-2 py-0.5 rounded bg-cyan-600 text-white font-bold text-[10px]">Padrão A: Ideologia & Discurso Justificador</button>
+          <button onclick="switchBranch(this, 'route-pb', 'route-pa'); document.getElementById('route-pc').classList.add('hidden');" class="px-2 py-0.5 rounded bg-slate-900 text-slate-400 text-[10px]">Padrão B: Guerras do Ópio & Tratados Desiguais</button>
+          <button onclick="switchBranch(this, 'route-pc', 'route-pa'); document.getElementById('route-pb').classList.add('hidden');" class="px-2 py-0.5 rounded bg-slate-900 text-slate-400 text-[10px]">Padrão C: Partilha Territorial Africana</button>
+        </div>
+      </div>
+
+      <!-- PADRÃO A -->
+      <div id="route-pa" class="space-y-3">
+        <div class="p-3 bg-cyan-950/20 border border-cyan-500/30 rounded-lg">
+          <div class="text-xs font-bold text-cyan-300 mb-1">🎯 Sinal de Reconhecimento no Enunciado:</div>
+          <p class="text-xs text-slate-300">Citações de textos antropológicos do século XIX, cartas de missionários, poesias de Kipling ("The White Man's Burden"), ilustrações de negros sendo vestidos por brancos com sabonetes Pears ou discursos positivistas de "levar a luz do progresso à escuridão bárbara".</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="p-3 bg-slate-900/90 border border-slate-800 rounded-lg">
+            <div class="text-[11px] font-mono text-emerald-400 font-bold mb-1">⚡ Algoritmo de Resolução Direta:</div>
+            <ul class="text-xs text-slate-300 space-y-1 list-disc list-inside">
+              <li>Identifique a <strong>dupla função do discurso</strong>: criar álibi moral para a violência e ocultar a espoliação de matérias-primas e capitais.</li>
+              <li>Conecte ao <strong>Darwinismo Social</strong> e ao <strong>Etnocentrismo</strong>: a Europa como padrão universal de civilização.</li>
+              <li>Aponte a contradição estrutural: pregar o humanismo liberal enquanto pratica pilhagem, mutilação e trabalho compulsório na África e Ásia.</li>
+            </ul>
+          </div>
+          <div class="p-3 bg-slate-900/90 border border-slate-800 rounded-lg">
+            <div class="text-[11px] font-mono text-red-400 font-bold mb-1">⚠️ Distratores Clássicos:</div>
+            <p class="text-xs text-slate-300">Afirmar que os europeus realmente buscavam democratizar o conhecimento tecnológico; confundir a retórica paternalista com ausência de racismo; supor que a justificativa religiosa católica do séc. XVI era a principal engrenagem do séc. XIX (no séc. XIX predominava a pseudociência biológica).</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PADRÃO B -->
+      <div id="route-pb" class="hidden space-y-3">
+        <div class="p-3 bg-sky-950/20 border border-sky-500/30 rounded-lg">
+          <div class="text-xs font-bold text-sky-300 mb-1">🎯 Sinal de Reconhecimento no Enunciado:</div>
+          <p class="text-xs text-slate-300">Menções ao chá, seda e porcelana chineses, comércio do ópio em Cantão, charges ocidentais partilhando a "torta chinesa", Tratado de Nanquim ou revoltas armadas asiáticas (Sipaios e Boxers).</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="p-3 bg-slate-900/90 border border-slate-800 rounded-lg">
+            <div class="text-[11px] font-mono text-emerald-400 font-bold mb-1">⚡ Algoritmo de Resolução Direta:</div>
+            <ul class="text-xs text-slate-300 space-y-1 list-disc list-inside">
+              <li>Na China: o modelo não foi de ocupação territorial integral, mas de <strong>"Áreas de Influência"</strong> e <strong>abertura forçada de mercado</strong> via canhoneiras (Gunboat Diplomacy).</li>
+              <li>O Tratado de Nanquim instituiu a perda de soberania aduaneira e territorial (Hong Kong britânica até 1997).</li>
+              <li>No Japão: a modernização Meiji foi a rota contrária à colonização, transformando o país em potência imperialista regional.</li>
+            </ul>
+          </div>
+          <div class="p-3 bg-slate-900/90 border border-slate-800 rounded-lg">
+            <div class="text-[11px] font-mono text-red-400 font-bold mb-1">⚠️ Distratores Clássicos:</div>
+            <p class="text-xs text-slate-300">Afirmar que a China se tornou colônia formal britânica como a Índia; supor que o tráfico de ópio visava fins medicinais aceitos pacificamente pelo governo imperial chinês; classificar a Restauração Meiji como um movimento de submissão aos EUA.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PADRÃO C -->
+      <div id="route-pc" class="hidden space-y-3">
+        <div class="p-3 bg-indigo-950/20 border border-indigo-500/30 rounded-lg">
+          <div class="text-xs font-bold text-indigo-300 mb-1">🎯 Sinal de Reconhecimento no Enunciado:</div>
+          <p class="text-xs text-slate-300">Mapas da África no final do século XIX, demarcação com linhas retas arbitrárias, menções à Conferência de Berlim, Batalha de Adwa, Incidente de Fachoda ou ao Estado Livre do Congo.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="p-3 bg-slate-900/90 border border-slate-800 rounded-lg">
+            <div class="text-[11px] font-mono text-emerald-400 font-bold mb-1">⚡ Algoritmo de Resolução Direta:</div>
+            <ul class="text-xs text-slate-300 space-y-1 list-disc list-inside">
+              <li>Berlim estabeleceu a <strong>Ocupação Efetiva</strong>: presença militar e administrativa no terreno para legitimar posse.</li>
+              <li>As fronteiras cortaram reinos e juntaram etnias hostis (fonte perene de guerras civis e instabilidade política no pós-independência).</li>
+              <li>Resistências existiram: a Etiópia derrotou o exército colonial italiano na Batalha de Adwa (1896) e manteve sua soberania junto à Libéria.</li>
+            </ul>
+          </div>
+          <div class="p-3 bg-slate-900/90 border border-slate-800 rounded-lg">
+            <div class="text-[11px] font-mono text-red-400 font-bold mb-1">⚠️ Distratores Clássicos:</div>
+            <p class="text-xs text-slate-300">Achar que a África foi conquistada pacificamente sem resistência armada; supor que os limites das colônias respeitaram as divisões tribais pré-coloniais; acreditar que toda a África foi colonizada (Etiópia e Libéria permaneceram soberanas).</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEC.03 // ESTRUTURA FORMAL & RELAÇÕES ESTRATÉGICAS -->
+  <section id="sec-estrutura" class="glass-card rounded-2xl p-6 md:p-8 border border-slate-800 scroll-mt-20">
+    <div class="flex items-center gap-3 mb-6 pb-2 border-b border-slate-800/80">
+      <span class="px-2.5 py-1 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-mono text-xs font-bold tracking-widest">SEC.03 // ESTRUTURA FORMAL</span>
+      <h2 class="text-xl font-extrabold text-white tracking-tight flex items-center gap-2"><span>🏛️</span> Matriz de Eixos Causais & Quadro Comparativo</h2>
+    </div>
+
+    <!-- MATRIZ DE EIXOS CAUSAIS DO PROCESSO HISTÓRICO -->
+    <div class="space-y-3 mb-6">
+      <div class="text-xs font-mono font-bold text-cyan-400 uppercase tracking-wider">Macro-Encadeamento Causal Histórico</div>
+      
+      <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+        <div class="text-xs font-bold text-white flex items-center gap-2">
+          <span class="px-2 py-0.5 rounded bg-sky-500/20 text-sky-400 font-mono text-[10px]">CADEIA DE DOMINAÇÃO</span>
+          Do Choque Industrial à Partilha Geopolítica Global
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-2 text-xs">
+          <div class="p-2.5 rounded bg-slate-950/60 border border-slate-800">
+            <b class="text-cyan-400 block text-[10px] font-mono mb-1">1. CAUSAS MATERIAIS</b>
+            2ª Rev. Industrial, saturação de capitais na Europa, necessidade de mercados cativos e escassez de matérias-primas (petróleo, cobre, borracha).
+          </div>
+          <div class="p-2.5 rounded bg-slate-950/60 border border-slate-800">
+            <b class="text-cyan-400 block text-[10px] font-mono mb-1">2. AGENTES HISTÓRICOS</b>
+            Burguesia industrial-financeira, monopólios (trustes/cartéis), Estados nacionais europeus, marinhas armadas e missionários.
+          </div>
+          <div class="p-2.5 rounded bg-slate-950/60 border border-slate-800">
+            <b class="text-cyan-400 block text-[10px] font-mono mb-1">3. MECANISMOS DE AÇÃO</b>
+            Conferência de Berlim (1884-85), "Gunboat Diplomacy" (diplomacia das canhoneiras), imposição de Tratados Desiguais e expropriação agrária.
+          </div>
+          <div class="p-2.5 rounded bg-slate-950/60 border border-slate-800">
+            <b class="text-cyan-400 block text-[10px] font-mono mb-1">4. CONSEQ. DIRETAS</b>
+            Desestruturação de reinos nativos, genocídio populacional (Congo, Hereros), criação de fronteiras artificiais e revoltas sufocadas.
+          </div>
+          <div class="p-2.5 rounded bg-slate-950/60 border border-slate-800">
+            <b class="text-cyan-400 block text-[10px] font-mono mb-1">5. DESDOBRAMENTOS</b>
+            Paz Armada, rivalidades interimperialistas irreconciliáveis (Alemanha x Inglaterra) e estopim estrutural da Primeira Guerra Mundial (1914).
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUADRO COMPARATIVO TÁTICO: COLONIALISMO VS NEOCOLONIALISMO -->
+    <div class="overflow-x-auto rounded-xl border border-slate-800 mb-6">
+      <table class="w-full text-left text-xs text-slate-300">
+        <thead class="bg-slate-900/90 text-cyan-400 font-mono uppercase text-[11px] border-b border-slate-800">
+          <tr>
+            <th class="p-3">Critério de Confrontação</th>
+            <th class="p-3">Colonialismo Moderno (Séc. XVI-XVIII)</th>
+            <th class="p-3">Neocolonialismo Imperialista (Séc. XIX-XX)</th>
+            <th class="p-3">Ponto Crítico em Prova (Pegadinha TRI)</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-800/60 bg-slate-950/50">
+          <tr>
+            <td class="p-3 font-mono font-bold text-white">Etapa Capitalista</td>
+            <td class="p-3 text-slate-300">Capitalismo Comercial / Primitivo / Metalista.</td>
+            <td class="p-3 text-cyan-300 font-semibold">Capitalismo Industrial-Financeiro e Monopolista.</td>
+            <td class="p-3 text-amber-300">Surgimento dos trustes, cartéis e exportação de capitais.</td>
+          </tr>
+          <tr>
+            <td class="p-3 font-mono font-bold text-white">Área Geográfica Alvo</td>
+            <td class="p-3 text-slate-300">América (faixa litorânea e bacias fluviais).</td>
+            <td class="p-3 text-cyan-300 font-semibold">África e Ásia (interiorização continental total).</td>
+            <td class="p-3 text-amber-300">Ocupação efetiva do interior africano só ocorreu no séc. XIX.</td>
+          </tr>
+          <tr>
+            <td class="p-3 font-mono font-bold text-white">Metrópoles Dominantes</td>
+            <td class="p-3 text-slate-300">Portugal, Espanha e posteriormente Holanda, Inglaterra e França.</td>
+            <td class="p-3 text-cyan-300 font-semibold">Grã-Bretanha, França, Alemanha, Bélgica, Japão e EUA.</td>
+            <td class="p-3 text-amber-300">Alemanha e Itália entram atrasadas devido às unificações tardias.</td>
+          </tr>
+          <tr>
+            <td class="p-3 font-mono font-bold text-white">Objetivo Econômico</td>
+            <td class="p-3 text-slate-300">Metais preciosos e gêneros tropicais (Pacto Colonial Mercantilista).</td>
+            <td class="p-3 text-cyan-300 font-semibold">Matérias-primas industriais, reserva de mercado e exportação de capitais.</td>
+            <td class="p-3 text-amber-300">No séc. XIX, a colônia é mercado para manufaturas da metrópole.</td>
+          </tr>
+          <tr>
+            <td class="p-3 font-mono font-bold text-white">Discurso Ideológico</td>
+            <td class="p-3 text-slate-300">Expansão da Fé Cristã (Contrarreforma / Catequese Jesuítica).</td>
+            <td class="p-3 text-cyan-300 font-semibold">Darwinismo Social, "Missão Civilizadora" e "Fardo do Homem Branco".</td>
+            <td class="p-3 text-amber-300">A religião cede primazia à pseudociência biológica e positivista.</td>
+          </tr>
+          <tr>
+            <td class="p-3 font-mono font-bold text-white">Regime de Trabalho</td>
+            <td class="p-3 text-slate-300">Escravidão africana transatlântica e mita/encomienda indígena.</td>
+            <td class="p-3 text-cyan-300 font-semibold">Trabalho compulsório nativo, servidão por dívida e trabalho assalariado precário.</td>
+            <td class="p-3 text-amber-300">O tráfico transatlântico de escravos já havia sido abolido.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TABELA DE MODALIDADES DE DOMINAÇÃO COLONIAL -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div class="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800">
+        <div class="text-xs font-mono font-bold text-cyan-400 uppercase mb-1">Colônia de Enquadramento Direto</div>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Administração estatal direta nomeada pela metrópole, expulsão de lideranças tradicionais e imposição de leis e forças armadas metropolitanas. Exemplo: Argélia (França) e Índia pós-1858 (Reino Unido).
+        </p>
+      </div>
+      <div class="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800">
+        <div class="text-xs font-mono font-bold text-sky-400 uppercase mb-1">Protetorado</div>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Manutenção formal de dinastias ou elites nativas no poder local para conter revoltas populares, submetidas inteiramente ao controle externo militar e à política de comércio exterior da metrópole. Exemplo: Egito (Grã-Bretanha) e Tunísia (França).
+        </p>
+      </div>
+      <div class="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800">
+        <div class="text-xs font-mono font-bold text-indigo-400 uppercase mb-1">Áreas de Influência / Esferas</div>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          O país preserva formalmente a sua soberania política e governo autônomo, mas perde o controle sobre alfândegas, tarifas, concessões ferroviárias e portos através de Tratados Desiguais. Exemplo: China após as Guerras do Ópio.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEC.04 // MACETES, ARMADILHAS & RADAR DE GATILHOS -->
+  <section class="glass-card rounded-2xl p-6 md:p-8 border border-slate-800">
+    <div class="flex items-center gap-3 mb-6 pb-2 border-b border-slate-800/80">
+      <span class="px-2.5 py-1 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-mono text-xs font-bold tracking-widest">SEC.04 // MACETES & ARMADILHAS</span>
+      <h2 class="text-xl font-extrabold text-white tracking-tight flex items-center gap-2"><span>🎯</span> Mnemônicos & Radar de Gatilhos</h2>
+    </div>
+
+    <!-- 3 MNEMÔNICOS -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+      <div class="p-4 rounded-xl bg-slate-900/80 border border-cyan-500/30 glow-cyan">
+        <span class="text-[10px] font-mono text-cyan-400 font-bold uppercase tracking-wider block mb-1">Mnemônico 01</span>
+        <h3 class="text-sm font-black text-white mb-2">"C.A.P.E.L." // Partilha de Berlim</h3>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          <strong>C</strong>onferência de Berlim (1884-85)<br>
+          <strong>A</strong>rbitragem de Bismarck<br>
+          <strong>P</strong>artilha violenta da África<br>
+          <strong>E</strong>fetividade de Ocupação como nova regra<br>
+          <strong>L</strong>eopoldo II fatiando o Congo como propriedade privada
+        </p>
+      </div>
+
+      <div class="p-4 rounded-xl bg-slate-900/80 border border-sky-500/30">
+        <span class="text-[10px] font-mono text-sky-400 font-bold uppercase tracking-wider block mb-1">Mnemônico 02</span>
+        <h3 class="text-sm font-black text-white mb-2">"N.A.N.Q.U.I.M." // Submissão da China</h3>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          <strong>N</strong>enhum controle aduaneiro chinês<br>
+          <strong>A</strong>bertura forçada de 5 portos (Cantão, Xangai...)<br>
+          <strong>N</strong>arcotráfico legalizado de ópio<br>
+          <strong>Q</strong>uitação de indenização pesada a Londres<br>
+          <strong>U</strong>so de extraterritorialidade jurídica<br>
+          <strong>I</strong>lha de Hong Kong entregue aos ingleses<br>
+          <strong>M</strong>áxima humilhação nacional da dinastia Qing
+        </p>
+      </div>
+
+      <div class="p-4 rounded-xl bg-slate-900/80 border border-indigo-500/30">
+        <span class="text-[10px] font-mono text-indigo-400 font-bold uppercase tracking-wider block mb-1">Mnemônico 03</span>
+        <h3 class="text-sm font-black text-white mb-2">"M.E.I.J.I." // A Virada do Japão</h3>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          <strong>M</strong>utsuhito no trono imperial (1868)<br>
+          <strong>E</strong>xceção colonial na Ásia<br>
+          <strong>I</strong>ndustrialização acelerada pelo Estado<br>
+          <strong>J</strong>apão criando os oligopólios <em>Zaibatsus</em><br>
+          <strong>I</strong>mperialismo contra China e Rússia
+        </p>
+      </div>
+    </div>
+
+    <!-- 2 PONTOS CEGOS TRI -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div class="p-4 rounded-xl bg-red-950/30 border border-red-500/40">
+        <div class="flex items-center gap-2 text-red-400 font-bold text-xs font-mono uppercase mb-2">
+          <span>⚠️ Ponto Cego 01</span> O Mito da Passividade Africana e Asiática
+        </div>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          <strong>A pegadinha:</strong> Muitas questões do ENEM e vestibulares trazem afirmativas sugerindo que os povos colonizados aceitaram a dominação de forma submissa ou cooperativa. <strong class="text-red-400">FALSO!</strong> A dominação imperialista só se sustentou pela força desproporcional da metralhadora Maxim e dos canhões a vapor. Houve feroz resistência armada: a <em>Revolta dos Sipaios</em> na Índia (1857), a <em>Guerra dos Boxers</em> na China (1899), as guerras dos <em>Zulus</em> contra ingleses e bôeres, a resistência de <em>Samori Touré</em> na África Ocidental e a histórica <span class="text-emerald-300 font-bold">Batalha de Adwa (1896)</span>, onde a Etiópia aniquilou o exército italiano e preservou sua independência.
+        </p>
+      </div>
+
+      <div class="p-4 rounded-xl bg-amber-950/30 border border-amber-500/40">
+        <div class="flex items-center gap-2 text-amber-400 font-bold text-xs font-mono uppercase mb-2">
+          <span>⚠️ Ponto Cego 02</span> O Discurso da "Missão Civilizadora" como Realidade
+        </div>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          <strong>A pegadinha:</strong> Tomar os discursos da época (ferrovias construídas, erradicação de costumes tribais, hospitais) como evidência de modernização generosa trazida pelos europeus. <strong class="text-amber-400">ERRO GRAVE!</strong> Toda a infraestrutura construída no continente africano e asiático visava unicamente o escoamento predatório de minérios e monoculturas das jazidas agrícolas diretamente aos portos marítimos, sem qualquer intenção de integração dos mercados internos ou desenvolvimento social das populações nativas.
+        </p>
+      </div>
+    </div>
+
+    <!-- RADAR DE TRIGGER WORDS -->
+    <div class="p-4 rounded-xl bg-slate-950 border border-slate-800">
+      <div class="flex justify-between items-center mb-3">
+        <span class="text-xs font-mono font-bold text-cyan-400 uppercase tracking-wider">Radar de Palavras-Gatilho (Decodificação Ativa)</span>
+        <span class="text-[10px] text-slate-500 font-mono">Clique na linha para decodificar</span>
+      </div>
+      <div class="space-y-2">
+        <div onclick="revealTriggerRow(this)" class="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800/80 hover:border-cyan-500/40 cursor-pointer transition-all flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <span class="status-dot w-2 h-2 rounded-full bg-slate-600"></span>
+            <span class="font-mono text-xs font-bold text-white">"O Fardo do Homem Branco" (Kipling)</span>
+          </div>
+          <div class="blur-content blur-sm select-none text-xs text-cyan-300 font-mono transition-all">
+            $\Rightarrow$ Aparelho ideológico paternalista; naturalização racista da dominação colonial como sacrifício civilizador dos brancos.
+          </div>
+        </div>
+
+        <div onclick="revealTriggerRow(this)" class="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800/80 hover:border-cyan-500/40 cursor-pointer transition-all flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <span class="status-dot w-2 h-2 rounded-full bg-slate-600"></span>
+            <span class="font-mono text-xs font-bold text-white">"Princípio da Ocupação Efetiva"</span>
+          </div>
+          <div class="blur-content blur-sm select-none text-xs text-cyan-300 font-mono transition-all">
+            $\Rightarrow$ Regra de ouro da Conferência de Berlim (1884-85); a posse exige presença militar e administrativa no terreno, forçando invasões militares.
+          </div>
+        </div>
+
+        <div onclick="revealTriggerRow(this)" class="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800/80 hover:border-cyan-500/40 cursor-pointer transition-all flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <span class="status-dot w-2 h-2 rounded-full bg-slate-600"></span>
+            <span class="font-mono text-xs font-bold text-white">"Tratados Desiguais" / "Tratado de Nanquim"</span>
+          </div>
+          <div class="blur-content blur-sm select-none text-xs text-cyan-300 font-mono transition-all">
+            $\Rightarrow$ Fim da soberania econômica da China pós-Guerras do Ópio; abertura compulsória de portos e cessão de Hong Kong aos britânicos.
+          </div>
+        </div>
+
+        <div onclick="revealTriggerRow(this)" class="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800/80 hover:border-cyan-500/40 cursor-pointer transition-all flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <span class="status-dot w-2 h-2 rounded-full bg-slate-600"></span>
+            <span class="font-mono text-xs font-bold text-white">"Fronteiras Artificiais"</span>
+          </div>
+          <div class="blur-content blur-sm select-none text-xs text-cyan-300 font-mono transition-all">
+            $\Rightarrow$ Linhas geopolíticas traçadas sem critério étnico em gabinetes europeus; causa direta das guerras civis africanas no pós-descolonização.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEC.05 // LABORATÓRIO INTERATIVO & BOSS FIGHT -->
+  <section id="sec-lab" class="glass-card rounded-2xl p-6 md:p-8 border border-slate-800 scroll-mt-20">
+    <div class="flex items-center gap-3 mb-6 pb-2 border-b border-slate-800/80">
+      <span class="px-2.5 py-1 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-mono text-xs font-bold tracking-widest">SEC.05 // LABORATÓRIO TÁTICO</span>
+      <h2 class="text-xl font-extrabold text-white tracking-tight flex items-center gap-2"><span>🧪</span> Desafios de Aplicação & Boss Fight</h2>
+    </div>
+
+    <!-- QUESTÕES 1 A 4 -->
+    <div class="space-y-6 mb-8">
+      <!-- Q1 -->
+      <div class="p-5 rounded-xl bg-slate-900/80 border border-slate-800">
+        <div class="flex justify-between items-center mb-3">
+          <span class="px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/30 text-blue-400 font-mono text-xs font-bold">LAB 01 // PARTILHA DA ÁFRICA & BERLIM</span>
+          <span class="text-slate-400 text-xs font-mono">Nível: Médio</span>
+        </div>
+        <p class="text-sm text-slate-200 mb-4 leading-relaxed">
+          A Conferência de Berlim (1884-1885) inaugurou uma nova dinâmica diplomática e geopolítica entre as potências metropolitanas europeias. O objetivo central acordado para dirimir disputas territoriais sobre a bacia do rio Congo e o interior do continente africano baseou-se:
+        </p>
+        <div class="space-y-2 mb-3">
+          <button onclick="checkLabAnswer(this, false, 'lab-q1-res')" class="w-full text-left p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 text-slate-300 hover:bg-slate-800 transition-all text-xs font-medium">A) Na preservação integral das fronteiras traçadas pelas dinastias islâmicas e reinos pré-coloniais subsarianos.</button>
+          <button onclick="checkLabAnswer(this, true, 'lab-q1-res')" class="w-full text-left p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 text-slate-300 hover:bg-slate-800 transition-all text-xs font-medium">B) Na substituição da primazia do descobrimento histórico pelo princípio da ocupação territorial e administrativa efetiva.</button>
+          <button onclick="checkLabAnswer(this, false, 'lab-q1-res')" class="w-full text-left p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 text-slate-300 hover:bg-slate-800 transition-all text-xs font-medium">C) Na proibição total de companhias privadas mercantis explorarem recursos minerais e agrícolas no continente.</button>
+          <button onclick="checkLabAnswer(this, false, 'lab-q1-res')" class="w-full text-left p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 text-slate-300 hover:bg-slate-800 transition-all text-xs font-medium">D) Na criação de um protetorado tripartite administrado em conjunto por Alemanha, Império Otomano e Portugal.</button>
+        </div>
+        <details id="lab-q1-res" class="p-4 rounded-xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300">
+          <summary class="font-mono font-bold text-cyan-400">PARECER TÉCNICO & DISSECAÇÃO DE DISTRATORES</summary>
+          <div class="mt-3 space-y-2">
+            <p><strong>Gabarito B:</strong> A Conferência de Berlim rompeu com a tradição moderna de que o mero pioneirismo marítimo ou declaração cartográfica conferia soberania. O Artigo 35 da Ata Geral impôs o princípio da "ocupação efetiva": o país precisava estabelecer guarnições armadas, postos aduaneiros e infraestrutura de extração para ter o domínio reconhecido pelas demais potências.</p>
+            <p class="text-slate-400"><strong>Distrator A:</strong> As fronteiras étnicas ancestrais foram sumariamente ignoradas e rasgadas pelos mapas coloniais.<br><strong>Distrator C:</strong> Ao contrário, a conferência incentivou a atuação de companhias monopolistas privadas (ex: concessão da bacia do Congo a Leopoldo II).<br><strong>Distrator D:</strong> O Império Otomano encontrava-se em franca decadência e não teve protagonismo partilhador na conferência.</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- Q2 -->
+      <div class="p-5 rounded-xl bg-slate-900/80 border border-slate-800">
+        <div class="flex justify-between items-center mb-3">
+          <span class="px-2 py-0.5 rounded bg-sky-500/10 border border-sky-500/30 text-sky-400 font-mono text-xs font-bold">LAB 02 // GUERRAS DO ÓPIO & TRATADOS DESIGUAIS</span>
+          <span class="text-slate-400 text-xs font-mono">Nível: Médio-Difícil</span>
+        </div>
+        <p class="text-sm text-slate-200 mb-4 leading-relaxed">
+          O Tratado de Nanquim (1842), que encerrou a Primeira Guerra do Ópio entre o Império Britânico e a dinastia Qing, inaugurou na China o período conhecido pela historiografia nacionalista como "Século da Humilhação". A consequência estrutural mais marcante desse tratado para a economia chinesa foi:
+        </p>
+        <div class="space-y-2 mb-3">
+          <button onclick="checkLabAnswer(this, false, 'lab-q2-res')" class="w-full text-left p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 text-slate-300 hover:bg-slate-800 transition-all text-xs font-medium">A) A conversão imediata de todo o território chinês em colônia de povoamento gerida diretamente pelo Parlamento britânico.</button>
+          <button onclick="checkLabAnswer(this, true, 'lab-q2-res')" class="w-full text-left p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 text-slate-300 hover:bg-slate-800 transition-all text-xs font-medium">B) A perda da soberania aduaneira e territorial, com a abertura compulsória de portos e a concessão de Hong Kong à Grã-Bretanha.</button>
+          <button onclick="checkLabAnswer(this, false, 'lab-q2-res')" class="w-full text-left p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 text-slate-300 hover:bg-slate-800 transition-all text-xs font-medium">C) O fechamento total das rotas fluviais chinesas e a proibição do desembarque de produtos industriais ocidentais.</button>
+          <button onclick="checkLabAnswer(this, false, 'lab-q2-res')" class="w-full text-left p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 text-slate-300 hover:bg-slate-800 transition-all text-xs font-medium">D) A derrubada imediata da dinastia Qing e a instalação da República Socialista Chinesa liderada pelo campesinato.</button>
+        </div>
+        <details id="lab-q2-res" class="p-4 rounded-xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300">
+          <summary class="font-mono font-bold text-cyan-400">PARECER TÉCNICO & DISSECAÇÃO DE DISTRATORES</summary>
+          <div class="mt-3 space-y-2">
+            <p><strong>Gabarito B:</strong> O Tratado de Nanquim foi o primeiro dos chamados "Tratados Desiguais". Ele forçou a abertura de cinco portos ("portos de tratado", como Cantão e Xangai), aboliu as tarifas alfandegárias protecionistas que a China impunha, transferiu a ilha de Hong Kong para a soberania britânica por mais de 150 anos e impôs a extraterritorialidade judiciária aos cidadãos ocidentais.</p>
+            <p class="text-slate-400"><strong>Distrator A:</strong> A China nunca foi uma colônia formal britânica direta; foi retalhada em "Áreas de Influência" por várias potências.<br><strong>Distrator C:</strong> O tratado visava exatamente o oposto: abrir forçadamente as fronteiras comerciais chinesas.<br><strong>Distrator D:</strong> Anacronismo crasso: a República Chinesa só surgiu em 1912 e a República Popular comunista em 1949.</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- Q3 -->
+      <div class="p-5 rounded-xl bg-slate-900/80 border border-slate-800">
+        <div class="flex justify-between items-center mb-3">
+          <span class="px-2 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 font-mono text-xs font-bold">LAB 03 // DARWINISMO SOCIAL & RETÓRICA RACIAL</span>
+          <span class="text-slate-400 text-xs font-mono">Nível: Médio</span>
+        </div>
+        <p class="text-sm text-slate-200 mb-4 leading-relaxed">
+          "A natureza não distribuiu igualmente as aptidões entre as raças humanas. A raça branca tem o monopólio da energia construtiva e do intelecto abstrato..." (Arthur de Gobineau, Ensaio sobre a desigualdade das raças humanas).<br><br>
+          No contexto do Neocolonialismo, a circulação e a legitimação acadêmica de teorias como o Darwinismo Social expressavam:
+        </p>
+        <div class="space-y-2 mb-3">
+          <button onclick="checkLabAnswer(this, false, 'lab-q3-res')" class="w-full text-left p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 text-slate-300 hover:bg-slate-800 transition-all text-xs font-medium">A) Um esforço filantrópico baseado na tolerância religiosa com o propósito de miscigenar as culturas mundiais em igualdade.</button>
+          <button onclick="checkLabAnswer(this, false, 'lab-q3-res')" class="w-full text-left p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 text-slate-300 hover:bg-slate-800 transition-all text-xs font-medium">B) O abandono do método científico empírico em favor da dogmática bíblica medieval da predestinação calvinista.</button>
+          <button onclick="checkLabAnswer(this, true, 'lab-q3-res')" class="w-full text-left p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 text-slate-300 hover:bg-slate-800 transition-all text-xs font-medium">C) A construção de um arcabouço ideológico pseudocientífico que naturalizava a dominação política e a expropriação econômica colonial.</button>
+          <button onclick="checkLabAnswer(this, false, 'lab-q3-res')" class="w-full text-left p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 text-slate-300 hover:bg-slate-800 transition-all text-xs font-medium">D) A defesa irrestrita dos direitos fundamentais dos povos nativos perante os tribunais de arbitragem de Haia.</button>
+        </div>
+        <details id="lab-q3-res" class="p-4 rounded-xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300">
+          <summary class="font-mono font-bold text-cyan-400">PARECER TÉCNICO & DISSECAÇÃO DE DISTRATORES</summary>
+          <div class="mt-3 space-y-2">
+            <p><strong>Gabarito C:</strong> O Darwinismo Social (formulado por Spencer e cooptado pelas metrópoles) transferiu indevidamente conceitos da evolução biológica de Darwin para as sociedades humanas. Ao classificar a Europa branca como o pináculo da escala evolutiva e os povos africanos e asiáticos como "primitivos", a burguesia justificou eticamente massacres, pilhagens e dominações como um processo biológico natural e progressista ("missão civilizadora").</p>
+            <p class="text-slate-400"><strong>Distrator A:</strong> O discurso colonial era profundamente racista e condenava a miscigenação como degeneração biológica.<br><strong>Distrator B:</strong> O discurso não era medieval/religioso; utilizava o prestígio da ciência e do positivismo para legitimar o racismo.<br><strong>Distrator D:</strong> Os povos colonizados não tinham personalidade jurídica internacional nem direitos protegidos por Haia.</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- Q4 -->
+      <div class="p-5 rounded-xl bg-slate-900/80 border border-slate-800">
+        <div class="flex justify-between items-center mb-3">
+          <span class="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-xs font-bold">LAB 04 // RESISTÊNCIA ARMADA AFRICANA: A BATALHA DE ADWA</span>
+          <span class="text-slate-400 text-xs font-mono">Nível: Difícil</span>
+        </div>
+        <p class="text-sm text-slate-200 mb-4 leading-relaxed">
+          Em 1896, o exército colonial italiano, munido de canhões e armamento moderno, enfrentou as forças do imperador Menelik II na Batalha de Adwa. O desfecho dessa batalha e sua repercussão histórica demonstraram que:
+        </p>
+        <div class="space-y-2 mb-3">
+          <button onclick="checkLabAnswer(this, true, 'lab-q4-res')" class="w-full text-left p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 text-slate-300 hover:bg-slate-800 transition-all text-xs font-medium">A) A Etiópia derrotou militarmente a metrópole invasora, consolidando-se como o único Estado africano soberano a rechaçar a partilha europeia pela força das armas.</button>
+          <button onclick="checkLabAnswer(this, false, 'lab-q4-res')" class="w-full text-left p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 text-slate-300 hover:bg-slate-800 transition-all text-xs font-medium">B) As forças coloniais italianas massacraram integralmente a população local, anexando a Etiópia como província vaticana até o final da Segunda Guerra.</button>
+          <button onclick="checkLabAnswer(this, false, 'lab-q4-res')" class="w-full text-left p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 text-slate-300 hover:bg-slate-800 transition-all text-xs font-medium">C) Os etíopes entregaram seu território pacificamente em troca do controle acionário do Canal de Suez.</button>
+          <button onclick="checkLabAnswer(this, false, 'lab-q4-res')" class="w-full text-left p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 text-slate-300 hover:bg-slate-800 transition-all text-xs font-medium">D) O Reino Unido e a França uniram-se à Itália para bombardear Adwa e extinguir a dinastia salomônica etíope.</button>
+        </div>
+        <details id="lab-q4-res" class="p-4 rounded-xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300">
+          <summary class="font-mono font-bold text-cyan-400">PARECER TÉCNICO & DISSECAÇÃO DE DISTRATORES</summary>
+          <div class="mt-3 space-y-2">
+            <p><strong>Gabarito A:</strong> A Batalha de Adwa (1º de março de 1896) foi o maior revés militar sofrido por uma potência imperialista na África no século XIX. Menelik II modernizou seu exército com rifles comprados da Rússia e da França e organizou mais de 100 mil combatentes que aniquilaram as tropas italianas. O Tratado de Adis Abeba forçou a Itália a reconhecer a independência incondicional da Etiópia, desfazendo o mito da invencibilidade biológica/militar branca.</p>
+            <p class="text-slate-400"><strong>Distrator B:</strong> A Itália só conseguiria ocupar precariamente a Etiópia em 1936, no regime fascista de Mussolini.<br><strong>Distrator C:</strong> O Canal de Suez ficava no Egito e estava sob controle anglo-francês, sem ligação com Adwa.<br><strong>Distrator D:</strong> Ingleses e franceses não intervieram em favor da Itália, pois viam com bons olhos o freio às ambições de Roma no Chifre da África.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <!-- BOSS FIGHT DE ELITE -->
+    <div class="p-6 rounded-2xl bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-red-500/40 glow-amber">
+      <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-1 rounded bg-red-500/20 text-red-400 font-mono text-xs font-bold uppercase tracking-wider">Boss Fight // Medicina 2ª Fase</span>
+          <span class="text-amber-400 text-xs font-mono font-bold">O Horror do Congo & As Contradições do Capital Monopolista</span>
+        </div>
+        <span class="text-xs font-mono text-slate-400">Dificuldade: Máxima</span>
+      </div>
+
+      <p class="text-sm text-slate-200 mb-4 leading-relaxed">
+        "O monarca fundou a Associação Internacional Africana sob o estandarte do progresso científico e da erradicação do comércio escravo árabe. Entre 1885 e 1908, contudo, o território da bacia do Congo operou sob um regime corporativo privado que exigia cotas compulsórias de látex selvagem sob pena de amputação de membros e extermínio de aldeias inteiras." (Adam Hochschild, O Fantasma do Rei Leopoldo).<br><br>
+        A articulação entre a administração do Estado Livre do Congo por Leopoldo II e os mecanismos estruturais do Neocolonialismo revela que:
+      </p>
+
+      <div class="space-y-2 mb-4">
+        <button onclick="checkLabAnswer(this, false, 'boss-res')" class="w-full text-left p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 text-slate-300 hover:bg-slate-800 transition-all text-xs font-medium">A) A violência congolesa decorreu exclusivamente de desvios psicopáticos individuais do rei belga, não guardando nexo causal com as exigências da indústria automobilística e elétrica ocidentais.</button>
+        <button onclick="checkLabAnswer(this, true, 'boss-res')" class="w-full text-left p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 text-slate-300 hover:bg-slate-800 transition-all text-xs font-medium">B) A pilhagem combinou a retórica humanitária e científica da filantropia ocidental com a violência corporativa extrema para abastecer a demanda global de borracha da 2ª Revolução Industrial ao custo operacional mínimo.</button>
+        <button onclick="checkLabAnswer(this, false, 'boss-res')" class="w-full text-left p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 text-slate-300 hover:bg-slate-800 transition-all text-xs font-medium">C) As potências signatárias da Conferência de Berlim invadiram a Bélgica em 1890 e destituíram o monarca por crimes contra a humanidade.</button>
+        <button onclick="checkLabAnswer(this, false, 'boss-res')" class="w-full text-left p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 text-slate-300 hover:bg-slate-800 transition-all text-xs font-medium">D) O Congo constituía uma república democrática cooperativa em que os lucros da borracha eram rateados paritariamente entre os chefes tribais e o parlamento de Bruxelas.</button>
+      </div>
+
+      <details id="boss-res" class="p-4 rounded-xl bg-slate-950 border border-red-500/30 text-xs text-slate-300">
+        <summary class="font-mono font-bold text-red-400">DISSECAÇÃO CIRÚRGICA DO BOSS FIGHT</summary>
+        <div class="mt-3 space-y-2">
+          <p><strong>1. A Farsa Filantrópica:</strong> Leopoldo II financiou expedições como as de Henry Morton Stanley alegando fins puramente humanitários, científicos e antiescravistas, conseguindo que a Conferência de Berlim outorgasse o Congo não à Bélgica como nação, mas a si próprio como proprietário privado absoluto.</p>
+          <p><strong>2. A Relação Econômica com a 2ª Revolução Industrial:</strong> Com a invenção do pneumático de borracha inflável por John Boyd Dunlop (1888) e o avanço das indústrias automotiva, elétrica e de calçados, o preço da borracha disparou nos mercados internacionais. Sem seringais plantados, a extração do látex silvestre no coração da floresta equatorial exigia milhões de horas de trabalho braçal esgotante.</p>
+          <p><strong>3. O Terror Corporativo da Force Publique:</strong> Para garantir rentabilidade astronômica às companhias concessionárias, o Estado leopoldino instituiu a <em>Force Publique</em> (exército colonial mercenário). Aldeias que não cumpriam as cotas diárias tinham mulheres sequestradas, homens fuzilados e mãos cortadas como prestação de contas dos cartuchos de munição utilizados. Estima-se a morte de 8 a 10 milhões de congoleses no período.</p>
+          <p><strong>4. A Repercussão:</strong> O escândalo internacional denunciado pelo jornalista E. D. Morel e pelo diplomata Roger Casement obrigou o parlamento belga a retirar o território das mãos do rei em 1908, transformando-o no "Congo Belga" formal, sem jamais restituir a riqueza espoliada.</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- SEC.06 // MATRIZ DE RECALL (FLASHCARDS DE ALTA RETENÇÃO) -->
+  <section id="sec-recall" class="glass-card rounded-2xl p-6 md:p-8 border border-slate-800 scroll-mt-20">
+    <div class="flex items-center gap-3 mb-6 pb-2 border-b border-slate-800/80">
+      <span class="px-2.5 py-1 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-mono text-xs font-bold tracking-widest">SEC.06 // MATRIZ DE RECALL</span>
+      <h2 class="text-xl font-extrabold text-white tracking-tight flex items-center gap-2"><span>🧠</span> Flashcards de Fixação & Pontos Cegos</h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <details class="glass-card p-4 rounded-xl border border-slate-800">
+        <summary class="text-xs font-bold text-slate-200">O que foi o princípio da "Ocupação Efetiva" na Conferência de Berlim?</summary>
+        <p class="text-xs text-slate-400 mt-2">Critério pelo qual uma nação só podia reivindicar soberania sobre um território africano se demonstrasse administração burocrática real, forças militares instaladas e infraestrutura econômica em funcionamento no local, substituindo o direito de simples descoberta marítima.</p>
+      </details>
+
+      <details class="glass-card p-4 rounded-xl border border-slate-800">
+        <summary class="text-xs font-bold text-slate-200">O que determinou o Tratado de Nanquim (1842) na China?</summary>
+        <p class="text-xs text-slate-400 mt-2">Tratado desigual que pôs fim à 1ª Guerra do Ópio: impôs a abertura de cinco portos ao comércio britânico, cedeu Hong Kong à Grã-Bretanha, estipulou pesadas indenizações e concedeu extraterritorialidade judiciária aos súditos ocidentais.</p>
+      </details>
+
+      <details class="glass-card p-4 rounded-xl border border-slate-800">
+        <summary class="text-xs font-bold text-slate-200">O que motivou a Revolta dos Sipaios na Índia em 1857?</summary>
+        <p class="text-xs text-slate-400 mt-2">Rebelião armada de soldados indianos (sipaios) da Companhia das Índias Orientais contra a espoliação britânica, estopada pelo uso de cartuchos untados com gordura de boi (sagrado aos hindus) e porco (impuro aos muçulmanos). O massacre resultou na Coroa assumir a colônia diretamente em 1858.</p>
+      </details>
+
+      <details class="glass-card p-4 rounded-xl border border-slate-800">
+        <summary class="text-xs font-bold text-slate-200">Como o Japão conseguiu escapar da colonização ocidental no século XIX?</summary>
+        <p class="text-xs text-slate-400 mt-2">Através da Restauração Meiji (1868): o poder foi centralizado no imperador Mutsuhito, liquidou-se o feudalismo dos samurais e o Estado promoveu uma industrialização tecnológica maciça e militarizada com o apoio dos conglomerados familiares (zaibatsus).</p>
+      </details>
+
+      <details class="glass-card p-4 rounded-xl border border-slate-800">
+        <summary class="text-xs font-bold text-slate-200">Por que a Etiópia e a Libéria permaneceram independentes na partilha africana?</summary>
+        <p class="text-xs text-slate-400 mt-2">A Etiópia derrotou o exército colonial italiano na Batalha de Adwa (1896) sob liderança de Menelik II; a Libéria era uma república fundada por ex-escravizados norte-americanos libertos sob proteção diplomática explícita dos Estados Unidos.</p>
+      </details>
+
+      <details class="glass-card p-4 rounded-xl border border-slate-800">
+        <summary class="text-xs font-bold text-slate-200">O que foi o Incidente de Fachoda (1898)?</summary>
+        <p class="text-xs text-slate-400 mt-2">Tensão extrema no Sudão entre França e Grã-Bretanha pelo controle da África: os franceses pretendiam um eixo Leste-Oeste (Dakar a Djibuti) e os britânicos o eixo Norte-Sul (Cairo ao Cabo). A França recuou, selando a reaproximação diplomática (Entente Cordiale em 1904).</p>
+      </details>
+
+      <details class="glass-card p-4 rounded-xl border border-slate-800">
+        <summary class="text-xs font-bold text-slate-200">O que caracterizou a Guerra dos Boxers (1899-1901) na China?</summary>
+        <p class="text-xs text-slate-400 mt-2">Levante popular nacionalista e xenófobo liderado pela sociedade secreta dos "Punhos Harmoniosos e Justos", visando expulsar missionários, diplomatas e comerciantes estrangeiros da China, esmagado pela aliança militar de oito potências imperialistas.</p>
+      </details>
+
+      <details class="glass-card p-4 rounded-xl border border-slate-800">
+        <summary class="text-xs font-bold text-slate-200">Qual foi o papel do Darwinismo Social na legitimação neocolonial?</summary>
+        <p class="text-xs text-slate-400 mt-2">Criou uma falsa justificativa biológica (Spencer) aplicando a sobrevivência do mais apto à sociologia: dizia que a raça branca atingira o cume civilizatório e tinha a obrigação moral e biológica de dominar e tutelar as raças tidas como "atrasadas".</p>
+      </details>
+
+      <details class="glass-card p-4 rounded-xl border border-slate-800">
+        <summary class="text-xs font-bold text-slate-200">O que foram as Guerras dos Bôeres (1899-1902) na África do Sul?</summary>
+        <p class="text-xs text-slate-400 mt-2">Conflito violento entre o Império Britânico e os colonos holandeses calvinistas (bôeres/africânderes) pelo controle das maiores minas de ouro e diamantes do mundo em Transvaal e Orange, terminando com a vitória inglesa e a criação da União Sul-Africana.</p>
+      </details>
+
+      <details class="glass-card p-4 rounded-xl border border-slate-800">
+        <summary class="text-xs font-bold text-slate-200">Por que o Imperialismo é considerado a causa motriz da Primeira Guerra?</summary>
+        <p class="text-xs text-slate-400 mt-2">A unificação tardia da Alemanha (1871) deixou-a com colônias residuais e deficitárias frente ao gigantesco império britânico e francês. A disputa por mercados, a ferrovia Berlim-Bagdá e a corrida armamentista da Paz Armada explodiram em 1914.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- SEÇÃO 7: ARCADE REVISIONAL PENTÁGONO -->
+  <section id="sec-arcade" class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 glow scroll-mt-20">
+    <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+      <h2 class="text-2xl font-black text-white">🕹️ Pentágono Revisional (Arcade)</h2>
+      <div class="flex gap-2">
+        <span class="hidden sm:inline-block text-xs font-mono text-gray-500 self-center">Teclas: [,] e [.] abas, [1-5] opções, [V/F], [Espaço] Avançar</span>
+        <button id="sound-toggle-btn" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg font-bold text-xs">🔊 Som Ativado</button>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap gap-2 mb-6 border-b border-slate-800 pb-4">
+      <button onclick="switchGame('game-timeline', this)" class="tab-btn active bg-blue-600 text-white border border-blue-500 px-3 py-1.5 rounded-lg font-bold text-xs transition-colors">1. Morte Súbita</button>
+      <button onclick="switchGame('game-match', this)" class="tab-btn bg-slate-800 text-gray-300 border border-slate-700 px-3 py-1.5 rounded-lg font-bold text-xs transition-colors">2. Conexão Neural</button>
+      <button onclick="switchGame('game-tf', this)" class="tab-btn bg-slate-800 text-gray-300 border border-slate-700 px-3 py-1.5 rounded-lg font-bold text-xs transition-colors">3. Pressão TRI</button>
+      <button onclick="switchGame('game-order', this)" class="tab-btn bg-slate-800 text-gray-300 border border-slate-700 px-3 py-1.5 rounded-lg font-bold text-xs transition-colors">4. Ordenação Tática</button>
+      <button onclick="switchGame('game-odd', this)" class="tab-btn bg-slate-800 text-gray-300 border border-slate-700 px-3 py-1.5 rounded-lg font-bold text-xs transition-colors">5. O Infiltrado</button>
+    </div>
+
+    <div id="game-timeline" class="game-view block bg-slate-950 p-5 rounded-xl border border-blue-500/30 min-h-[300px]">
+      <div class="flex justify-between items-center mb-4"><span id="streak-counter" class="text-xs font-bold text-amber-400 bg-amber-400/10 px-3 py-1 rounded-md border border-amber-500/20">🔥 Combo: 0</span></div>
+      <div class="w-full bg-slate-800 rounded-full h-2 mb-6"><div id="progress-bar" class="bg-blue-600 h-2 rounded-full transition-all" style="width:0%"></div></div>
+      <div id="timeline-container"></div>
+    </div>
+
+    <div id="game-match" class="game-view hidden bg-slate-950 p-5 rounded-xl border border-emerald-500/30 min-h-[300px]">
+      <p class="text-xs text-gray-400 mb-4 uppercase font-bold text-center">Associe as colunas. Clique no termo e depois na definição.</p>
+      <div id="match-container" class="grid grid-cols-2 gap-4"></div>
+      <div id="match-victory" class="hidden text-emerald-400 font-black text-2xl text-center mt-6 p-4">🧠 CONEXÃO ESTABELECIDA!</div>
+    </div>
+
+    <div id="game-tf" class="game-view hidden bg-slate-950 p-5 rounded-xl border border-red-500/30 min-h-[300px]">
+      <div class="flex justify-between items-center mb-2">
+        <span class="text-xs font-bold text-red-400 uppercase tracking-wider">Contra o Relógio</span>
+        <span id="timer-text" class="text-xl font-mono font-black text-white">15s</span>
+      </div>
+      <div class="w-full bg-slate-800 rounded-full h-3 mb-6"><div id="timer-bar" class="bg-red-600 h-3 rounded-full transition-all duration-1000" style="width:100%"></div></div>
+      <div id="tf-container"></div>
+    </div>
+
+    <div id="game-order" class="game-view hidden bg-slate-950 p-5 rounded-xl border border-amber-500/30 min-h-[300px]">
+      <h3 class="text-lg text-white font-bold mb-2">Ordenação Tática</h3>
+      <div id="g4-container"></div>
+    </div>
+
+    <div id="game-odd" class="game-view hidden bg-slate-950 p-5 rounded-xl border border-purple-500/30 min-h-[300px]">
+      <h3 class="text-lg text-white font-bold mb-2">O Infiltrado</h3>
+      <div id="g5-container"></div>
+    </div>
+
+    <!-- MODAL SCORE TRI -->
+    <div id="final-score-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+      <div class="bg-slate-900 border-2 border-blue-500 p-8 rounded-2xl text-center max-w-md w-full">
+        <h2 class="text-3xl font-black text-white mb-2">SCORE TRI FINAL</h2>
+        <div id="score-number" class="text-6xl font-black text-blue-400 mb-4">000</div>
+        <div id="score-verdict" class="text-xl font-bold text-gray-300 mb-6">Calculando...</div>
+        <canvas id="radar-chart" width="300" height="300" class="mx-auto mb-6 bg-slate-900/50 rounded-full hidden"></canvas>
+        <button onclick="document.getElementById('final-score-modal').classList.add('hidden')" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold w-full transition-colors">FECHAR</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- MOTOR OPERACIONAL V16 COMPLETO -->
+  <script>
+    const CARD_KEY = 'mestre_v16_' + (document.title || 'default').replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+
+    function saveCardProgress(extraScore = null) {
+      try {
+        const payload = {
+          gamesStatus: gamesStatus,
+          scoreG1Results: scoreG1Results,
+          scoreG3TimeSaved: scoreG3TimeSaved,
+          totalAttemptsG4: totalAttemptsG4,
+          hitsG5: hitsG5,
+          isHardcore: isHardcore,
+          userHP: userHP,
+          lastScore: extraScore !== null ? extraScore : (localStorage.getItem(CARD_KEY) ? JSON.parse(localStorage.getItem(CARD_KEY)).lastScore : null),
+          lastDate: new Date().toLocaleDateString('pt-BR')
+        };
+        localStorage.setItem(CARD_KEY, JSON.stringify(payload));
+        updateHistoryHUD();
+      } catch (e) { console.warn(e); }
+    }
+
+    function loadCardProgress() {
+      try {
+        const raw = localStorage.getItem(CARD_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        if (data.gamesStatus) gamesStatus = data.gamesStatus;
+        if (data.scoreG1Results) scoreG1Results = data.scoreG1Results;
+        if (data.scoreG3TimeSaved) scoreG3TimeSaved = data.scoreG3TimeSaved;
+        if (data.totalAttemptsG4) totalAttemptsG4 = data.totalAttemptsG4;
+        if (data.hitsG5) hitsG5 = data.hitsG5;
+        if (data.isHardcore) {
+          isHardcore = true;
+          userHP = data.userHP ?? 100;
+          const btn = document.getElementById('btn-hardcore');
+          const label = document.getElementById('hardcore-label');
+          const icon = document.getElementById('hardcore-icon');
+          const hpBox = document.getElementById('hud-hp-box');
+          if (btn) btn.className = "px-3 py-1 rounded-full bg-red-950/80 border border-red-500 text-xs font-mono text-red-300 transition-all flex items-center gap-1.5 glow-amber";
+          if (label) label.innerText = "Modo Sobrevivência";
+          if (icon) icon.innerText = "🔥";
+          if (hpBox) { hpBox.classList.remove('hidden'); hpBox.classList.add('flex'); }
+          updateHPBar();
+        }
+        updateHUD();
+        updateHistoryHUD();
+      } catch (e) { console.warn(e); }
+    }
+
+    function updateHistoryHUD() {
+      const raw = localStorage.getItem(CARD_KEY);
+      const scoreEl = document.getElementById('hud-last-score');
+      if (!scoreEl || !raw) return;
+      const data = JSON.parse(raw);
+      if (data.lastScore) {
+        scoreEl.innerHTML = `Recorde: <b class="text-cyan-400">${data.lastScore} pts</b> (${data.lastDate})`;
+      }
+    }
+
+    function clearCardStorage() {
+      if (confirm("Deseja resetar o histórico e o progresso deste card?")) {
+        localStorage.removeItem(CARD_KEY);
+        location.reload();
+      }
+    }
+
+    function checkLabAnswer(btn, isCorrect, resDetailsId) {
+      const parent = btn.parentElement;
+      parent.querySelectorAll('button').forEach(b => {
+        b.disabled = true;
+        b.classList.remove('hover:bg-slate-900');
+      });
+      playSound(isCorrect);
+      if (isCorrect) {
+        btn.className = "w-full text-left p-3 rounded-xl bg-emerald-950/40 border-2 border-emerald-500 text-emerald-300 transition-all flex items-start gap-3 glow-emerald";
+      } else {
+        btn.className = "w-full text-left p-3 rounded-xl bg-red-950/40 border-2 border-red-500 text-red-300 transition-all flex items-start gap-3";
+        applyDamage(20);
+      }
+      const res = document.getElementById(resDetailsId);
+      if (res) res.open = true;
+    }
+
+    window.addEventListener('scroll', () => {
+      const winScroll = document.documentElement.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      const pBar = document.getElementById('scroll-progress');
+      if (pBar) pBar.style.width = scrolled + '%';
+
+      const sections = ['sec-teoria', 'sec-estrutura', 'sec-lab', 'sec-recall', 'sec-arcade'];
+      sections.forEach(secId => {
+        const el = document.getElementById(secId);
+        const navLink = document.querySelector(`header nav a[href="#${secId}"]`);
+        if (el && navLink) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= 120 && rect.bottom >= 120) {
+            navLink.className = "px-2.5 py-1 rounded text-cyan-400 bg-slate-900 border border-cyan-500/30 transition-colors font-bold";
+          } else {
+            navLink.className = "px-2.5 py-1 rounded hover:text-cyan-400 hover:bg-slate-900 transition-colors";
+          }
+        }
+      });
+    });
+
+    function revealTriggerRow(row) {
+      row.querySelectorAll('.blur-content').forEach(el => el.classList.remove('blur-sm', 'select-none'));
+      const dot = row.querySelector('.status-dot');
+      if (dot) dot.className = "status-dot w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
+      playSound(true);
+    }
+
+    function switchBranch(btn, showId, hideId) {
+      const parent = btn.parentElement;
+      parent.querySelectorAll('button').forEach(b => b.className = "px-2 py-0.5 rounded bg-slate-900 text-slate-400 text-[10px]");
+      btn.className = "px-2 py-0.5 rounded bg-cyan-600 text-white font-bold text-[10px]";
+      document.getElementById(showId).classList.remove('hidden');
+      document.getElementById(hideId).classList.add('hidden');
+      playSound(true);
+    }
+
+    let isHardcore = false;
+    let userHP = 100;
+
+    function toggleHardcoreMode() {
+      isHardcore = !isHardcore;
+      userHP = 100;
+      const btn = document.getElementById('btn-hardcore');
+      const label = document.getElementById('hardcore-label');
+      const icon = document.getElementById('hardcore-icon');
+      const hpBox = document.getElementById('hud-hp-box');
+      if (isHardcore) {
+        btn.className = "px-3 py-1 rounded-full bg-red-950/80 border border-red-500 text-xs font-mono text-red-300 transition-all flex items-center gap-1.5 glow-amber";
+        label.innerText = "Modo Sobrevivência";
+        icon.innerText = "🔥";
+        hpBox.classList.remove('hidden');
+        hpBox.classList.add('flex');
+        updateHPBar();
+      } else {
+        btn.className = "px-3 py-1 rounded-full bg-slate-900/90 border border-slate-700 text-xs font-mono text-slate-400 hover:border-red-500/50 hover:text-red-300 transition-all flex items-center gap-1.5";
+        label.innerText = "Modo Normal";
+        icon.innerText = "🛡️";
+        hpBox.classList.add('hidden');
+        hpBox.classList.remove('flex');
+      }
+    }
+
+    function applyDamage(amount = 20) {
+      if (!isHardcore) return;
+      userHP = Math.max(0, userHP - amount);
+      updateHPBar();
+      if (userHP <= 0) {
+        setTimeout(() => {
+          alert("⚠️ COLAPSO DO SISTEMA! Seu HP zerou no Modo Sobrevivência. Recalibre a teoria e tente novamente.");
+          userHP = 100;
+          updateHPBar();
+        }, 300);
+      }
+    }
+
+    function updateHPBar() {
+      const fill = document.getElementById('hp-bar-fill');
+      const txt = document.getElementById('hp-val');
+      if (fill) fill.style.width = userHP + '%';
+      if (txt) txt.innerText = userHP;
+    }
+
+    let blockTimer = null;
+    let gamesStatus = { g1:false, g2:false, g3:false, g4:false, g5:false };
+    let scoreG1Attempts = 0, scoreG3TimeSaved = 0;
+    let scoreG1Results = [];
+    let totalAttemptsG4 = 0;
+    let hitsG5 = 0;
+
+    // --- MATRIZES DE DADOS ARCADE V16 - IMPERIALISMO NO SÉCULO XIX ---
+    const questionsData = [
+      {
+        question: "A Conferência de Berlim (1884-1885) instituiu uma nova regra jurídica para a legitimação internacional de colônias na África conhecida como:",
+        difficulty: "Fácil",
+        options: [
+          { text: "Princípio do descobrimento histórico por cartas de navegação", isCorrect: false, feedback: "Esse princípio vigorou no mercantilismo do século XVI e foi revogado em Berlim." },
+          { text: "Princípio da ocupação territorial e administrativa efetiva", isCorrect: true, feedback: "Correto! Ocupar o território com forças militares e burocracia passou a ser a exigência legal." },
+          { text: "Doutrina do protetorado religioso compartilhado", isCorrect: false, feedback: "A partilha era de natureza geopolítica e capitalista, não confessional." },
+          { text: "Princípio do livre plebiscito das populações nativas", isCorrect: false, feedback: "Os povos africanos não tinham direito de voz ou voto perante as potências coloniais." }
+        ]
+      },
+      {
+        question: "O Tratado de Nanquim (1842), assinado ao término da Primeira Guerra do Ópio entre Grã-Bretanha e China, estabeleceu:",
+        difficulty: "Média",
+        options: [
+          { text: "A devolução de Cantão à soberania da dinastia Ming", isCorrect: false, feedback: "A dinastia reinante era a Qing e Cantão foi um dos portos abertos forçadamente." },
+          { text: "A cessão territorial de Hong Kong e a abertura de portos ao livre-comércio britânico", isCorrect: true, feedback: "Exato! Hong Kong virou colônia inglesa e cinco portos foram forçados a abrir sem tarifas protetoras." },
+          { text: "A proibição sumária da entrada de mercadores europeus em todo o território chinês", isCorrect: false, feedback: "O objetivo britânico com a guerra foi precisamente o oposto: romper o isolamento chinês." },
+          { text: "A conversão obrigatória da corte imperial chinesa ao protestantismo anglicano", isCorrect: false, feedback: "Não houve cláusula de conversão forçada da família imperial." }
+        ]
+      },
+      {
+        question: "A Batalha de Adwa (1896) possui singular relevância nos estudos sobre o imperialismo africano porque:",
+        difficulty: "Média",
+        options: [
+          { text: "Marcou a vitória militar definitiva da Etiópia contra a invasão colonial italiana", isCorrect: true, feedback: "Gabarito! Menelik II derrotou as forças italianas, mantendo a Etiópia como Estado soberano." },
+          { text: "Resultou na entrega do Canal de Suez para os administradores belgas", isCorrect: false, feedback: "O Canal de Suez localiza-se no Egito e era administrado por ingleses e franceses." },
+          { text: "Selou a aliança militar entre o povo Zulu e os soldados da Rainha Vitória", isCorrect: false, feedback: "Os Zulus foram ferozes inimigos do Império Britânico na África do Sul." },
+          { text: "Instituiu a primeira república parlamentar socialista da África Oriental", isCorrect: false, feedback: "A Etiópia era um império tradicional e monárquico." }
+        ]
+      },
+      {
+        question: "A teoria do Darwinismo Social formulada por pensadores como Herbert Spencer no século XIX foi utilizada para:",
+        difficulty: "Fácil",
+        options: [
+          { text: "Comprovar a igualdade cognitiva e moral de todas as etnias do planeta", isCorrect: false, feedback: "O Darwinismo Social afirmava exatamente o oposto, postulando a desigualdade racial biológica." },
+          { text: "Justificar pseudocientificamente a dominação e opressão colonial dos povos europeus sobre os demais", isCorrect: true, feedback: "Perfeito! A tese da sobrevivência do mais apto serviu de cortina para a pilhagem capitalista." },
+          { text: "Apoiar a descolonização imediata e a autodeterminação dos povos asiáticos", isCorrect: false, feedback: "A teoria serviu para aprofundar e naturalizar o colonialismo, não para combatê-lo." },
+          { text: "Restaurar os dogmas religiosos do criacionismo bíblico nas universidades", isCorrect: false, feedback: "O darwinismo social baseava-se em distorções do positivismo e da biologia empírica." }
+        ]
+      },
+      {
+        question: "Diferente da maioria das nações asiáticas que foram colonizadas, o Japão respondeu à pressão ocidental do século XIX através:",
+        difficulty: "Média",
+        options: [
+          { text: "Da Restauração Meiji, centralizando o poder no imperador e modernizando a economia e o exército", isCorrect: true, feedback: "Correto! O Japão se industrializou via Estado e tornou-se uma potência imperialista regional." },
+          { text: "Do isolamento absoluto e fechamento total de suas fronteiras navais até o século XXI", isCorrect: false, feedback: "O isolamento feudal (sakoku) terminou exatamente com a chegada dos navios americanos em 1853." },
+          { text: "Da rendição incondicional ao Império Russo, tornando-se província czarista", isCorrect: false, feedback: "O Japão derrotou a Rússia na Guerra Russo-Japonesa de 1904-1905." },
+          { text: "Da abolição de todas as indústrias para preservar as tradições dos samurais feudais", isCorrect: false, feedback: "A classe dos samurais foi extinta e o país investiu maciçamente na indústria pesada." }
+        ]
+      },
+      {
+        question: "O domínio pessoal de Leopoldo II da Bélgica sobre o Estado Livre do Congo (1885-1908) caracterizou-se economicamente por:",
+        difficulty: "Difícil",
+        options: [
+          { text: "Um sistema cooperativo de salários elevados para os extratores de borracha", isCorrect: false, feedback: "O regime não pagava salários; baseava-se em terror, trabalho forçado e sequestro de famílias." },
+          { text: "Um violento regime corporativo de trabalho compulsório com mutilações e assassinatos na extração de látex", isCorrect: true, feedback: "Gabarito! Milhões de congoleses foram massacrados pela Force Publique para abastecer o mercado de borracha." },
+          { text: "A exportação maciça de trigo e café sob supervisão da Liga das Nações", isCorrect: false, feedback: "A Liga das Nações ainda não existia e a principal matéria-prima era a borracha silvestre e marfim." },
+          { text: "A construção de ferrovias que distribuíam riqueza equitativa por todo o interior africano", isCorrect: false, feedback: "As ferrovias ligavam as zonas de extração aos portos apenas para pilhagem metropolitana." }
+        ]
+      }
+    ];
+
+    const matchData = [
+      { left: "Conferência de Berlim", right: "Consagrou o princípio da ocupação efetiva para a partilha da África" },
+      { left: "Tratado de Nanquim", right: "Imposição de portos abertos e cessão de Hong Kong após a Guerra do Ópio" },
+      { left: "Revolta dos Sipaios", right: "Insurreição de soldados indianos que levou a Índia ao controle direto da Coroa" },
+      { left: "Fardo do Homem Branco", right: "Poema de Kipling que travestia a espoliação colonial em missão filantrópica" },
+      { left: "Restauração Meiji", right: "Modernização acelerada que transformou o Japão em potência imperialista" },
+      { left: "Batalha de Adwa", right: "Vitória militar da Etiópia que aniquilou a tentativa colonialista italiana" },
+      { left: "Incidente de Fachoda", right: "Crise geopolítica no Sudão entre os eixos de expansão da França e Inglaterra" }
+    ];
+
+    const tfData = [
+      {
+        statement: "O Imperialismo do século XIX foi motivado unicamente por ideais religiosos de catequese, sem vínculo com as demandas materiais da 2ª Revolução Industrial.",
+        isTrue: false,
+        feedback: "FALSO! A mola propulsora central foi a busca por matérias-primas industriais (petróleo, borracha, minérios), mercados cativos e escoamento de capitais excedentes."
+      },
+      {
+        statement: "A partilha da África desrespeitou as fronteiras culturais pré-existentes, agrupando povos historicamente rivais sob o mesmo domínio administrativo colonial.",
+        isTrue: true,
+        feedback: "VERDADEIRO! Linhas retas artificiais desenhadas em Berlim semearam conflitos étnicos profundos após a descolonização."
+      },
+      {
+        statement: "As Guerras do Ópio foram desencadeadas porque o governo imperial chinês pretendia invadir e anexar as ilhas britânicas.",
+        isTrue: false,
+        feedback: "FALSO! As guerras ocorreram porque a Grã-Bretanha reagiu com canhoneiras à destruição de estoques ilegais de ópio apreendidos pelas autoridades chinesas em Cantão."
+      },
+      {
+        statement: "A ferrovia Berlim-Bagdá gerou atritos geopolíticos graves entre a Alemanha e o Império Britânico por ameaçar as rotas inglesas para a Índia.",
+        isTrue: true,
+        feedback: "VERDADEIRO! A ferrovia alemã ameaçava os interesses britânicos no Golfo Pérsico e no subcontinente indiano, acelerando a corrida armamentista."
+      },
+      {
+        statement: "Todos os países do continente africano foram formalmente colonizados pelas metrópoles europeias até o início do século XX.",
+        isTrue: false,
+        feedback: "FALSO! A Etiópia (que derrotou a Itália em Adwa) e a Libéria (sob protetorado diplomático dos EUA) mantiveram sua soberania independente."
+      },
+      {
+        statement: "O Darwinismo Social apropriou-se indevidamente de teorias biológicas para justificar uma suposta hierarquia de superioridade racial humana.",
+        isTrue: true,
+        feedback: "VERDADEIRO! A doutrina de Spencer manipulou os conceitos de Darwin para naturalizar a dominação violenta dos povos colonizados."
+      },
+      {
+        statement: "O Estado Livre do Congo era uma colônia de povoamento democrática governada pelo parlamento constitucional belga desde 1885.",
+        isTrue: false,
+        feedback: "FALSO! O Congo era uma possessão privada e pessoal do rei Leopoldo II, marcada por exploração sangrenta, até ser transferido para a Bélgica em 1908."
+      }
+    ];
+
+    const orderData = [
+      {
+        title: "Dedução do Processo de Dominação e Abertura da China no Século XIX",
+        steps: [
+          "Déficit na balança comercial britânica devido à alta compra de chá, seda e porcelana chineses",
+          "Introdução ilegal maciça de ópio indiano na China pela Companhia das Índias para inverter a balança",
+          "Apreensão e incineração de toneladas de ópio britânico pelas autoridades imperiais em Cantão",
+          "Reação bélica naval britânica com canhoneiras a vapor deflagrando a 1ª Guerra do Ópio",
+          "Assinatura do humilhante Tratado de Nanquim com abertura de portos e perda de Hong Kong",
+          "Retalhamento formal do território chinês em áreas de influência pelas potências ocidentais"
+        ]
+      },
+      {
+        title: "Cronologia da Partilha da África e Crises Interimperialistas",
+        steps: [
+          "Expansão das indústrias pesadas na Europa gerando saturação de mercados e capitais",
+          "Expedições e reivindicações de Leopoldo II da Bélgica sobre a bacia do rio Congo",
+          "Convocação da Conferência de Berlim por Bismarck e estipulação da ocupação efetiva",
+          "Demarcação das fronteiras artificiais cortando reinos e etnias no interior africano",
+          "Choque territorial entre França e Inglaterra no Sudão com o Incidente de Fachoda",
+          "Eclosão das Crises Marroquinas polarizando a Tríplice Entente contra o Império Alemão"
+        ]
+      },
+      {
+        title: "Evolução do Domínio Britânico no Subcontinente Indiano",
+        steps: [
+          "Atuação mercantil inicial e concessões da Companhia Britânica das Índias Orientais",
+          "Desestruturação da manufatura têxtil artesanal indiana em favor dos tecidos de Manchester",
+          "Eclosão da Revolta dos Sipaios contra o desrespeito a preceitos religiosos hindus e muçulmanos",
+          "Repressão militar sanguinária comandada pelas tropas metropolitanas britânicas",
+          "Dissolvimento da Companhia e assunção do controle direto da colônia pela Coroa inglesa",
+          "Coroação da Rainha Vitória como Imperatriz da Índia transformando o país na joia do império"
+        ]
+      },
+      {
+        title: "A Trajetória Singular do Japão da Abertura ao Imperialismo",
+        steps: [
+          "Abertura forçada dos portos japoneses pelos navios de guerra americanos do Comodoro Perry",
+          "Reação nacionalista contra os tratados desiguais provocando o colapso do xogunato Tokugawa",
+          "Eclosão da Restauração Meiji com centralização de poder político na figura do imperador",
+          "Adoção de reformas industriais, envio de estudantes ao Ocidente e criação dos Zaibatsus",
+          "Modernização das Forças Armadas e início da expansão territorial em busca de minérios",
+          "Vitórias na Guerra Sino-Japonesa e Guerra Russo-Japonesa anexando territórios na Ásia"
+        ]
+      },
+      {
+        title: "Encadeamento Ideológico do Darwinismo Social e Ações no Congo",
+        steps: [
+          "Publicação de A Origem das Espécies de Darwin sobre seleção natural nas ciências biológicas",
+          "Apropriação indevida por Herbert Spencer formulando a tese do darwinismo social",
+          "Publicação de poemas e manifestos consagrando a missão civilizadora e o fardo do homem branco",
+          "Criação da Associação Internacional Africana por Leopoldo II sob pretexto filantrópico",
+          "Instituição de cotas de látex e punições de mutilação física pela Force Publique no Congo",
+          "Denúncias internacionais forçando a entrega do território à administração do parlamento belga"
+        ]
+      },
+      {
+        title: "Encadeamento do Imperialismo à Eclosão da Primeira Guerra Mundial",
+        steps: [
+          "Unificação tardia da Alemanha em 1871 alterando a correlação de forças na Europa continental",
+          "Insatisfação de Berlim com a partilha desigual de territórios coloniais na África e Ásia",
+          "Projeto expansionista alemão da Ferrovia Berlim-Bagdá colidindo com interesses ingleses e russos",
+          "Início da corrida armamentista e política de blocos militares antagônicos na Paz Armada",
+          "Rivalidades interimperialistas extremas servindo de combustível para a deflagração de 1914"
+        ]
+      }
+    ];
+
+    const oddData = [
+      {
+        question: "Identifique a afirmativa INCORRETA sobre o Neocolonialismo na África:",
+        options: [
+          { text: "A Conferência de Berlim substituiu o direito de descoberta pelo princípio da ocupação efetiva.", isOdd: false, feedback: "Correto! Marco da conferência de 1884-85." },
+          { text: "As fronteiras artificiais traçadas pelos europeus uniram etnias rivais e dividiram povos irmãos.", isOdd: false, feedback: "Correto! Causa das guerras civis contemporâneas." },
+          { text: "A Etiópia derrotou o exército colonial italiano na histórica Batalha de Adwa em 1896.", isOdd: false, feedback: "Correto! A Etiópia permaneceu soberana." },
+          { text: "A Inglaterra e a França entraram em guerra total aberta na Europa após o Incidente de Fachoda.", isOdd: true, explanation: "No Incidente de Fachoda (1898), a França RECUA militarmente frente à Grã-Bretanha, evitando a guerra e pavimentando a aliança da Entente Cordiale em 1904." }
+        ]
+      },
+      {
+        question: "Identifique a afirmação FALSA referente à dominação colonial britânica na Índia:",
+        options: [
+          { text: "A Revolta dos Sipaios de 1857 resultou na dissolução da Companhia das Índias Orientais.", isOdd: false, feedback: "Correto! A Coroa assumiu a gestão direta." },
+          { text: "A exportação de tecidos industriais britânicos arruinou a tradicional produção têxtil artesanal indiana.", isOdd: false, feedback: "Correto! Destruição da manufatura local." },
+          { text: "A rainha Vitória foi formalmente proclamada Imperatriz da Índia em 1876.", isOdd: false, feedback: "Correto! Consagração de 'a joia da coroa'." },
+          { text: "Os britânicos permitiram que o exército nativo mantivesse o controle absoluto dos impostos e alfândegas.", isOdd: true, explanation: "O controle fiscal, aduaneiro e militar era ESTRITAMENTE BRITÂNICO; a exploração de tributos sobre o sal e a terra sustentava o império." }
+        ]
+      },
+      {
+        question: "Identifique a afirmativa INCORRETA sobre a penetração imperialista na China:",
+        options: [
+          { text: "O contrabando de ópio cultivado na Índia britânica visava reverter o déficit comercial do Reino Unido.", isOdd: false, feedback: "Correto! O ópio equilibrou as contas inglesas." },
+          { text: "O Tratado de Nanquim transferiu a posse da ilha de Hong Kong ao Império Britânico.", isOdd: false, feedback: "Correto! Concessão territorial até 1997." },
+          { text: "A Guerra dos Boxers foi um movimento de aliança pacífica entre chineses e missionários cristãos.", isOdd: true, explanation: "A Revolta dos Boxers foi um levante VIOLENTO, armando e xenófobo que buscava EXTERMINAR e expulsar estrangeiros e missionários da China." },
+          { text: "A China não virou uma colônia unitária, mas foi dividida em áreas de influência comercial.", isOdd: false, feedback: "Correto! Fatiamento em esferas de monopólio." }
+        ]
+      },
+      {
+        question: "Identifique a afirmativa FALSA referente ao aparelho ideológico do Imperialismo:",
+        options: [
+          { text: "O Darwinismo Social defendia que os europeus brancos ocupavam o ápice biológico da evolução.", isOdd: false, feedback: "Correto! Deturpação racista da biologia." },
+          { text: "O poema 'O Fardo do Homem Branco' retratava a colonização como uma missão pesada e filantrópica.", isOdd: false, feedback: "Correto! Obra de Rudyard Kipling." },
+          { text: "A Igreja e as academias de ciências condenavam unanimemente qualquer intervenção colonial na África.", isOdd: true, explanation: "Pelo contrário: instituições acadêmicas, geográficas e ordens religiosas DERAM APOIO MACIÇO ao neocolonialismo sob a bandeira da 'missão civilizadora'." },
+          { text: "A frenologia e a antropometria foram usadas para medir crânios e tentar justificar o racismo.", isOdd: false, feedback: "Correto! Práticas pseudocientíficas do século XIX." }
+        ]
+      },
+      {
+        question: "Identifique a afirmação INCORRETA sobre as transformações no Japão durante o século XIX:",
+        options: [
+          { text: "A Restauração Meiji de 1868 marcou a queda do xogunato e a centralização em torno do imperador.", isOdd: false, feedback: "Correto! Início da modernização Meiji." },
+          { text: "O Japão foi a única potência asiática a derrotar uma potência militar europeia na Guerra Russo-Japonesa.", isOdd: false, feedback: "Correto! Vitória surpreendente em 1905." },
+          { text: "A industrialização japonesa foi conduzida exclusivamente por investimentos do governo britânico.", isOdd: true, explanation: "A industrialização foi PLANEJADA E FINANCIADA PELO ESTADO JAPONÊS, que depois repassou as indústrias aos monopólios privados locais (zaibatsus)." },
+          { text: "A carência de matérias-primas e petróleo impulsionou o expansionismo militar do Japão na Ásia.", isOdd: false, feedback: "Correto! Invasão de Taiwan, Coreia e Manchúria." }
+        ]
+      },
+      {
+        question: "Identifique a afirmativa FALSA sobre as causas do Imperialismo Monopolista:",
+        options: [
+          { text: "A 2ª Revolução Industrial exigiu matérias-primas como petróleo, borracha e cobre.", isOdd: false, feedback: "Correto! Base técnica fundamental." },
+          { text: "A saturação dos capitais nos países de origem gerou a necessidade de exportar investimentos.", isOdd: false, feedback: "Correto! Tese clássica do capital financeiro." },
+          { text: "Os governos europeus queriam transferir integralmente todas as fábricas para a África.", isOdd: true, explanation: "Os europeus JAMAIS industrializaram as colônias; queriam a África como mera fornecedora de matérias-primas e compradora cativa de produtos metropolitanos." },
+          { text: "O protecionismo alfandegário na Europa exigiu a conquista de mercados cativos exclusivos.", isOdd: false, feedback: "Correto! Conquista para fugir das tarifas europeias." }
+        ]
+      }
+    ];
+
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx;
+    let soundEnabled = true;
+    document.getElementById('sound-toggle-btn').addEventListener('click', (e) => {
+      soundEnabled = !soundEnabled;
+      e.target.innerText = soundEnabled ? '🔊 Som Ativado' : '🔇 Som Desativado';
+      e.target.classList.toggle('bg-emerald-600'); e.target.classList.toggle('bg-slate-600');
+    });
+    function playSound(isCorrect) {
+      if(!soundEnabled) return;
+      if(!audioCtx) audioCtx = new AudioContext();
+      const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.type = isCorrect ? 'sine' : 'sawtooth';
+      osc.frequency.setValueAtTime(isCorrect ? 880 : 150, audioCtx.currentTime);
+      if(isCorrect) osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+    }
+
+    function shuffle(arr) { let a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+    function switchGame(id, btn) {
+      document.querySelectorAll('.game-view').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active', 'bg-blue-600', 'text-white'));
+      document.getElementById(id).classList.remove('hidden');
+      btn.classList.add('active', 'bg-blue-600', 'text-white');
+    }
+
+    function updateHUD() {
+      const done = Object.values(gamesStatus).filter(Boolean).length;
+      const countEl = document.getElementById('hud-count');
+      const badgeEl = document.getElementById('hud-badge');
+      if (countEl) countEl.innerText = `${done}/5`;
+      if (badgeEl && done === 5) {
+        badgeEl.innerText = "Missão Concluída";
+        badgeEl.className = "px-2.5 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 text-xs font-mono font-bold uppercase tracking-wider glow-emerald";
+      }
+    }
+
+    function calcFinalScore(force = false) {
+      if(!force && !Object.values(gamesStatus).every(v=>v)) return;
+      let totalF = 0, hitsF = 0, totalM = 0, hitsM = 0, totalD = 0, hitsD = 0;
+      scoreG1Results.forEach(r => {
+        let d = (r.diff || '').toLowerCase();
+        if(d.includes('fácil') || d.includes('facil')) { totalF++; if(r.hit) hitsF++; }
+        else if(d.includes('difícil') || d.includes('dificil')) { totalD++; if(r.hit) hitsD++; }
+        else { totalM++; if(r.hit) hitsM++; }
+      });
+
+      let rateF = totalF ? (hitsF / totalF) : 1;
+      let rateD = totalD ? (hitsD / totalD) : 0;
+      let baseScore = 400;
+      let hitScore = (hitsF * 40) + (hitsM * 60) + (hitsD * 80);
+      let triPenalty = 0;
+      if(rateD > 0 && rateF < 0.6) triPenalty = 150;
+      else if(rateD > 0 && rateF < 0.8) triPenalty = 75;
+
+      let timeBonus = Math.min(200, scoreG3TimeSaved * 2);
+      let score = Math.floor(baseScore + hitScore + timeBonus - triPenalty);
+      if(score > 1000) score = 1000;
+      if(score < 0) score = 0;
+
+      let verdict = score >= 850 ? "<span class='text-emerald-400'>Pronto pra Prova! 🚀</span>" : (score < 750 ? "<span class='text-red-400'>Revisão Obrigatória! 📚</span>" : "<span class='text-amber-400'>Na Média! Continue Revisando. 🎯</span>");
+      let extraMsg = triPenalty > 0 ? `<div class="text-xs text-red-400 mt-3 font-bold border border-red-500/30 bg-red-900/20 p-2 rounded">⚠️ ALERTA TRI: Padrão de inconsistência detectado. Penalidade: -${triPenalty}pts.</div>` : '';
+
+      document.getElementById('score-number').innerText = score;
+      document.getElementById('score-verdict').innerHTML = verdict + extraMsg;
+      document.getElementById('final-score-modal').classList.remove('hidden');
+      saveCardProgress(score);
+
+      let j1Hits = scoreG1Results.filter(r => r.hit).length;
+      let val1 = scoreG1Results.length ? j1Hits / scoreG1Results.length : 0;
+      let val2 = Math.max(0, 1 - (triPenalty / 150));
+      let maxTimeG3 = typeof tfData !== 'undefined' ? tfData.length * 15 : 15;
+      let val3 = Math.min(1, scoreG3TimeSaved / maxTimeG3);
+      let val4 = totalAttemptsG4 > 0 ? (typeof orderData !== 'undefined' ? orderData.length / totalAttemptsG4 : 0) : 0;
+      let val5 = typeof oddData !== 'undefined' && oddData.length > 0 ? hitsG5 / oddData.length : 0;
+
+      setTimeout(() => {
+        const canvas = document.getElementById('radar-chart');
+        if (!canvas) return;
+        canvas.classList.remove('hidden');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const radius = Math.min(centerX, centerY) - 30;
+        ctx.clearRect(0, 0, width, height);
+        const labels = ['Precisão', 'Coerência TRI', 'Agilidade', 'Retenção', 'Imunidade'];
+        const values = [val1, val2, val3, val4, val5];
+        const numAxes = 5;
+        const angleStep = (Math.PI * 2) / numAxes;
+
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.2)';
+        ctx.lineWidth = 1;
+        for (let i = 1; i <= 5; i++) {
+          const r = radius * (i / 5);
+          ctx.beginPath();
+          for (let j = 0; j < numAxes; j++) {
+            const angle = j * angleStep - Math.PI / 2;
+            const x = centerX + Math.cos(angle) * r;
+            const y = centerY + Math.sin(angle) * r;
+            if (j === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+          }
+          ctx.closePath();
+          ctx.stroke();
+        }
+
+        for (let j = 0; j < numAxes; j++) {
+          const angle = j * angleStep - Math.PI / 2;
+          ctx.beginPath();
+          ctx.moveTo(centerX, centerY);
+          ctx.lineTo(centerX + Math.cos(angle) * radius, centerY + Math.sin(angle) * radius);
+          ctx.stroke();
+          ctx.fillStyle = '#94a3b8';
+          ctx.font = '10px "JetBrains Mono", monospace';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(labels[j], centerX + Math.cos(angle) * (radius + 20), centerY + Math.sin(angle) * (radius + 15));
+        }
+
+        ctx.beginPath();
+        for (let j = 0; j < numAxes; j++) {
+          const angle = j * angleStep - Math.PI / 2;
+          const r = radius * Math.max(0, Math.min(1, values[j] || 0));
+          const x = centerX + Math.cos(angle) * r;
+          const y = centerY + Math.sin(angle) * r;
+          if (j === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(56, 189, 248, 0.3)';
+        ctx.fill();
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        for (let j = 0; j < numAxes; j++) {
+          const angle = j * angleStep - Math.PI / 2;
+          const r = radius * Math.max(0, Math.min(1, values[j] || 0));
+          ctx.beginPath();
+          ctx.arc(centerX + Math.cos(angle) * r, centerY + Math.sin(angle) * r, 4, 0, Math.PI * 2);
+          ctx.fillStyle = '#0ea5e9';
+          ctx.fill();
+        }
+      }, 100);
+    }
+
+    function triggerPunishment(containerId, sec, resetCallback) {
+      if(blockTimer) clearInterval(blockTimer);
+      const el = document.getElementById(containerId);
+      const punishId = 'punish-' + Math.random().toString(36).substr(2, 9);
+      el.innerHTML += `<div class="mt-4 p-4 bg-red-900/40 border border-red-500 rounded-lg text-center"><p class="text-red-300 font-bold mb-2">Atenção! Você errou e o sistema travou.</p><p class="text-sm text-gray-300">Liberando em <span id="${punishId}" class="text-xl font-mono text-white">${sec}s</span></p><button id="force-reset-${punishId}" class="mt-3 bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded font-bold text-xs transition-colors shortcut-next">Continuar Agora (Espaço) ➔</button></div>`;
+      const forceResetBtn = document.getElementById(`force-reset-${punishId}`);
+      if (forceResetBtn) {
+        forceResetBtn.onclick = () => {
+          if (blockTimer) clearInterval(blockTimer);
+          blockTimer = null;
+          resetCallback();
+        };
+      }
+      blockTimer = setInterval(() => {
+        sec--;
+        const tEl = document.getElementById(punishId);
+        if(tEl) tEl.innerText = sec + 's';
+        if(sec <= 0) { 
+          clearInterval(blockTimer); 
+          blockTimer = null; 
+          resetCallback(); 
+        }
+      }, 1000);
+    }
+
+    let step1 = 0, streak = 0, currentOptsG1 = [];
+    function renderG1() {
+      if(blockTimer) { clearInterval(blockTimer); blockTimer = null; }
+      const c = document.getElementById('timeline-container');
+      document.getElementById('progress-bar').style.width = (questionsData.length ? (step1/questionsData.length)*100 : 0) + '%';
+      const streakEl = document.getElementById('streak-counter');
+      streakEl.innerText = '🔥 Combo: ' + streak;
+      if(step1 >= questionsData.length) { gamesStatus.g1 = true; updateHUD(); calcFinalScore(); return c.innerHTML = `<div class="text-center p-6"><div class="text-5xl mb-3">🏆</div><div class="text-emerald-400 font-black text-xl">DOMINADO!</div></div>`; }
+      const q = questionsData[step1]; currentOptsG1 = shuffle(q.options);
+      c.innerHTML = `<div class="flex justify-between items-center mb-3"><span class="text-xs font-bold text-blue-400 bg-blue-400/10 px-2 py-1 rounded">Questão ${step1 + 1}/${questionsData.length}</span><span class="text-xs font-bold text-gray-500 border border-gray-700 px-2 rounded uppercase">${q.difficulty || 'Média'}</span></div><h3 class="text-lg text-white font-bold mb-4">${q.question}</h3><div id="g1-opts" class="space-y-3"></div>`;
+      const optDiv = document.getElementById('g1-opts');
+      currentOptsG1.forEach((o, i) => { 
+        const btn = document.createElement('button');
+        btn.className = 'w-full text-left p-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm text-gray-200 border border-slate-700 transition-colors g1-btn flex items-center';
+        btn.innerHTML = `<span class="mr-3 font-bold text-blue-400 bg-blue-900/30 px-2 py-0.5 rounded border border-blue-500/20">${i+1}</span> <span>${o.text}</span>`;
+        btn.onclick = () => checkG1(i);
+        const fb = document.createElement('div');
+        fb.id = `fb1-${i}`; fb.className = 'hidden mt-2 p-3 text-sm rounded-lg font-bold';
+        optDiv.appendChild(btn); optDiv.appendChild(fb);
+      });
+    }
+    function checkG1(idx) {
+      scoreG1Attempts++;
+      const q = questionsData[step1];
+      const opt = currentOptsG1[idx];
+      scoreG1Results.push({ hit: opt.isCorrect, diff: q.difficulty || "Média" });
+      document.querySelectorAll('.g1-btn').forEach(b => b.disabled = true);
+      const el = document.getElementById(`fb1-${idx}`); el.classList.remove('hidden');
+      playSound(opt.isCorrect);
+      if(opt.isCorrect) { 
+        streak++; el.className = 'mt-2 p-3 text-sm rounded-lg font-bold bg-emerald-900/60 text-emerald-300 border border-emerald-500/30'; 
+        el.innerText = `✅ ${opt.feedback}`;
+        const nxt = document.createElement('button'); nxt.className = 'block mt-3 bg-emerald-600 px-4 py-2 rounded text-white text-xs shortcut-next'; nxt.innerText = 'Avançar ➔ (Espaço)'; nxt.onclick = () => { step1++; renderG1(); };
+        el.appendChild(nxt);
+      } else { 
+        streak = Math.max(0, streak - 2); el.className = 'mt-2 p-3 text-sm rounded-lg font-bold bg-red-900/60 text-red-300 border border-red-500/30'; 
+        el.innerText = `❌ ${opt.feedback}`;
+        applyDamage(20);
+        triggerPunishment('timeline-container', 10, () => { step1++; renderG1(); });
+      }
+      saveCardProgress();
+    }
+
+    let leftArr = [], rightArr = [], selLeft = null, selRight = null, matched = 0;
+    function initG2() {
+      leftArr = shuffle(matchData.map((d,i) => ({id: i, txt: d.left})));
+      rightArr = shuffle(matchData.map((d,i) => ({id: i, txt: d.right})));
+      renderG2();
+    }
+    function renderG2() {
+      let html = `<div class="space-y-2">` + leftArr.map(l => `<button id="l-${l.id}" onclick="clickMatch('l', ${l.id})" class="w-full p-3 bg-slate-800 text-gray-300 text-sm text-center rounded-lg border-2 border-slate-700 transition-colors disabled:opacity-30 disabled:border-emerald-500">${l.txt}</button>`).join('') + `</div>`;
+      html += `<div class="space-y-2">` + rightArr.map(r => `<button id="r-${r.id}" onclick="clickMatch('r', ${r.id})" class="w-full p-3 bg-slate-800 text-gray-300 text-sm text-center rounded-lg border-2 border-slate-700 transition-colors disabled:opacity-30 disabled:border-emerald-500">${r.txt}</button>`).join('') + `</div>`;
+      document.getElementById('match-container').innerHTML = html;
+    }
+    function clickMatch(side, id) {
+      const btn = document.getElementById(`${side}-${id}`);
+      if(side === 'l') { 
+        if(selLeft !== null) { document.getElementById(`l-${selLeft}`).className = 'w-full p-3 bg-slate-800 text-gray-300 text-sm text-center rounded-lg border-2 border-slate-700 transition-colors'; }
+        selLeft = id; btn.className = 'w-full p-3 bg-blue-600/20 text-blue-400 text-sm text-center rounded-lg border-2 border-blue-500 glow-blue animate-pulse transition-all';
+      } else { 
+        if(selRight !== null) { document.getElementById(`r-${selRight}`).className = 'w-full p-3 bg-slate-800 text-gray-300 text-sm text-center rounded-lg border-2 border-slate-700 transition-colors'; }
+        selRight = id; btn.className = 'w-full p-3 bg-blue-600/20 text-blue-400 text-sm text-center rounded-lg border-2 border-blue-500 transition-all';
+      }
+      if(selLeft !== null && selRight !== null) {
+        const lBtn = document.getElementById(`l-${selLeft}`);
+        const rBtn = document.getElementById(`r-${selRight}`);
+        if(selLeft === selRight) {
+          playSound(true);
+          lBtn.className = 'w-full p-3 bg-emerald-600/20 text-emerald-400 text-sm text-center rounded-lg border-2 border-emerald-500 glow-emerald transition-all'; 
+          rBtn.className = 'w-full p-3 bg-emerald-600/20 text-emerald-400 text-sm text-center rounded-lg border-2 border-emerald-500 glow-emerald transition-all';
+          lBtn.disabled = true; rBtn.disabled = true;
+          matched++; selLeft = null; selRight = null;
+          if(matched === matchData.length) { document.getElementById('match-victory').classList.remove('hidden'); gamesStatus.g2 = true; updateHUD(); calcFinalScore(); }
+        } else {
+          playSound(false);
+          applyDamage(20);
+          lBtn.className = 'w-full p-3 bg-red-600/20 text-red-400 text-sm text-center rounded-lg border-2 border-red-500 transition-all'; 
+          rBtn.className = 'w-full p-3 bg-red-600/20 text-red-400 text-sm text-center rounded-lg border-2 border-red-500 transition-all';
+          setTimeout(() => { 
+            lBtn.className = 'w-full p-3 bg-slate-800 text-gray-300 text-sm text-center rounded-lg border-2 border-slate-700 transition-colors'; 
+            rBtn.className = 'w-full p-3 bg-slate-800 text-gray-300 text-sm text-center rounded-lg border-2 border-slate-700 transition-colors'; 
+            selLeft = null; selRight = null; 
+          }, 800);
+        }
+      }
+      saveCardProgress();
+    }
+
+    let step3 = 0, timer = null, timeLeft = 15;
+    function initG3() {
+      if(timer) { clearInterval(timer); timer = null; }
+      if(blockTimer) { clearInterval(blockTimer); blockTimer = null; }
+      step3 = 0;
+      const c = document.getElementById('tf-container');
+      if(!c) return;
+      c.innerHTML = `
+        <div class="text-center py-6 px-4 space-y-4">
+          <div class="text-4xl">⏱️</div>
+          <h3 class="text-xl font-black text-white">Desafio Contra o Relógio</h3>
+          <p class="text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
+            Você terá <strong class="text-red-400 font-mono">15 segundos</strong> por afirmação para responder <strong class="text-emerald-400 font-mono">Verdadeiro [V]</strong> ou <strong class="text-red-400 font-mono">Falso [F]</strong>.
+          </p>
+          <button onclick="renderG3()" class="mt-2 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-black px-6 py-3 rounded-xl text-xs font-mono tracking-wider uppercase transition-all shadow-lg shadow-red-600/30 shortcut-next">
+            INICIAR PRESSÃO TRI ➔ (Espaço)
+          </button>
+        </div>
+      `;
+    }
+
+    function renderG3() {
+      if(blockTimer) { clearInterval(blockTimer); blockTimer = null; }
+      if(step3 >= tfData.length) { 
+        gamesStatus.g3 = true; updateHUD(); calcFinalScore(); 
+        if(timer) { clearInterval(timer); timer = null; }
+        return document.getElementById('tf-container').innerHTML = `<div class="text-center p-6"><div class="text-5xl mb-3">🛡️</div><div class="text-blue-400 font-black text-xl">PROVA CONCLUÍDA!</div></div>`; 
+      }
+      const q = tfData[step3]; 
+      if(timer) clearInterval(timer); 
+      timeLeft = 15;
+      const tText = document.getElementById('timer-text');
+      const tBar = document.getElementById('timer-bar');
+      tText.innerText = timeLeft + 's'; 
+      tBar.style.width = '100%';
+      document.getElementById('tf-container').innerHTML = `
+        <div class="flex justify-between items-center mb-3">
+          <span class="text-xs font-bold text-red-400 bg-red-400/10 px-2 py-1 rounded">Afirmação ${step3 + 1}/${tfData.length}</span>
+        </div>
+        <h3 class="text-lg text-white font-bold mb-6 text-center leading-relaxed">${q.statement}</h3>
+        <div class="flex gap-4" id="tf-btns">
+          <button id="btn-t" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-black py-4 rounded-xl text-lg transition-colors">VERDADEIRO [V]</button>
+          <button id="btn-f" class="flex-1 bg-red-600 hover:bg-red-500 text-white font-black py-4 rounded-xl text-lg transition-colors">FALSO [F]</button>
+        </div>
+        <div id="fb3" class="hidden mt-4 p-4 rounded-lg font-bold text-sm"></div>
+      `;
+      document.getElementById('btn-t').onclick = () => checkG3(true, q.isTrue, q.feedback);
+      document.getElementById('btn-f').onclick = () => checkG3(false, q.isTrue, q.feedback);
+
+      timer = setInterval(() => {
+        timeLeft--; 
+        tText.innerText = timeLeft + 's'; 
+        tBar.style.width = (timeLeft/15)*100 + '%';
+        if(timeLeft <= 0) { 
+          clearInterval(timer); timer = null;
+          checkG3(null, q.isTrue, "TEMPO ESGOTADO!"); 
+        }
+      }, 1000);
+    }
+
+    function checkG3(answer, isTrue, fb) {
+      if(timer) { clearInterval(timer); timer = null; }
+      if(answer === isTrue) scoreG3TimeSaved += timeLeft;
+      const btnT = document.getElementById('btn-t');
+      const btnF = document.getElementById('btn-f');
+      if(btnT) btnT.disabled = true; 
+      if(btnF) btnF.disabled = true;
+      const el = document.getElementById(`fb3`); 
+      el.classList.remove('hidden');
+      playSound(answer === isTrue);
+      if(answer === isTrue) { 
+        el.className = 'mt-4 p-4 rounded-lg font-bold text-sm bg-emerald-900/60 text-emerald-300 border border-emerald-500/30'; 
+        el.innerText = `✅ CORRETO! ${fb}`;
+        const nxt = document.createElement('button'); 
+        nxt.className = 'block mt-3 bg-emerald-600 hover:bg-emerald-500 px-4 py-2 rounded text-white text-xs transition-colors shortcut-next'; 
+        nxt.innerText = 'Próxima ➔ (Espaço)'; 
+        nxt.onclick = () => { step3++; renderG3(); };
+        el.appendChild(nxt);
+      } else { 
+        el.className = 'mt-4 p-4 rounded-lg font-bold text-sm bg-red-900/60 text-red-300 border border-red-500/30'; 
+        el.innerText = `❌ ERRO! ${fb}`;
+        applyDamage(20);
+        triggerPunishment('tf-container', 5, () => { step3++; renderG3(); });
+      }
+      saveCardProgress();
+    }
+
+    let step4Seq = 0, step4Node = 0, orderShuffled = [];
+    function initG4() { 
+      if(step4Seq >= orderData.length) { gamesStatus.g4 = true; updateHUD(); calcFinalScore(); return document.getElementById('g4-container').innerHTML = `<div class="text-center p-6"><div class="text-5xl mb-3">🏆</div><div class="text-amber-400 font-black text-xl">TODAS AS SEQUÊNCIAS CONCLUÍDAS!</div></div>`; }
+      totalAttemptsG4++;
+      orderShuffled = shuffle(orderData[step4Seq].steps.map((txt, i) => ({txt, id: i, clicked: false}))); 
+      step4Node = 0; renderG4(); 
+    }
+    function renderG4() {
+      if(step4Node >= orderData[step4Seq].steps.length) {
+        step4Seq++; 
+        setTimeout(initG4, 1500);
+        document.getElementById('g4-container').innerHTML = `<div class="text-center p-6 text-emerald-400 font-black text-xl">Sequência Concluída! Carregando próxima...</div>`;
+        return;
+      }
+      let html = `<div class="flex justify-between items-center mb-3"><span class="text-xs font-bold text-amber-400 bg-amber-400/10 px-2 py-1 rounded">Sequência ${step4Seq + 1}/${orderData.length}</span></div><p class="text-sm text-gray-300 mb-2 font-bold">${orderData[step4Seq].title}</p><p class="text-xs text-gray-500 mb-4">Clique nos passos na ordem exata. Erros resetam a sequência.</p><div class="flex flex-col gap-2">`;
+      orderShuffled.forEach((o) => { if(!o.clicked) html += `<button onclick="clickG4(${o.id})" class="p-3 bg-slate-800 border border-slate-700 rounded-lg text-sm text-left hover:bg-slate-700 text-gray-200 transition-colors">${o.txt}</button>`; });
+      html += `</div><div class="mt-6"><div class="text-xs text-amber-400 font-bold mb-2 uppercase tracking-wider">Sua Sequência:</div><div class="flex flex-col gap-2">`;
+      for(let i=0; i<step4Node; i++) { html += `<div class="p-3 bg-emerald-900/40 border border-emerald-500/30 rounded-lg text-sm text-emerald-300">✅ ${orderData[step4Seq].steps[i]}</div>`; }
+      document.getElementById('g4-container').innerHTML = html + `</div></div>`;
+      saveCardProgress();
+    }
+    function clickG4(id) {
+      if(id === step4Node) { playSound(true); orderShuffled.find(o => o.id === id).clicked = true; step4Node++; renderG4(); } 
+      else { 
+        playSound(false); applyDamage(20); const c = document.getElementById('g4-container'); c.classList.add('bg-red-900/30'); 
+        setTimeout(() => { c.classList.remove('bg-red-900/30'); initG4(); }, 500); 
+      }
+      saveCardProgress();
+    }
+
+    let step5 = 0, currentOptsG5 = [];
+    function renderG5() {
+      if(blockTimer) { clearInterval(blockTimer); blockTimer = null; }
+      if(step5 >= oddData.length) { gamesStatus.g5 = true; updateHUD(); calcFinalScore(); return document.getElementById('g5-container').innerHTML = `<div class="text-center p-6"><div class="text-5xl mb-3">🕵️</div><div class="text-purple-400 font-black text-xl">AMEAÇAS IDENTIFICADAS!</div></div>`; }
+      const q = oddData[step5];
+      currentOptsG5 = shuffle(q.options);
+      const c = document.getElementById('g5-container');
+      c.innerHTML = `<div class="flex justify-between items-center mb-3"><span class="text-xs font-bold text-purple-400 bg-purple-400/10 px-2 py-1 rounded">Infiltração ${step5 + 1}/${oddData.length}</span></div><h4 class="text-sm text-white font-bold mb-4">${q.question}</h4><div id="g5-opts" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div><div id="fb5" class="hidden mt-4 p-4 rounded-lg font-bold text-sm"></div>`;
+      const optDiv = document.getElementById('g5-opts');
+      currentOptsG5.forEach((opt, i) => { 
+        const btn = document.createElement('button');
+        btn.className = 'p-4 bg-slate-800 border border-slate-700 rounded-lg text-sm hover:bg-slate-700 font-bold text-gray-200 transition-colors g5-btn flex items-center';
+        btn.innerHTML = `<span class="mr-3 font-bold text-purple-400 bg-purple-900/30 px-2 py-0.5 rounded border border-purple-500/20">${i+1}</span> <span>${opt.text}</span>`;
+        btn.onclick = () => checkG5(i);
+        optDiv.appendChild(btn);
+      });
+    }
+    function checkG5(idx) {
+      const opt = currentOptsG5[idx];
+      document.querySelectorAll('.g5-btn').forEach(b => b.disabled = true);
+      const el = document.getElementById(`fb5`); el.classList.remove('hidden');
+      playSound(opt.isOdd);
+      if(opt.isOdd) { 
+        hitsG5++;
+        el.className = 'mt-4 p-4 rounded-lg font-bold text-sm bg-emerald-900/60 text-emerald-300 border border-emerald-500/30'; 
+        el.innerHTML = `✅ INTRUSO IDENTIFICADO!<br><br><strong>Explicação:</strong> ${opt.explanation}`;
+        const nxt = document.createElement('button'); nxt.className = 'block mt-3 bg-emerald-600 px-4 py-2 rounded text-white text-xs shortcut-next'; nxt.innerText = 'Próxima ➔ (Espaço)'; nxt.onclick = () => { step5++; renderG5(); };
+        el.appendChild(nxt);
+      } else { 
+        el.className = 'mt-4 p-4 rounded-lg font-bold text-sm bg-red-900/60 text-red-300 border border-red-500/30'; 
+        const actualOdd = currentOptsG5.find(o => o.isOdd);
+        el.innerHTML = `❌ OPÇÃO LEGÍTIMA!<br><br>Sua escolha (${opt.text}) é válida: <strong>${opt.explanation}</strong><br><br>👉 O Infiltrado era: <strong>${actualOdd.text}</strong><br>Motivo: ${actualOdd.explanation}`;
+        applyDamage(20);
+        triggerPunishment('g5-container', 5, () => { step5++; renderG5(); });
+      }
+      saveCardProgress();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      loadCardProgress();
+      try {
+        if (typeof renderMathInElement === 'function') {
+          renderMathInElement(document.body, {
+            delimiters: [
+              { left: "$$", right: "$$", display: true },
+              { left: "$", right: "$", display: false }
+            ],
+            throwOnError: false,
+            errorColor: '#f87171'
+          });
+        }
+      } catch (e) { console.warn(e); }
+
+      try {
+        if (typeof questionsData !== 'undefined' && questionsData.length > 0) renderG1();
+        if (typeof matchData !== 'undefined' && matchData.length > 0) initG2();
+        if (typeof tfData !== 'undefined' && tfData.length > 0) initG3();
+        if (typeof orderData !== 'undefined' && orderData.length > 0) initG4();
+        if (typeof oddData !== 'undefined' && oddData.length > 0) renderG5();
+      } catch (e) { console.error(e); }
+
+      document.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        if (e.code === 'Space') {
+          const nextBtn = document.querySelector('.game-view:not(.hidden) .shortcut-next');
+          if (nextBtn) { e.preventDefault(); nextBtn.click(); return; }
+        }
+        if (e.key === ',' || e.key === '.') {
+          const tabs = Array.from(document.querySelectorAll('.tab-btn'));
+          const activeIdx = tabs.findIndex(t => t.classList.contains('active'));
+          if (activeIdx >= 0) {
+            let nxtIdx = e.key === '.' ? activeIdx + 1 : activeIdx - 1;
+            if (nxtIdx >= tabs.length) nxtIdx = 0;
+            if (nxtIdx < 0) nxtIdx = tabs.length - 1;
+            tabs[nxtIdx].click();
+          }
+        }
+        if (!document.getElementById('game-tf').classList.contains('hidden')) {
+          if (e.key.toLowerCase() === 'v') { const b = document.getElementById('btn-t'); if (b && !b.disabled) b.click(); }
+          if (e.key.toLowerCase() === 'f') { const b = document.getElementById('btn-f'); if (b && !b.disabled) b.click(); }
+        }
+        if (e.key >= '1' && e.key <= '5') {
+          const idx = parseInt(e.key) - 1;
+          if (!document.getElementById('game-timeline').classList.contains('hidden')) {
+            const btns = document.querySelectorAll('.g1-btn:not([disabled])');
+            if (btns[idx]) btns[idx].click();
+          }
+          if (!document.getElementById('game-odd').classList.contains('hidden')) {
+            const btns = document.querySelectorAll('.g5-btn:not([disabled])');
+            if (btns[idx]) btns[idx].click();
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

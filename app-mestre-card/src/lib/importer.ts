@@ -27,15 +27,35 @@ export function sanitizeAndParseJSON(rawInput: string): unknown {
       sanitized = lines.join('\n');
     }
 
-    // Procura o primeiro { e o ultimo }
+    // Encontra os limites do JSON (pode ser objeto ou array)
     const firstBrace = sanitized.indexOf('{');
+    const firstBracket = sanitized.indexOf('[');
     const lastBrace = sanitized.lastIndexOf('}');
-    
-    if (firstBrace === -1 || lastBrace === -1 || firstBrace > lastBrace) {
-      throw new Error('Nenhum objeto JSON válido encontrado na entrada.');
+    const lastBracket = sanitized.lastIndexOf(']');
+
+    const hasObject = firstBrace !== -1 && lastBrace !== -1 && firstBrace < lastBrace;
+    const hasArray = firstBracket !== -1 && lastBracket !== -1 && firstBracket < lastBracket;
+
+    if (!hasObject && !hasArray) {
+      throw new Error('Nenhum objeto ou array JSON válido encontrado na entrada.');
     }
 
-    const jsonStr = sanitized.substring(firstBrace, lastBrace + 1);
+    let startIdx = -1;
+    let endIdx = -1;
+
+    if (hasObject && hasArray) {
+      // Pega o que vier primeiro e terminar por último
+      startIdx = Math.min(firstBrace, firstBracket);
+      endIdx = Math.max(lastBrace, lastBracket);
+    } else if (hasObject) {
+      startIdx = firstBrace;
+      endIdx = lastBrace;
+    } else {
+      startIdx = firstBracket;
+      endIdx = lastBracket;
+    }
+
+    const jsonStr = sanitized.substring(startIdx, endIdx + 1);
     return JSON.parse(jsonStr);
   } catch (error: any) {
     throw new Error(`Falha ao decodificar JSON: ${error.message}`);
