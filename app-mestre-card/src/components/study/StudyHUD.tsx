@@ -59,7 +59,7 @@ export const StudyHUD = ({
   const [activeHash, setActiveHash] = useState('sec-01');
   const [speechState, setSpeechState] = useState<'idle' | 'playing' | 'paused'>('idle');
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
-  const { isBionic, toggleBionic, searchTerm, setSearchTerm, clearSearch } = useReading();
+  const { searchTerm, setSearchTerm, clearSearch } = useReading();
 
   // Strict cleanup of SpeechSynthesis on unmount or card changes
   useEffect(() => {
@@ -363,19 +363,6 @@ export const StudyHUD = ({
                     <span className="hidden sm:inline">OLED</span>
                   </button>
                 )}
-
-                <button
-                  onClick={toggleBionic}
-                  className={`px-2.5 py-1 rounded text-xs font-mono font-bold transition-all flex items-center gap-1 cursor-pointer ${
-                    isBionic
-                      ? 'bg-purple-950 border border-purple-400 text-purple-300 shadow-[0_0_8px_rgba(192,132,252,0.4)]'
-                      : 'bg-slate-900 border border-slate-700 hover:border-purple-500/50 text-slate-400 hover:text-slate-200'
-                  }`}
-                  title="Leitura Biônica: Destaca fixação sacádica nas primeiras letras das palavras"
-                >
-                  <span>⚡</span>
-                  <span className="hidden sm:inline">Bionic</span>
-                </button>
               </div>
 
               {/* Localizador Tático In-Page */}

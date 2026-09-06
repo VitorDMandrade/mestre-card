@@ -17,10 +17,10 @@ const ENTITY_REGEX = /(\b\d{1,2}º?\s+[Ss]éculo|\b[Ss]éculo\s+[IVXLCDM]+|\b(?:
 export const MathRenderer: React.FC<MathRendererProps> = ({ content, className = '' }) => {
   if (!content) return null;
 
-  const { isBionic, searchTerm, semanticColors } = useReading();
+  const { searchTerm, semanticColors } = useReading();
 
-  // Helper para renderizar folhas de texto (aplicando Spotlight Search e Bionic Reading)
-  const renderLeafText = (text: string, keyPrefix: string, allowBionic: boolean = true): React.ReactNode => {
+  // Helper para renderizar folhas de texto (aplicando Spotlight Search)
+  const renderLeafText = (text: string, keyPrefix: string): React.ReactNode => {
     if (!text) return null;
 
     const trimmedSearch = searchTerm ? searchTerm.trim() : '';
@@ -42,30 +42,9 @@ export const MathRenderer: React.FC<MathRendererProps> = ({ content, className =
               </mark>
             );
           }
-          return renderLeafText(part, `${keyPrefix}-sleaf-${sIdx}`, allowBionic);
+          return renderLeafText(part, `${keyPrefix}-sleaf-${sIdx}`);
         });
       }
-    }
-
-    // Se Bionic Reading estiver ativo e permitido nesta folha
-    if (isBionic && allowBionic) {
-      const tokens = text.split(/(\s+)/);
-      return tokens.map((token, tIdx) => {
-        if (/^\s+$/.test(token) || token.length <= 1) {
-          return <span key={`${keyPrefix}-bio-${tIdx}`}>{token}</span>;
-        }
-        // Fixação sacádica otimizada (1 letra para 2-3, 2 para 4-5, 3 para 6-9, 4 para 10+)
-        const fixLen = token.length <= 3 ? 1 : token.length <= 5 ? 2 : token.length <= 9 ? 3 : 4;
-        const head = token.slice(0, fixLen);
-        const tail = token.slice(fixLen);
-
-        return (
-          <span key={`${keyPrefix}-bio-${tIdx}`} className="inline">
-            <strong className="font-extrabold text-slate-100 tracking-normal">{head}</strong>
-            <span className="text-slate-300/85">{tail}</span>
-          </span>
-        );
-      });
     }
 
     return <span key={keyPrefix}>{text}</span>;
@@ -74,7 +53,7 @@ export const MathRenderer: React.FC<MathRendererProps> = ({ content, className =
   // Helper para renderizar segmentos simples de texto com auto-detecção de entidades
   const renderPlainWithEntities = (plainText: string, segKey: string): React.ReactNode => {
     if (!semanticColors) {
-      return renderLeafText(plainText, segKey, true);
+      return renderLeafText(plainText, segKey);
     }
 
     const isEntityMatch = (str: string) => {
@@ -95,7 +74,7 @@ export const MathRenderer: React.FC<MathRendererProps> = ({ content, className =
               key={subKey}
               className="text-amber-300 font-semibold bg-amber-500/10 px-1 py-0.5 rounded border border-amber-500/25 font-mono text-[0.93em] mx-0.5 shadow-sm inline-block"
             >
-              {renderLeafText(part, `${subKey}-leaf`, false)}
+              {renderLeafText(part, `${subKey}-leaf`)}
             </span>
           );
         }
@@ -106,7 +85,7 @@ export const MathRenderer: React.FC<MathRendererProps> = ({ content, className =
               key={subKey}
               className="text-emerald-300 font-mono font-bold bg-emerald-500/10 px-1 py-0.5 rounded border border-emerald-500/20 mx-0.5 inline-block"
             >
-              {renderLeafText(part, `${subKey}-leaf`, false)}
+              {renderLeafText(part, `${subKey}-leaf`)}
             </span>
           );
         }
@@ -116,12 +95,12 @@ export const MathRenderer: React.FC<MathRendererProps> = ({ content, className =
             key={subKey}
             className="text-rose-400 font-bold underline decoration-rose-500/60 decoration-wavy mx-0.5 inline-block"
           >
-            {renderLeafText(part, `${subKey}-leaf`, false)}
+            {renderLeafText(part, `${subKey}-leaf`)}
           </span>
         );
       }
 
-      return renderLeafText(part, subKey, true);
+      return renderLeafText(part, subKey);
     });
   };
 
@@ -175,7 +154,7 @@ export const MathRenderer: React.FC<MathRendererProps> = ({ content, className =
                       const inner = segment.slice(2, -2);
                       return (
                         <strong key={tagKey} className="text-cyan-300 font-bold tracking-tight mx-0.5">
-                          {renderLeafText(inner, `${tagKey}-inner`, false)}
+                          {renderLeafText(inner, `${tagKey}-inner`)}
                         </strong>
                       );
                     }
@@ -188,7 +167,7 @@ export const MathRenderer: React.FC<MathRendererProps> = ({ content, className =
                           key={tagKey}
                           className="bg-amber-400/20 text-amber-200 border-b-2 border-amber-400/60 px-1 py-0.5 rounded font-semibold mx-0.5 inline-block"
                         >
-                          {renderLeafText(inner, `${tagKey}-inner`, false)}
+                          {renderLeafText(inner, `${tagKey}-inner`)}
                         </mark>
                       );
                     }
@@ -202,7 +181,7 @@ export const MathRenderer: React.FC<MathRendererProps> = ({ content, className =
                           className="bg-rose-500/15 text-rose-300 border border-rose-500/40 px-1.5 py-0.5 rounded font-bold inline-flex items-center gap-1 mx-0.5 shadow-sm"
                         >
                           <span className="text-xs">⚠️</span>
-                          {renderLeafText(inner, `${tagKey}-inner`, false)}
+                          {renderLeafText(inner, `${tagKey}-inner`)}
                         </span>
                       );
                     }
