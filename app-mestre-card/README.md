@@ -24,3 +24,7 @@ Agilize sua revisão sem tocar no mouse durante os confrontos diretos:
 - `npm run dev`: Inicia o servidor local de desenvolvimento na porta padrão (5173) com HMR rápido.
 - `npm run build`: Compila, tipa e empacota a aplicação (TypeScript Strict) para o diretório `/dist` com otimização de minificação.
 - `npm run preview`: Inicia o servidor com o build de produção final (Ideal para auditar ativação do cache offline do Service Worker).
+
+## Registro de Decisões de Arquitetura (ADR)
+- **[ADR-17] 2026-09-06**: Vetada a expansão de features v1.1.0; arbitrada a publicação estática da v1.0.0 com roteamento SPA universal (`_redirects` e `vercel.json`) para instalação PWA em dispositivos móveis e início imediato da rotina de estudos.
+
