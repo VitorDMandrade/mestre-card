@@ -5,11 +5,15 @@ import { GameMatch } from './GameMatch';
 import { GameTrueFalse } from './GameTrueFalse';
 import { GameOrder } from './GameOrder';
 import { GameOdd } from './GameOdd';
-import { RadarChart } from './RadarChart';
+import { ScoreScreen } from './ScoreScreen';
 import { calculateTRIScore } from '../../lib/tri-engine';
 import type { TRICalculationInput, TRIScoreResult } from '../../lib/tri-engine';
 import { db } from '../../lib/db';
 import { ErrorBoundary } from '../ErrorBoundary';
+import { useGame } from '../../context/GameContext';
+import { addXP, calculateSessionXP } from '../../lib/xp-engine';
+import type { XPResult } from '../../lib/xp-engine';
+import { playVictorySound } from '../../lib/audio';
 
 interface ArcadeEngineProps {
   card: MestreCardData;
@@ -74,6 +78,10 @@ export const ArcadeEngine = ({
 
   const [gamesStatus, setGamesStatus] = useState({ g1: false, g2: false, g3: false, g4: false, g5: false });
   const [triResult, setTriResult] = useState<TRIScoreResult | null>(null);
+  const [xpResult, setXpResult] = useState<XPResult | null>(null);
+
+  // Game engine integrations
+  const { maxComboReached, triggerFlash, fireXpToast, refreshProfile } = useGame();
 
   // Keyboard navigation for tabs
   useEffect(() => {
@@ -99,26 +107,31 @@ export const ArcadeEngine = ({
   const handleG1Complete = useCallback((results: { hit: boolean; difficulty: string }[]) => {
     setG1Results(results);
     setGamesStatus(prev => ({ ...prev, g1: true }));
-  }, []);
+    triggerFlash('hit');
+  }, [triggerFlash]);
 
   const handleG2Complete = useCallback(() => {
     setGamesStatus(prev => ({ ...prev, g2: true }));
-  }, []);
+    triggerFlash('hit');
+  }, [triggerFlash]);
 
   const handleG3Complete = useCallback((timeSaved: number) => {
     setG3TimeSaved(timeSaved);
     setGamesStatus(prev => ({ ...prev, g3: true }));
-  }, []);
+    triggerFlash('hit');
+  }, [triggerFlash]);
 
   const handleG4Complete = useCallback((attempts: number) => {
     setG4Attempts(attempts);
     setGamesStatus(prev => ({ ...prev, g4: true }));
-  }, []);
+    triggerFlash('hit');
+  }, [triggerFlash]);
 
   const handleG5Complete = useCallback((hits: number) => {
     setG5Hits(hits);
     setGamesStatus(prev => ({ ...prev, g5: true }));
-  }, []);
+    triggerFlash('hit');
+  }, [triggerFlash]);
 
   const calculateFinalScore = async () => {
     const input: TRICalculationInput = {
@@ -162,6 +175,27 @@ export const ArcadeEngine = ({
     } catch (err) {
       console.error('Failed to save session to DB:', err);
     }
+
+    // Award XP
+    const gamesCompleted = Object.values(gamesStatus).filter(Boolean).length;
+    const xpAmount = calculateSessionXP({
+      score: result.score,
+      comboMax: maxComboReached,
+      sessionErrors: sessionErrors.length,
+      gamesCompleted,
+    });
+    const g3TotalQ = card.sec07_arcade?.tfData?.length || 1;
+    const g3AvgTime = g3TimeSaved > 0 ? (g3TimeSaved / g3TotalQ) : Infinity;
+    const xp = addXP(xpAmount, result.score, {
+      comboMax: maxComboReached,
+      g3SpeedPerQ: g3AvgTime,
+      hardcoreNoDamage: isHardcore && hp === 100,
+      sessionErrors: sessionErrors.length,
+    });
+    setXpResult(xp);
+    refreshProfile();
+    fireXpToast(xpAmount, xp.leveledUp ? xp.newLevelName : undefined);
+    if (result.score >= 750) playVictorySound(soundEnabled);
   };
 
   const { questionsData, matchData, tfData, orderData, oddData } = card.sec07_arcade || {};
@@ -315,75 +349,13 @@ export const ArcadeEngine = ({
         </div>
       </ErrorBoundary>
 
-      {/* Final Score Modal */}
       {triResult && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 animate-fade-in backdrop-blur-sm overflow-y-auto">
-          <div className="bg-slate-900 border-2 border-blue-500 p-6 sm:p-8 rounded-2xl text-center max-w-lg w-full shadow-[0_0_30px_rgba(59,130,246,0.3)] my-6 max-h-[90vh] overflow-y-auto scrollbar-thin">
-            <h2 className="text-3xl font-black text-white mb-2 tracking-tight">SCORE TRI FINAL</h2>
-            <div className="text-6xl font-black text-blue-400 mb-4 tracking-tighter shadow-blue-500/20 drop-shadow-lg">
-              {triResult.score}
-            </div>
-            
-            <div className="text-xl font-bold text-gray-300 mb-4">
-              {triResult.verdict}
-            </div>
-
-            {triResult.penalty > 0 && (
-              <div className="text-xs text-red-400 mb-6 font-bold border border-red-500/30 bg-red-900/20 p-3 rounded-lg">
-                ⚠️ ALERTA TRI: Padrão de inconsistência detectado. Penalidade: -{triResult.penalty}pts.
-              </div>
-            )}
-
-            <div className="mb-6 flex justify-center">
-              <RadarChart values={triResult.axes} size={280} />
-            </div>
-
-            {/* Caderno de Erros da Sessão / Repescagem Imediata */}
-            {sessionErrors.length > 0 ? (
-              <details className="mb-6 text-left border border-red-500/40 bg-red-950/20 rounded-xl p-3.5 space-y-3">
-                <summary className="cursor-pointer text-xs font-mono font-bold text-red-400 hover:text-red-300 transition-colors select-none flex items-center justify-between">
-                  <span>🚨 CADERNO DE ERROS DA SESSÃO ({sessionErrors.length} FALHAS DETECTADAS)</span>
-                  <span className="text-[10px] text-red-400/80 font-mono">EXPANDIR ▼</span>
-                </summary>
-                <div className="mt-3 space-y-3 max-h-60 overflow-y-auto pr-1 scrollbar-thin">
-                  {sessionErrors.map((err, idx) => (
-                    <div key={idx} className="p-3 rounded-lg bg-slate-950/80 border border-red-900/50 space-y-1.5 text-xs font-mono">
-                      <div className="flex items-center justify-between text-[10px] text-slate-400">
-                        <span className="px-1.5 py-0.5 rounded bg-red-950 border border-red-800 text-red-300 font-bold">
-                          {err.game === 'G1' ? 'G1: MORTE SÚBITA' : err.game === 'G3' ? 'G3: PRESSÃO TRI' : 'G5: O INFILTRADO'}
-                        </span>
-                        <span>FALHA #{idx + 1}</span>
-                      </div>
-                      <p className="text-slate-200 font-sans text-xs font-semibold leading-relaxed">
-                        {err.prompt}
-                      </p>
-                      <div className="text-[11px] bg-red-950/40 border-l-2 border-l-red-500 pl-2 py-1 text-red-300">
-                        <span className="font-bold text-red-400">Sua Escolha: </span>
-                        <span>{err.userWrongAnswer}</span>
-                      </div>
-                      <div className="text-[11px] bg-emerald-950/30 border-l-2 border-l-emerald-500 pl-2 py-1 text-emerald-300">
-                        <span className="font-bold text-emerald-400">Correção Tática: </span>
-                        <span>{err.explanation}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </details>
-            ) : (
-              <div className="mb-6 p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 font-mono text-xs font-bold flex items-center justify-center gap-2">
-                <span>🛡️</span>
-                <span>SESSÃO IMPECÁVEL // ZERO ERROS DETECTADOS</span>
-              </div>
-            )}
-
-            <button 
-              onClick={() => setTriResult(null)}
-              className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold w-full transition-colors uppercase tracking-widest text-sm cursor-pointer"
-            >
-              FECHAR RELATÓRIO
-            </button>
-          </div>
-        </div>
+        <ScoreScreen
+          triResult={triResult}
+          sessionErrors={sessionErrors}
+          xpResult={xpResult}
+          onClose={() => { setTriResult(null); setXpResult(null); }}
+        />
       )}
     </section>
   );

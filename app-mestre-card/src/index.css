@@ -95,6 +95,130 @@
   animation: shake 0.35s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
+/* ═══════════════════════════════════════════════
+   🎮 MOTOR DE JOGO v2.0 — Animações
+   ═══════════════════════════════════════════════ */
+
+/* Partículas de Acerto */
+@keyframes particlePop {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(var(--scale, 1));
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx, 0), var(--dy, -50px)) scale(0.2);
+  }
+}
+
+.particle-pop {
+  position: fixed;
+  animation: particlePop 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* XP Toast Float Up */
+@keyframes xpFloatUp {
+  0%   { opacity: 0; transform: translateY(12px) scale(0.85); }
+  15%  { opacity: 1; transform: translateY(0)    scale(1); }
+  75%  { opacity: 1; transform: translateY(-8px) scale(1); }
+  100% { opacity: 0; transform: translateY(-20px) scale(0.9); }
+}
+
+.xp-toast {
+  animation: xpFloatUp 2.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Screen Flash (Hit/Miss) */
+@keyframes flashHit {
+  0%   { opacity: 0.18; }
+  100% { opacity: 0; }
+}
+
+@keyframes flashMiss {
+  0%   { opacity: 0.22; }
+  100% { opacity: 0; }
+}
+
+.screen-flash-hit {
+  animation: flashHit 0.22s ease-out forwards;
+  background: radial-gradient(ellipse at center, rgba(34, 211, 100, 0.5) 0%, transparent 70%);
+  mix-blend-mode: screen;
+}
+
+.screen-flash-miss {
+  animation: flashMiss 0.22s ease-out forwards;
+  background: radial-gradient(ellipse at center, rgba(239, 68, 68, 0.6) 0%, transparent 70%);
+  mix-blend-mode: screen;
+}
+
+/* Combo Badge Pulse */
+@keyframes comboPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 8px rgba(251, 191, 36, 0.3); }
+  50%       { transform: scale(1.05); box-shadow: 0 0 20px rgba(251, 191, 36, 0.6); }
+}
+
+.combo-pulse {
+  animation: comboPulse 0.7s ease-in-out infinite;
+}
+
+@keyframes comboRampUp {
+  0%   { transform: scale(0.7) rotate(-3deg); opacity: 0; }
+  60%  { transform: scale(1.12) rotate(1deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.combo-enter {
+  animation: comboRampUp 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* XP Bar Glow Near-Full */
+@keyframes xpNearFull {
+  0%, 100% { box-shadow: 0 0 6px rgba(34, 211, 238, 0.4); }
+  50%       { box-shadow: 0 0 16px rgba(34, 211, 238, 0.8); }
+}
+
+.xp-bar-fill {
+  transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.xp-near-full {
+  animation: xpNearFull 1.2s ease-in-out infinite;
+}
+
+/* Neon Level Name Pulse */
+@keyframes neonPulse {
+  0%, 100% { text-shadow: 0 0 6px currentColor; }
+  50%       { text-shadow: 0 0 18px currentColor, 0 0 30px currentColor; }
+}
+
+.neon-pulse {
+  animation: neonPulse 2.4s ease-in-out infinite;
+}
+
+/* Score Screen Overlay */
+.score-screen-overlay {
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* CRT Scanlines */
+.scanlines {
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(0, 0, 0, 0.12) 3px,
+    rgba(0, 0, 0, 0.12) 4px
+  );
+  pointer-events: none;
+}
+
 /* Scrollbar and Katex Overrides */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-main); }

@@ -10,8 +10,23 @@ import { RadarSection } from './study/RadarSection';
 import { LabSection } from './study/LabSection';
 import { RecallSection } from './study/RecallSection';
 import { ArcadeEngine } from './arcade/ArcadeEngine';
+import { ParticlesBurst } from './arcade/ParticlesBurst';
 import { ErrorBoundary } from './ErrorBoundary';
 import { ReadingProvider } from '../context/ReadingContext';
+import { GameProvider, useGame } from '../context/GameContext';
+import { XpToast } from './study/XpToast';
+
+// Inner component that uses GameContext (must be inside GameProvider)
+const ScreenFlashOverlay: FC = () => {
+  const { screenFlash } = useGame();
+  if (!screenFlash) return null;
+  return (
+    <div
+      className={`fixed inset-0 z-[9995] pointer-events-none ${screenFlash === 'hit' ? 'screen-flash-hit' : 'screen-flash-miss'}`}
+      aria-hidden="true"
+    />
+  );
+};
 
 interface StudyViewProps {
   card: MestreCardData;
@@ -71,7 +86,8 @@ export const StudyView: FC<StudyViewProps> = ({ card, onBack, queueInfo, onNextQ
   const [isOledMode, setIsOledMode] = useState(false);
 
   return (
-    <ReadingProvider>
+    <GameProvider>
+      <ReadingProvider>
       <div className={`min-h-screen transition-colors duration-300 ${isOledMode ? 'oled-mode bg-black' : 'bg-[#050810]'}`}>
         {/* Header Fixo Global de Navegação (Retornar) */}
         <div className={`border-b border-slate-800 p-4 flex items-center justify-between z-50 relative ${isOledMode ? 'bg-black' : 'bg-[#0a0f18]'}`}>
@@ -170,6 +186,11 @@ export const StudyView: FC<StudyViewProps> = ({ card, onBack, queueInfo, onNextQ
           </ErrorBoundary>
         </div>
       </div>
-    </ReadingProvider>
+      </ReadingProvider>
+      {/* Global game engine overlays */}
+      <ScreenFlashOverlay />
+      <ParticlesBurst />
+      <XpToast />
+    </GameProvider>
   );
 };

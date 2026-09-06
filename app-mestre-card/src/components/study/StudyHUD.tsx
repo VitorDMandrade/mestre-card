@@ -2,6 +2,8 @@ import { useEffect, useState, useRef } from 'react';
 import type { StudySessionRecord, TheoryBlock } from '../../types/mestre-card';
 import { playClickSound } from '../../lib/audio';
 import { useReading } from '../../context/ReadingContext';
+import { useGame } from '../../context/GameContext';
+import { getLevelColor, getLevelGlowClass } from '../../lib/xp-engine';
 
 export function sanitizeForSpeech(rawText: string): string {
   if (!rawText) return '';
@@ -199,10 +201,54 @@ export const StudyHUD = ({
     setActiveHash('sec-01');
   };
 
+  const { combo, playerProfile } = useGame();
+  const { xp, levelName, xpForCurrentLevel, xpForNextLevel, xpProgress } = playerProfile;
+  const xpRange = xpForNextLevel - xpForCurrentLevel;
+  const isNearNextLevel = xpProgress >= 0.8;
+  const levelColorClass = getLevelColor(levelName);
+  const glowClass = getLevelGlowClass(levelName);
+
   return (
     <>
       <div className="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-md border-b border-slate-800 mb-8 pt-4 pb-0 shadow-lg safe-top">
         <div className="max-w-6xl mx-auto px-4">
+
+          {/* ─── XP Bar Row ─────────────────────────────── */}
+          <div className="flex items-center gap-3 mb-3 flex-wrap">
+            {/* Level Badge */}
+            <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-black font-mono tracking-wider ${levelColorClass} ${glowClass} border-current/30 bg-slate-900 neon-pulse`}>
+              <span>⭐</span>
+              <span>{levelName}</span>
+            </div>
+
+            {/* XP Progress Bar */}
+            <div className="flex-1 flex items-center gap-2 min-w-0">
+              <div className="flex-1 bg-slate-800 rounded-full h-2 overflow-hidden border border-slate-700">
+                <div
+                  className={`h-full bg-gradient-to-r from-cyan-500 to-blue-500 xp-bar-fill ${isNearNextLevel ? 'xp-near-full' : ''}`}
+                  style={{ width: `${Math.round(xpProgress * 100)}%` }}
+                />
+              </div>
+              <span className="text-[10px] font-mono text-slate-400 whitespace-nowrap">
+                {xp - xpForCurrentLevel}/{xpRange > 0 ? xpRange : '∞'} XP
+              </span>
+            </div>
+
+            {/* Combo Counter (when active) */}
+            {combo >= 2 && (
+              <div className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black font-mono combo-enter ${
+                combo >= 10
+                  ? 'bg-rose-950/80 border border-rose-400 text-rose-300 combo-pulse shadow-[0_0_12px_rgba(251,113,133,0.4)]'
+                  : combo >= 5
+                  ? 'bg-amber-950/80 border border-amber-400 text-amber-300 combo-pulse shadow-[0_0_10px_rgba(251,191,36,0.3)]'
+                  : 'bg-cyan-950/80 border border-cyan-500 text-cyan-300'
+              }`}>
+                <span>{combo >= 10 ? '🔥' : combo >= 5 ? '💥' : '⚡'}</span>
+                <span>x{combo} COMBO</span>
+              </div>
+            )}
+          </div>
+
           <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
             <div className="flex items-center gap-3 flex-wrap">
               {queueInfo ? (
