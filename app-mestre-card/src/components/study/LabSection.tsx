@@ -2,8 +2,11 @@ import { useState } from 'react';
 import type { LabQuestion, BossFight } from '../../types/mestre-card';
 import { MathRenderer } from '../MathRenderer';
 import { playSound, playDamageSound, playVictorySound } from '../../lib/audio';
+import { db } from '../../lib/db';
 
 interface LabSectionProps {
+  cardId?: string;
+  cardTitle?: string;
   questions: LabQuestion[];
   hardcoreQuestions?: LabQuestion[];
   bossFight: BossFight;
@@ -52,7 +55,7 @@ export function parseDistractorAnalysis(
   return { success: true, fullText: analysisText, items };
 }
 
-export const LabSection = ({ questions, hardcoreQuestions, bossFight, isHardcore, soundEnabled, onApplyDamage }: LabSectionProps) => {
+export const LabSection = ({ cardId, cardTitle, questions, hardcoreQuestions, bossFight, isHardcore, soundEnabled, onApplyDamage }: LabSectionProps) => {
   const [answeredQs, setAnsweredQs] = useState<Record<string, 'A' | 'B' | 'C' | 'D'>>({});
   const hasHardcore = Array.isArray(hardcoreQuestions) && hardcoreQuestions.length > 0;
   const [selectedTab, setSelectedTab] = useState<'standard' | 'hardcore'>(isHardcore && hasHardcore ? 'hardcore' : 'standard');
@@ -88,6 +91,39 @@ export const LabSection = ({ questions, hardcoreQuestions, bossFight, isHardcore
         onApplyDamage(20);
       } else {
         playSound(false, soundEnabled);
+      }
+
+      // Registro atômico imediato no Caderno de Erros Históricos (IndexedDB)
+      if (cardId) {
+        let promptText = '';
+        let wrongText = '';
+        let explanationText = '';
+
+        if (questionId === 'boss') {
+          promptText = bossFight.context;
+          const opt = bossFight.options.find(o => o.letter === letter);
+          wrongText = opt ? `Alternativa ${letter}: ${opt.text}` : `Alternativa ${letter}`;
+          explanationText = bossFight.stepByStepResolution;
+        } else {
+          const currentQ = activeQuestions.find(q => q.id === questionId);
+          if (currentQ) {
+            promptText = currentQ.enunciado;
+            const opt = currentQ.options.find(o => o.letter === letter);
+            wrongText = opt ? `Alternativa ${letter}: ${opt.text}` : `Alternativa ${letter}`;
+            const parsed = parseDistractorAnalysis(currentQ.resolution.distractorAnalysis, currentQ.options);
+            explanationText = parsed.items[letter] || currentQ.resolution.technicalVerdict;
+          }
+        }
+
+        db.recordSessionError({
+          cardId,
+          cardTitle: cardTitle || 'Dossiê Tático',
+          game: isViewingHardcore ? 'Lab-Hardcore' : questionId === 'boss' ? 'Lab-Boss' : 'Lab',
+          prompt: promptText,
+          userWrongAnswer: wrongText,
+          explanation: explanationText,
+          timestamp: Date.now()
+        }).catch(err => console.error('Erro ao registrar falha do Lab no DB:', err));
       }
     }
   };

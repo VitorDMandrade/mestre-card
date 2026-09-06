@@ -105,6 +105,55 @@ export const db = {
     });
   },
 
+  async recordSessionError(error: {
+    cardId: string;
+    cardTitle: string;
+    game: 'G1' | 'G3' | 'G5' | 'Lab' | 'Lab-Hardcore' | 'Lab-Boss' | string;
+    prompt: string;
+    userWrongAnswer: string;
+    explanation: string;
+    timestamp?: number;
+  }): Promise<void> {
+    const database = await openDB();
+    return new Promise((resolve, reject) => {
+      const transaction = database.transaction('history', 'readwrite');
+      const store = transaction.objectStore('history');
+
+      const errorItem = {
+        game: error.game,
+        prompt: error.prompt,
+        userWrongAnswer: error.userWrongAnswer,
+        explanation: error.explanation,
+        cardId: error.cardId,
+        cardTitle: error.cardTitle,
+        timestamp: error.timestamp || Date.now()
+      };
+
+      const record: StudySessionRecord = {
+        id: crypto.randomUUID(),
+        cardId: error.cardId,
+        timestamp: errorItem.timestamp,
+        score: 0,
+        stats: {
+          accuracy: 0,
+          coherenceScore: 0,
+          speed: 0,
+          immunity: 0,
+          totalScore: 0
+        },
+        details: {
+          verdict: `Falha Registrada // ${error.game}`,
+          sessionErrors: [errorItem]
+        }
+      };
+
+      const request = store.put(record);
+      transaction.onerror = () => reject(new Error('Erro ao salvar falha na tabela history'));
+      transaction.oncomplete = () => resolve();
+      request.onerror = () => reject(new Error('Erro na requisição recordSessionError'));
+    });
+  },
+
   async clearAllHistoricErrors(): Promise<number> {
     const database = await openDB();
     return new Promise((resolve, reject) => {

@@ -11,54 +11,215 @@ export type ParsedImport =
   | { type: 'backup'; data: UnifiedBackupPayload }
   | { type: 'single_card'; data: MestreCardData };
 
-export function sanitizeAndParseJSON(rawInput: string): unknown {
-  try {
-    let sanitized = rawInput.trim();
-    
-    // Remove markdown fences se existirem
-    if (sanitized.startsWith('```')) {
-      const lines = sanitized.split('\n');
-      if (lines.length > 1) {
-        lines.shift(); // remove primeira linha ```json
+/**
+ * Limpa e repara anomalias comuns geradas por LLMs em payloads JSON:
+ * 1. Comentários C/JS
+ * 2. Vírgulas residuais (trailing commas antes de } ou ])
+ * 3. Contrabarras de KaTeX/LaTeX não escapadas (\Delta, \frac -> \\Delta, \\frac)
+ * 4. Vírgulas ausentes entre pares de propriedades consecutivas
+ */
+export function repairJSONString(str: string): string {
+  let output = str;
+
+  // 1. Remove comentários multi-linha e linha única fora de strings
+  output = output.replace(/\/\*[\s\S]*?\*\//g, '');
+  output = output.replace(/^\s*\/\/.*$/gm, '');
+
+  // 2. Remove vírgulas residuais (trailing commas) antes de fechar chaves ou colchetes
+  output = output.replace(/,\s*([}\]])/g, '$1');
+
+  // 3. Normaliza contrabarras de fórmulas KaTeX que não sejam escapes JSON válidos
+  // No JSON, apenas \", \\, \/, \b, \f, \n, \r, \t, \uXXXX são válidos.
+  output = output.replace(/\\([^"\\\/bfnrtu]|u(?![\da-fA-F]{4}))/g, '\\\\$1');
+
+  // 4. Repara vírgulas esquecidas entre propriedades em linhas separadas
+  // Ex: "title": "X"\n  "content": "Y" -> "title": "X",\n  "content": "Y"
+  output = output.replace(/("|\d+|true|false|null|\]|\})\s*\n\s*("|\{)/g, '$1,\n$2');
+
+  // 5. Remove novamente vírgulas antes de fechar estruturas que possam ter surgido
+  output = output.replace(/,\s*([}\]])/g, '$1');
+
+  return output;
+}
+
+/**
+ * Varredura profunda caractere a caractere para reparar:
+ * - Quebras de linha reais e tabs crus dentro de strings literais
+ * - Aspas duplas internas não escapadas dentro de valores de propriedades
+ */
+export function deepRepairJSON(input: string): string {
+  let repaired = '';
+  let inString = false;
+  let isEscaped = false;
+  let isValue = false; // Indica se estamos dentro do valor de uma propriedade (após :)
+
+  for (let i = 0; i < input.length; i++) {
+    const char = input[i];
+
+    if (inString) {
+      if (isEscaped) {
+        repaired += char;
+        isEscaped = false;
+        continue;
       }
-      if (lines[lines.length - 1].trim().startsWith('```')) {
-        lines.pop(); // remove ultima linha ```
+
+      if (char === '\\') {
+        repaired += char;
+        isEscaped = true;
+        continue;
       }
-      sanitized = lines.join('\n');
-    }
 
-    // Encontra os limites do JSON (pode ser objeto ou array)
-    const firstBrace = sanitized.indexOf('{');
-    const firstBracket = sanitized.indexOf('[');
-    const lastBrace = sanitized.lastIndexOf('}');
-    const lastBracket = sanitized.lastIndexOf(']');
+      if (char === '\n') {
+        repaired += '\\n';
+        continue;
+      }
 
-    const hasObject = firstBrace !== -1 && lastBrace !== -1 && firstBrace < lastBrace;
-    const hasArray = firstBracket !== -1 && lastBracket !== -1 && firstBracket < lastBracket;
+      if (char === '\r') {
+        continue; // Ignora retorno de carro dentro de strings
+      }
 
-    if (!hasObject && !hasArray) {
-      throw new Error('Nenhum objeto ou array JSON válido encontrado na entrada.');
-    }
+      if (char === '\t') {
+        repaired += '\\t';
+        continue;
+      }
 
-    let startIdx = -1;
-    let endIdx = -1;
+      if (char === '"') {
+        // Checa se é realmente o fechamento da string ou uma aspas interna não-escapada
+        const remaining = input.substring(i + 1);
+        const matchNext = remaining.match(/^\s*(,|:|}|\]|\n|\r)/);
+        
+        if (isValue && !matchNext) {
+          // Não é seguido por pontuação JSON estrutural: é uma aspas interna do texto!
+          repaired += '\\"';
+          continue;
+        } else {
+          // Fechamento legítimo da string
+          inString = false;
+          repaired += char;
+          continue;
+        }
+      }
 
-    if (hasObject && hasArray) {
-      // Pega o que vier primeiro e terminar por último
-      startIdx = Math.min(firstBrace, firstBracket);
-      endIdx = Math.max(lastBrace, lastBracket);
-    } else if (hasObject) {
-      startIdx = firstBrace;
-      endIdx = lastBrace;
+      repaired += char;
     } else {
-      startIdx = firstBracket;
-      endIdx = lastBracket;
+      // Fora de string
+      if (char === '"') {
+        inString = true;
+        isEscaped = false;
+        repaired += char;
+      } else {
+        if (char === ':') isValue = true;
+        else if (char === ',' || char === '{' || char === '[') isValue = false;
+        repaired += char;
+      }
     }
+  }
 
-    const jsonStr = sanitized.substring(startIdx, endIdx + 1);
+  return repairJSONString(repaired);
+}
+
+/**
+ * Formata um snippet diagnóstico destacando a linha e coluna do erro sintático
+ */
+function formatJSONErrorDiagnostic(jsonText: string, errorMsg: string): string {
+  // Extrai linha e coluna se existirem no erro V8/SpiderMonkey
+  const lineColMatch = errorMsg.match(/line\s+(\d+)\s+column\s+(\d+)|linha\s+(\d+)\s+coluna\s+(\d+)/i);
+  let lineNum = 0;
+  let colNum = 0;
+
+  if (lineColMatch) {
+    lineNum = parseInt(lineColMatch[1] || lineColMatch[3], 10);
+    colNum = parseInt(lineColMatch[2] || lineColMatch[4], 10);
+  } else {
+    const posMatch = errorMsg.match(/position\s+(\d+)|posição\s+(\d+)/i);
+    if (posMatch) {
+      const pos = parseInt(posMatch[1] || posMatch[2], 10);
+      const sub = jsonText.substring(0, pos);
+      const lines = sub.split('\n');
+      lineNum = lines.length;
+      colNum = lines[lines.length - 1].length + 1;
+    }
+  }
+
+  if (lineNum > 0) {
+    const allLines = jsonText.split('\n');
+    const start = Math.max(0, lineNum - 3);
+    const end = Math.min(allLines.length, lineNum + 2);
+    
+    let snippet = `[DIAGNÓSTICO TÁTICO NO PONTO DE ERRO - LINHA ${lineNum}, COLUNA ${colNum}]:\n`;
+    for (let l = start; l < end; l++) {
+      const isErrorLine = l + 1 === lineNum;
+      const prefix = isErrorLine ? '➔ ' : '  ';
+      snippet += `${prefix}${String(l + 1).padStart(4, ' ')} | ${allLines[l]}\n`;
+      if (isErrorLine && colNum > 0) {
+        snippet += `         | ${' '.repeat(Math.max(0, colNum - 1))}^\n`;
+      }
+    }
+    snippet += `\n[SOLUÇÃO]: O modelo inseriu aspas sem escape (\\"), uma vírgula a mais ou omitiu uma vírgula na linha anterior.`;
+    return snippet;
+  }
+
+  return `[DICA TÁTICA]: Verifique se há aspas internas não escapadas ou caracteres de controle no JSON gerado.`;
+}
+
+export function sanitizeAndParseJSON(rawInput: string): unknown {
+  if (!rawInput || typeof rawInput !== 'string') {
+    throw new Error('Entrada de dados vazia ou inválida.');
+  }
+
+  let sanitized = rawInput.trim();
+  
+  // Remove markdown fences se existirem (```json e ```)
+  sanitized = sanitized.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+
+  // Encontra os limites externos do JSON (objeto {} ou array [])
+  const firstBrace = sanitized.indexOf('{');
+  const firstBracket = sanitized.indexOf('[');
+  const lastBrace = sanitized.lastIndexOf('}');
+  const lastBracket = sanitized.lastIndexOf(']');
+
+  const hasObject = firstBrace !== -1 && lastBrace !== -1 && firstBrace < lastBrace;
+  const hasArray = firstBracket !== -1 && lastBracket !== -1 && firstBracket < lastBracket;
+
+  if (!hasObject && !hasArray) {
+    throw new Error('Nenhum objeto {...} ou array [...] JSON válido encontrado no texto enviado.');
+  }
+
+  let startIdx = 0;
+  let endIdx = sanitized.length - 1;
+
+  if (hasObject && hasArray) {
+    startIdx = Math.min(firstBrace, firstBracket);
+    endIdx = Math.max(lastBrace, lastBracket);
+  } else if (hasObject) {
+    startIdx = firstBrace;
+    endIdx = lastBrace;
+  } else {
+    startIdx = firstBracket;
+    endIdx = lastBracket;
+  }
+
+  const jsonStr = sanitized.substring(startIdx, endIdx + 1);
+
+  // Nível 1: Tentativa Direta Pura
+  try {
     return JSON.parse(jsonStr);
-  } catch (error: any) {
-    throw new Error(`Falha ao decodificar JSON: ${error.message}`);
+  } catch (err1: any) {
+    // Nível 2: Auto-Reparação Padrão (vírgulas residuais, contrabarras KaTeX e comentários)
+    try {
+      const repaired = repairJSONString(jsonStr);
+      return JSON.parse(repaired);
+    } catch (err2: any) {
+      // Nível 3: Auto-Reparação Profunda (varredura de aspas internas e quebras de linha em strings)
+      try {
+        const deepRepaired = deepRepairJSON(jsonStr);
+        return JSON.parse(deepRepaired);
+      } catch (err3: any) {
+        const originalMsg = err1?.message || err2?.message || err3?.message;
+        const diagnostic = formatJSONErrorDiagnostic(jsonStr, originalMsg);
+        throw new Error(`Falha ao decodificar JSON: ${originalMsg}\n\n${diagnostic}`);
+      }
+    }
   }
 }
 

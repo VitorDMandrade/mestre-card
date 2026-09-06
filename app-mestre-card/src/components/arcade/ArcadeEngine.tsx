@@ -58,7 +58,19 @@ export const ArcadeEngine = ({
 
   const recordError = useCallback((error: SessionErrorLog) => {
     setSessionErrors(prev => [...prev, error]);
-  }, []);
+    // Persist immediately to IndexedDB so failures are never lost if user exits or collapses in G1
+    db.recordSessionError({
+      game: error.game,
+      prompt: error.prompt,
+      userWrongAnswer: error.userWrongAnswer,
+      explanation: error.explanation,
+      cardId: card.id,
+      cardTitle: card.title,
+      timestamp: Date.now()
+    }).catch(err => {
+      console.error('Falha ao registrar erro no banco imediatamente:', err);
+    });
+  }, [card.id, card.title]);
 
   const [gamesStatus, setGamesStatus] = useState({ g1: false, g2: false, g3: false, g4: false, g5: false });
   const [triResult, setTriResult] = useState<TRIScoreResult | null>(null);

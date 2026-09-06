@@ -147,7 +147,7 @@ export interface StudySessionRecord {
   stats: TRIStatistics;
   details?: {
     sessionErrors?: Array<{
-      game: 'G1' | 'G3' | 'G5';
+      game: 'G1' | 'G3' | 'G5' | 'Lab' | 'Lab-Hardcore' | 'Lab-Boss' | string;
       prompt: string;
       userWrongAnswer: string;
       explanation: string;

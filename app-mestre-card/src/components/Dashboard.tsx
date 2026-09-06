@@ -74,14 +74,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
     }
   });
 
-  const getErrorHash = (err: { cardId?: string; prompt: string; timestamp?: number; game: string }) => 
-    `${err.cardId || ''}:${err.game}:${err.prompt}:${err.timestamp || ''}`;
+  const getErrorHash = (err: { cardId?: string; prompt: string; game: string }) => 
+    `${err.cardId || ''}:${err.game}:${err.prompt}`;
 
   // Extract all historical errors from allHistory
   const historicErrors = useMemo(() => {
     if (!allHistory || isHistoryCleared) return [];
     const errors: Array<{
-      game: 'G1' | 'G3' | 'G5';
+      game: 'G1' | 'G3' | 'G5' | 'Lab' | 'Lab-Hardcore' | 'Lab-Boss' | string;
       prompt: string;
       userWrongAnswer: string;
       explanation: string;
@@ -101,7 +101,21 @@ export const Dashboard: React.FC<DashboardProps> = ({
         }
       }
     }
-    return errors;
+
+    // Sort by most recent first
+    errors.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+    // Deduplicate by signature to avoid spamming the same failure
+    const seen = new Set<string>();
+    const deduplicated: typeof errors = [];
+    for (const err of errors) {
+      const key = `${err.cardId || ''}:${err.game}:${err.prompt}:${err.userWrongAnswer}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        deduplicated.push(err);
+      }
+    }
+    return deduplicated;
   }, [allHistory, isHistoryCleared]);
 
   const activeHistoricErrors = useMemo(() => {
@@ -278,15 +292,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         <div className="flex flex-wrap gap-2 justify-end">
-          {activeHistoricErrors.length > 0 && (
-            <button 
-              onClick={() => setIsGlobalErrorModalOpen(true)}
-              className="bg-red-500/15 hover:bg-red-500/25 border border-red-500/60 text-red-300 px-3.5 py-2 rounded-lg text-xs font-mono font-bold transition-all uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_15px_rgba(239,68,68,0.25)] animate-pulse hover:animate-none cursor-pointer"
-              title="Abrir Caderno de Erros Global de sessões anteriores">
-              <span>🚨</span>
-              <span>MODO REPESCAGEM: {activeHistoricErrors.length} ERROS HISTÓRICOS</span>
-            </button>
-          )}
+          <button 
+            onClick={() => setIsGlobalErrorModalOpen(true)}
+            className={activeHistoricErrors.length > 0 
+              ? "bg-red-500/15 hover:bg-red-500/25 border border-red-500/60 text-red-300 px-3.5 py-2 rounded-lg text-xs font-mono font-bold transition-all uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_15px_rgba(239,68,68,0.25)] animate-pulse hover:animate-none cursor-pointer"
+              : "bg-slate-900/80 hover:bg-slate-800 border border-slate-700/60 text-slate-400 hover:text-slate-200 px-3.5 py-2 rounded-lg text-xs font-mono font-bold transition-all uppercase tracking-wider flex items-center gap-1.5 cursor-pointer"
+            }
+            title="Abrir Caderno de Erros Global de sessões anteriores">
+            <span>{activeHistoricErrors.length > 0 ? '🚨' : '🛡️'}</span>
+            <span>{activeHistoricErrors.length > 0 ? `REPESCAGEM: ${activeHistoricErrors.length} ERROS` : 'CADERNO DE ERROS (0)'}</span>
+          </button>
 
           <button 
             onClick={() => setIsTerminalOpen(!isTerminalOpen)}
@@ -319,6 +334,39 @@ export const Dashboard: React.FC<DashboardProps> = ({
           )}
         </div>
       </div>
+
+      {/* Banner Tático de Vulnerabilidade Cognitiva / Caderno de Erros Ativo */}
+      {activeHistoricErrors.length > 0 && (
+        <div className="p-4 rounded-2xl border border-red-500/50 bg-gradient-to-r from-red-950/40 via-slate-900/90 to-amber-950/30 shadow-[0_0_25px_rgba(239,68,68,0.15)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-fade-in">
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-red-500/20 border border-red-500/40 flex items-center justify-center text-xl shrink-0 animate-pulse">
+              🚨
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-sm font-black text-white font-mono tracking-tight uppercase">
+                  Caderno de Erros Ativo // Fila de Repescagem
+                </h2>
+                <span className="px-2 py-0.5 rounded-full bg-red-500/20 border border-red-500/40 text-red-300 font-mono text-[10px] font-bold">
+                  {activeHistoricErrors.length} {activeHistoricErrors.length === 1 ? 'FALHA' : 'FALHAS'}
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 font-sans mt-0.5 leading-relaxed">
+                Foram registradas falhas conceituais no Laboratório e Arcade. Realize o auto-teste de repescagem para fixar as lacunas antes do simulado.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 w-full sm:w-auto shrink-0 justify-end">
+            <button
+              onClick={() => setIsGlobalErrorModalOpen(true)}
+              className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-mono text-xs font-bold transition-all shadow-[0_0_15px_rgba(239,68,68,0.4)] flex items-center gap-1.5 cursor-pointer w-full sm:w-auto justify-center"
+            >
+              <span>🎯</span>
+              <span>RETESTAR FALHAS AGORA</span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Terminal Retrátil de Ingestão & Sincronização */}
       {isTerminalOpen && (
@@ -689,7 +737,15 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       <div className="flex items-center justify-between text-[10px] text-slate-400">
                         <div className="flex items-center gap-2">
                           <span className="px-1.5 py-0.5 rounded bg-red-950 border border-red-800 text-red-300 font-bold">
-                            {err.game === 'G1' ? 'G1: MORTE SÚBITA' : err.game === 'G3' ? 'G3: PRESSÃO TRI' : 'G5: O INFILTRADO'}
+                            {err.game === 'G1' 
+                              ? 'G1: MORTE SÚBITA' 
+                              : err.game === 'G3' 
+                              ? 'G3: PRESSÃO TRI' 
+                              : err.game === 'G5' 
+                              ? 'G5: O INFILTRADO' 
+                              : err.game.startsWith('Lab') 
+                              ? `LAB PRÁTICO (${err.game})` 
+                              : err.game}
                           </span>
                           {err.cardTitle && (
                             <span className="text-slate-300 font-semibold truncate max-w-[200px]">

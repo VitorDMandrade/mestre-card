@@ -131,6 +131,8 @@ export const StudyView: FC<StudyViewProps> = ({ card, onBack, queueInfo, onNextQ
         
         <ErrorBoundary fallbackTitle="Erro no Laboratório Tático">
           <LabSection 
+            cardId={card.id}
+            cardTitle={card.title}
             questions={card.sec05_lab?.questions || []}
             hardcoreQuestions={card.sec05_lab?.hardcoreQuestions}
             bossFight={card.sec05_lab?.bossFight}
