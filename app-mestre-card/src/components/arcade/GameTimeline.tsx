@@ -35,11 +35,15 @@ export const GameTimeline = ({ questions, soundEnabled, onDamage, onComplete }: 
   const [shuffledOptions, setShuffledOptions] = useState<ArcadeQuestion['options']>([]);
   const [answeredIdx, setAnsweredIdx] = useState<number | null>(null);
   const [punishTime, setPunishTime] = useState<number | null>(null);
+  const [selectedWrong, setSelectedWrong] = useState<{ text: string; feedback: string } | null>(null);
+  const [correctOpt, setCorrectOpt] = useState<{ text: string; feedback: string } | null>(null);
   const [isFinished, setIsFinished] = useState(false);
 
   const nextQuestion = () => {
     setAnsweredIdx(null);
     setPunishTime(null);
+    setSelectedWrong(null);
+    setCorrectOpt(null);
     if (step + 1 >= questions.length) {
       setIsFinished(true);
       onComplete(results);
@@ -54,6 +58,8 @@ export const GameTimeline = ({ questions, soundEnabled, onDamage, onComplete }: 
       const opts = Array.isArray(q?.options) ? q.options : [];
       setShuffledOptions(shuffleArray(opts));
       setAnsweredIdx(null);
+      setSelectedWrong(null);
+      setCorrectOpt(null);
     }
   }, [step, questions]);
 
@@ -77,7 +83,12 @@ export const GameTimeline = ({ questions, soundEnabled, onDamage, onComplete }: 
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
 
       if (e.code === 'Space') {
-        if (punishTime !== null || answeredIdx !== null) {
+        if (punishTime !== null) {
+          if (punishTime <= 7) {
+            e.preventDefault();
+            nextQuestion();
+          }
+        } else if (answeredIdx !== null) {
           e.preventDefault();
           nextQuestion();
         }
@@ -128,6 +139,11 @@ export const GameTimeline = ({ questions, soundEnabled, onDamage, onComplete }: 
     if (opt.isCorrect) {
       setStreak(s => s + 1);
     } else {
+      const correct = shuffledOptions.find(o => o.isCorrect);
+      setSelectedWrong({ text: opt.text, feedback: opt.feedback });
+      if (correct) {
+        setCorrectOpt({ text: correct.text, feedback: correct.feedback });
+      }
       setStreak(Math.max(0, streak - 2));
       onDamage(20);
       setPunishTime(10);
@@ -150,17 +166,86 @@ export const GameTimeline = ({ questions, soundEnabled, onDamage, onComplete }: 
       </div>
 
       {punishTime !== null ? (
-        <div className="mt-4 p-4 bg-red-900/40 border border-red-500 rounded-lg text-center animate-pulse">
-          <p className="text-red-300 font-bold mb-2">Atenção! Você errou e o sistema travou.</p>
-          <p className="text-sm text-gray-300 mb-4">
-            Liberando em <span className="text-xl font-mono text-white">{punishTime}s</span>
-          </p>
-          <button 
-            onClick={() => { setPunishTime(null); nextQuestion(); }}
-            className="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded font-bold text-xs transition-colors"
-          >
-            Continuar Agora (Espaço) ➔
-          </button>
+        <div className="mt-2 p-5 bg-gradient-to-b from-red-950/80 to-slate-950/90 border-2 border-red-500/80 rounded-xl shadow-[0_0_30px_rgba(239,68,68,0.25)] space-y-4 animate-fade-in">
+          <div className="flex justify-between items-center border-b border-red-800/50 pb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-xl">⚠️</span>
+              <div>
+                <h4 className="text-red-400 font-extrabold text-sm uppercase tracking-wider">
+                  FALHA TÁTICA // MORTE SÚBITA
+                </h4>
+                <p className="text-[11px] text-red-300/80 font-mono">DANO RECEBIDO: -20 HP | QUEBRA DE COMBO</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <span className="text-[10px] text-slate-400 uppercase font-mono block">Tempo Restante</span>
+              <span className="text-2xl font-black font-mono text-red-400 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]">
+                {punishTime}s
+              </span>
+            </div>
+          </div>
+
+          <div className="bg-slate-900/90 p-3 rounded-lg border border-slate-800">
+            <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block mb-1">Questão</span>
+            <p className="text-white text-sm font-semibold">{currentQ.question}</p>
+          </div>
+
+          {/* Diagnostic Comparison */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {selectedWrong && (
+              <div className="bg-red-950/40 border border-red-500/40 rounded-lg p-3.5 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-red-400 mb-1.5 uppercase font-mono">
+                    <span>❌</span> O Que Você Marcou (Distrator)
+                  </div>
+                  <p className="text-xs text-red-200 font-medium mb-2 pl-3 border-l-2 border-red-500/40">
+                    {selectedWrong.text}
+                  </p>
+                </div>
+                <div className="bg-red-900/30 rounded p-2 text-xs text-red-300 font-mono leading-relaxed mt-2 border border-red-800/40">
+                  <span className="font-bold text-red-400">Pegadinha: </span>
+                  {selectedWrong.feedback || 'Conceito incorreto ou armadilha da banca.'}
+                </div>
+              </div>
+            )}
+
+            {correctOpt && (
+              <div className="bg-emerald-950/40 border border-emerald-500/40 rounded-lg p-3.5 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-400 mb-1.5 uppercase font-mono">
+                    <span>✅</span> Gabarito Correto
+                  </div>
+                  <p className="text-xs text-emerald-200 font-medium mb-2 pl-3 border-l-2 border-emerald-500/40">
+                    {correctOpt.text}
+                  </p>
+                </div>
+                <div className="bg-emerald-900/30 rounded p-2 text-xs text-emerald-300 font-mono leading-relaxed mt-2 border border-emerald-800/40">
+                  <span className="font-bold text-emerald-400">Fundamentação: </span>
+                  {correctOpt.feedback || 'Afirmação correta de acordo com a teoria.'}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Advance Action */}
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-red-900/30">
+            <span className="text-xs text-slate-400 font-mono">
+              {punishTime > 7 
+                ? `🔒 Leitura obrigatória: desbloqueando em ${punishTime - 7}s...` 
+                : '✓ Diagnóstico assimilado! Você já pode prosseguir.'}
+            </span>
+            <button
+              disabled={punishTime > 7}
+              onClick={() => { setPunishTime(null); nextQuestion(); }}
+              className={`px-5 py-2.5 rounded-lg font-bold text-xs font-mono transition-all flex items-center gap-2 ${
+                punishTime > 7
+                  ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
+                  : 'bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-lg shadow-red-600/30 animate-pulse cursor-pointer'
+              }`}
+            >
+              Continuar Agora (Espaço) ➔
+            </button>
+          </div>
         </div>
       ) : (
         <>

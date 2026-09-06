@@ -85,12 +85,18 @@ Adapte **OBRIGATORIAMENTE** a natureza desta seção à matéria:
   - `trap`: A armadilha oculta e a ação tática imediata de decodificação.
 
 #### SEC.05 // LABORATÓRIO INTERATIVO & BOSS FIGHT
-- `questions`: Exatamente **4 questões inéditas e contextualizadas de aplicação imediata**, padrão ENEM/Fuvest/Unicamp:
+- `questions`: Exatamente **4 questões inéditas e contextualizadas de aplicação imediata**, padrão ENEM/Fuvest/Unicamp (1ª Fase):
   - `id`: `"lab-01"`, `"lab-02"`, `"lab-03"`, `"lab-04"`.
   - `enunciado`: Texto-base denso, autêntico e contextualizado.
   - `options`: 4 alternativas completas e desafiadoras (A, B, C, D), com uma correta (`isCorrect: true`).
   - `resolution.distractorAnalysis`: **Análise cirúrgica distrator por distrator** (explicando minuciosamente o erro de cada uma das 3 alternativas incorretas).
   - `resolution.technicalVerdict`: Veredito técnico detalhado e fundamentação da alternativa correta.
+- `hardcoreQuestions`: Exatamente **2 questões de Aprofundamento Conteudista / Nível 2ª Fase (FUVEST, UNICAMP, ITA)**:
+  - `id`: `"lab-hc-01"`, `"lab-hc-02"`.
+  - `enunciado`: Enunciado altamente analítico, interdisciplinar, exigindo domínio fino de exceções teóricas e dedução avançada.
+  - `options`: 4 alternativas de altíssimo rigor (A, B, C, D) com armadilhas conceituais refinadas.
+  - `resolution.distractorAnalysis`: Desmontagem cirúrgica de cada distrator de 2ª fase.
+  - `resolution.technicalVerdict`: Fundamentação técnica aprofundada com rigor conceitual máximo.
 - `bossFight`: **1 Desafio de Elite (Padrão 2ª Fase Medicina / ITA / Fuvest)**:
   - `title`: Título do desafio de alto nível.
   - `context`: Texto-base longo, complexo e interdisciplinar.
@@ -198,7 +204,20 @@ Implementação obrigatória das 5 matrizes completas, **com 6 a 8 ITENS COMPLET
           "technicalVerdict": string
         }
       }
-    ], // Exatamente 4 questões
+    ], // Exatamente 4 questões padrão (1ª Fase)
+    "hardcoreQuestions": [
+      {
+        "id": string,
+        "enunciado": string,
+        "options": [
+          { "letter": "A" | "B" | "C" | "D", "text": string, "isCorrect": boolean }
+        ],
+        "resolution": {
+          "distractorAnalysis": string,
+          "technicalVerdict": string
+        }
+      }
+    ], // Exatamente 2 questões de alto rigor (2ª Fase)
     "bossFight": {
       "title": string,
       "context": string,

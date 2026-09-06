@@ -109,6 +109,7 @@ export const StudyView: FC<StudyViewProps> = ({ card, onBack }) => {
         <ErrorBoundary fallbackTitle="Erro no Laboratório Tático">
           <LabSection 
             questions={card.sec05_lab?.questions || []}
+            hardcoreQuestions={card.sec05_lab?.hardcoreQuestions}
             bossFight={card.sec05_lab?.bossFight}
             isHardcore={isHardcore}
             soundEnabled={soundEnabled}

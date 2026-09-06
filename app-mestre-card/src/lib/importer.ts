@@ -98,8 +98,13 @@ export function validateMestreCard(data: any): MestreCardData {
       blindSpots: [],
       triggerWords: []
     },
-    sec05_lab: data.sec05_lab || {
+    sec05_lab: data.sec05_lab ? {
+      questions: data.sec05_lab.questions || [],
+      hardcoreQuestions: data.sec05_lab.hardcoreQuestions || [],
+      bossFight: data.sec05_lab.bossFight || { title: '', context: '', options: [], stepByStepResolution: '' }
+    } : {
       questions: [],
+      hardcoreQuestions: [],
       bossFight: { title: '', context: '', options: [], stepByStepResolution: '' }
     },
     sec06_recall: data.sec06_recall || [],

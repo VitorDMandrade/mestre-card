@@ -109,6 +109,7 @@ export interface MestreCardData {
   };
   sec05_lab: {
     questions: LabQuestion[];
+    hardcoreQuestions?: LabQuestion[];
     bossFight: BossFight;
   };
   sec06_recall: Flashcard[];

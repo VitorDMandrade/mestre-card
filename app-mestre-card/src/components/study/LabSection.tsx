@@ -1,18 +1,33 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { LabQuestion, BossFight } from '../../types/mestre-card';
 import { MathRenderer } from '../MathRenderer';
 import { playSound, playDamageSound, playVictorySound } from '../../lib/audio';
 
 interface LabSectionProps {
   questions: LabQuestion[];
+  hardcoreQuestions?: LabQuestion[];
   bossFight: BossFight;
   isHardcore: boolean;
   soundEnabled: boolean;
   onApplyDamage: (amount: number) => void;
 }
 
-export const LabSection = ({ questions, bossFight, isHardcore, soundEnabled, onApplyDamage }: LabSectionProps) => {
+export const LabSection = ({ questions, hardcoreQuestions, bossFight, isHardcore, soundEnabled, onApplyDamage }: LabSectionProps) => {
   const [answeredQs, setAnsweredQs] = useState<Record<string, 'A' | 'B' | 'C' | 'D'>>({});
+  const hasHardcore = Array.isArray(hardcoreQuestions) && hardcoreQuestions.length > 0;
+  const [selectedTab, setSelectedTab] = useState<'standard' | 'hardcore'>(isHardcore && hasHardcore ? 'hardcore' : 'standard');
+
+  // Synchronize tab when isHardcore toggles in StudyHUD
+  useEffect(() => {
+    if (isHardcore && hasHardcore) {
+      setSelectedTab('hardcore');
+    } else if (!isHardcore) {
+      setSelectedTab('standard');
+    }
+  }, [isHardcore, hasHardcore]);
+
+  const activeQuestions = selectedTab === 'hardcore' && hasHardcore ? hardcoreQuestions : questions;
+  const isViewingHardcore = selectedTab === 'hardcore' && hasHardcore;
   
   const handleAnswer = (questionId: string, letter: 'A' | 'B' | 'C' | 'D', isCorrect: boolean) => {
     if (answeredQs[questionId]) return; // Already answered
@@ -37,23 +52,88 @@ export const LabSection = ({ questions, bossFight, isHardcore, soundEnabled, onA
 
   return (
     <section id="sec-05" className="mb-12 scroll-mt-24">
-      <h2 className="text-2xl font-black text-white mb-6 border-b border-slate-800 pb-4 flex items-center gap-3">
-        <span className="text-blue-500">05.</span> LABORATÓRIO PRÁTICO
-      </h2>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-slate-800 pb-4">
+        <h2 className="text-2xl font-black text-white flex items-center gap-3">
+          <span className="text-blue-500">05.</span> LABORATÓRIO PRÁTICO
+        </h2>
+
+        {hasHardcore && (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setSelectedTab('standard')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all border ${
+                !isViewingHardcore
+                  ? 'bg-blue-600/20 text-blue-300 border-blue-500/50'
+                  : 'bg-slate-800/60 text-slate-400 border-slate-700 hover:text-slate-200'
+              }`}
+            >
+              Padrão ({questions.length})
+            </button>
+            <button
+              onClick={() => setSelectedTab('hardcore')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all border flex items-center gap-1.5 ${
+                isViewingHardcore
+                  ? 'bg-red-600/20 text-red-300 border-red-500/50 shadow-[0_0_12px_rgba(239,68,68,0.25)]'
+                  : 'bg-slate-800/60 text-slate-400 border-slate-700 hover:text-slate-200'
+              }`}
+            >
+              <span>⚡</span>
+              <span>Hardcore 2ª Fase ({hardcoreQuestions?.length || 0})</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Hardcore Active Notice Banner */}
+      {isHardcore && (
+        <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-red-950/80 via-slate-900 to-slate-950 border border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.15)] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">⚡</span>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="px-2 py-0.5 rounded bg-red-500/20 text-red-400 font-mono text-[10px] font-extrabold tracking-wider border border-red-500/40">
+                  MODO HARDCORE ATIVO
+                </span>
+                <span className="text-white text-xs sm:text-sm font-bold">
+                  {isViewingHardcore ? 'BATERIA 2ª FASE (FUVEST / UNICAMP)' : 'PENALIDADE REAL DE DANO ATIVA'}
+                </span>
+              </div>
+              <p className="text-xs text-red-300/80 font-mono mt-0.5">
+                {isViewingHardcore
+                  ? 'Questões conteudistas de alto rigor analítico. Cada erro drena 20 HP do HUD.'
+                  : 'Modo Hardcore habilitado: cada erro drena 20 HP da sua barra de integridade.'}
+              </p>
+            </div>
+          </div>
+          <span className="text-[11px] font-mono text-red-400 bg-red-950/60 px-2.5 py-1 rounded border border-red-800/40">
+            DANO: -20 HP / ERRO
+          </span>
+        </div>
+      )}
 
       <div className="space-y-8">
-        {questions.map((q, i) => {
+        {activeQuestions.map((q, i) => {
           const answeredLetter = answeredQs[q.id];
           const isAnswered = !!answeredLetter;
 
           return (
-            <div key={q.id} className="bg-slate-900 border border-slate-700/80 rounded-2xl p-6 transition-all hover:border-slate-600">
+            <div key={q.id} className={`bg-slate-900 border rounded-2xl p-6 transition-all ${
+              isViewingHardcore 
+                ? 'border-red-900/60 hover:border-red-500/50 shadow-[0_0_25px_rgba(239,68,68,0.08)]' 
+                : 'border-slate-700/80 hover:border-slate-600'
+            }`}>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="bg-blue-900/30 text-blue-400 font-bold font-mono px-3 py-1 rounded border border-blue-500/20 text-sm">
-                    Q{String(i+1).padStart(2, '0')}
+                  <div className={`font-bold font-mono px-3 py-1 rounded text-sm border ${
+                    isViewingHardcore
+                      ? 'bg-red-900/40 text-red-400 border-red-500/40'
+                      : 'bg-blue-900/30 text-blue-400 border-blue-500/20'
+                  }`}>
+                    Q{String(i+1).padStart(2, '0')}{isViewingHardcore ? ' HC' : ''}
                   </div>
-                  <div className="text-slate-400 text-sm font-medium">Treinamento Padrão</div>
+                  <div className={`text-sm font-medium ${isViewingHardcore ? 'text-red-300/90' : 'text-slate-400'}`}>
+                    {isViewingHardcore ? '⚡ 2ª Fase / Aprofundamento' : 'Treinamento Padrão'}
+                  </div>
                 </div>
                 {isAnswered && (
                   <span className="text-xs font-mono text-slate-400">
