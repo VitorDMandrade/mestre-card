@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef } from 'react';
 import type { MestreCardData, StudySessionRecord } from '../types/mestre-card';
+import { db } from '../lib/db';
 
 interface DashboardProps {
   cards: MestreCardData[];
@@ -60,14 +61,25 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [isProcessingFile, setIsProcessingFile] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Global Error Modal state (Deck de Repescagem Direta)
+  // Global Error Notebook state
   const [isGlobalErrorModalOpen, setIsGlobalErrorModalOpen] = useState(false);
   const [revealedErrorIdxs, setRevealedErrorIdxs] = useState<Set<number>>(new Set());
-  const [dismissedErrorIdxs, setDismissedErrorIdxs] = useState<Set<number>>(new Set());
+  const [isHistoryCleared, setIsHistoryCleared] = useState(false);
+  const [dismissedHashes, setDismissedHashes] = useState<Set<string>>(() => {
+    try {
+      const raw = localStorage.getItem('mestre_dismissed_error_hashes');
+      return raw ? new Set(JSON.parse(raw)) : new Set();
+    } catch {
+      return new Set();
+    }
+  });
+
+  const getErrorHash = (err: { cardId?: string; prompt: string; timestamp?: number; game: string }) => 
+    `${err.cardId || ''}:${err.game}:${err.prompt}:${err.timestamp || ''}`;
 
   // Extract all historical errors from allHistory
   const historicErrors = useMemo(() => {
-    if (!allHistory) return [];
+    if (!allHistory || isHistoryCleared) return [];
     const errors: Array<{
       game: 'G1' | 'G3' | 'G5';
       prompt: string;
@@ -90,11 +102,40 @@ export const Dashboard: React.FC<DashboardProps> = ({
       }
     }
     return errors;
-  }, [allHistory]);
+  }, [allHistory, isHistoryCleared]);
 
   const activeHistoricErrors = useMemo(() => {
-    return historicErrors.filter((_, idx) => !dismissedErrorIdxs.has(idx));
-  }, [historicErrors, dismissedErrorIdxs]);
+    return historicErrors.filter(err => !dismissedHashes.has(getErrorHash(err)));
+  }, [historicErrors, dismissedHashes]);
+
+  const handleDismissSingleError = (err: typeof historicErrors[0]) => {
+    const hash = getErrorHash(err);
+    setDismissedHashes(prev => {
+      const next = new Set(prev);
+      next.add(hash);
+      try {
+        localStorage.setItem('mestre_dismissed_error_hashes', JSON.stringify(Array.from(next)));
+      } catch (e) {
+        console.error(e);
+      }
+      return next;
+    });
+  };
+
+  const handleClearAllErrors = async () => {
+    try {
+      await db.clearAllHistoricErrors();
+      setIsHistoryCleared(true);
+      setDismissedHashes(new Set());
+      try {
+        localStorage.removeItem('mestre_dismissed_error_hashes');
+      } catch (e) {
+        console.error(e);
+      }
+    } catch (err) {
+      console.error('Falha ao limpar erros no DB:', err);
+    }
+  };
 
   const toggleRevealError = (idx: number) => {
     setRevealedErrorIdxs(prev => {
@@ -623,9 +664,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   {revealedErrorIdxs.size === activeHistoricErrors.length ? '🙈 Ocultar Gabaritos' : '👁️ Revelar Todos'}
                 </button>
                 <button
-                  onClick={() => setDismissedErrorIdxs(new Set(historicErrors.map((_, i) => i)))}
+                  onClick={handleClearAllErrors}
                   className="px-2.5 py-1 rounded bg-red-950/60 border border-red-800/50 hover:bg-red-900 text-red-300 text-[11px] transition-colors cursor-pointer"
-                  title="Marcar todas as falhas como revisadas nesta sessão"
+                  title="Marcar todas as falhas como revisadas e limpar permanentemente do banco"
                 >
                   🧹 Limpar Fila
                 </button>
@@ -657,7 +698,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                           )}
                         </div>
                         <button
-                          onClick={() => setDismissedErrorIdxs(prev => new Set(prev).add(idx))}
+                          onClick={() => handleDismissSingleError(err)}
                           className="text-slate-500 hover:text-slate-300 text-[10px] underline cursor-pointer"
                         >
                           Marcar Revisado

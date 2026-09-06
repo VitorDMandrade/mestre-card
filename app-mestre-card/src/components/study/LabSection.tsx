@@ -12,6 +12,46 @@ interface LabSectionProps {
   onApplyDamage: (amount: number) => void;
 }
 
+export function parseDistractorAnalysis(
+  analysisText: string, 
+  options: LabQuestion['options']
+): { success: boolean; fullText: string; items: Record<string, string> } {
+  if (!analysisText || typeof analysisText !== 'string') {
+    return { success: false, fullText: analysisText || '', items: {} };
+  }
+
+  const incorrectOptions = options.filter(o => !o.isCorrect);
+  const incorrectLetters = incorrectOptions.map(o => o.letter.toUpperCase());
+
+  const regex = /(?:(?:A\s+alternativa|Alternativa|Letra|Opção)\s+([A-D])|(?:\b|^)([A-D])\s*[\)\:\-\–])/gi;
+  const matches: Array<{ letter: string; index: number }> = [];
+  let m: RegExpExecArray | null;
+  while ((m = regex.exec(analysisText)) !== null) {
+    const letter = (m[1] || m[2]).toUpperCase();
+    if (incorrectLetters.includes(letter)) {
+      matches.push({ letter, index: m.index });
+    }
+  }
+
+  const foundUniqueLetters = new Set(matches.map(m => m.letter));
+  if (foundUniqueLetters.size < Math.min(2, incorrectLetters.length)) {
+    return { success: false, fullText: analysisText, items: {} };
+  }
+
+  const items: Record<string, string> = {};
+  for (let i = 0; i < matches.length; i++) {
+    const current = matches[i];
+    const next = matches[i + 1];
+    const chunk = next 
+      ? analysisText.substring(current.index, next.index).trim() 
+      : analysisText.substring(current.index).trim();
+    
+    items[current.letter] = chunk;
+  }
+
+  return { success: true, fullText: analysisText, items };
+}
+
 export const LabSection = ({ questions, hardcoreQuestions, bossFight, isHardcore, soundEnabled, onApplyDamage }: LabSectionProps) => {
   const [answeredQs, setAnsweredQs] = useState<Record<string, 'A' | 'B' | 'C' | 'D'>>({});
   const hasHardcore = Array.isArray(hardcoreQuestions) && hardcoreQuestions.length > 0;
@@ -186,23 +226,120 @@ export const LabSection = ({ questions, hardcoreQuestions, bossFight, isHardcore
               <details open={isAnswered} className="group bg-slate-950 rounded-xl border border-slate-800 overflow-hidden [&_summary::-webkit-details-marker]:hidden">
                 <summary className="p-4 cursor-pointer font-bold text-slate-400 flex items-center justify-between select-none hover:text-white transition-colors">
                   <span className="flex items-center gap-2">
-                    <span className="text-blue-500">🔬</span> PARECER TÉCNICO
+                    <span className="text-blue-500">🔬</span> PARECER TÉCNICO & ANÁLISE DE ALTERNATIVAS
                   </span>
                   <span className="text-slate-600 transition-transform group-open:rotate-180">▼</span>
                 </summary>
                 <div className="p-5 border-t border-slate-800 bg-slate-900/50 space-y-4">
-                  <div>
-                    <h4 className="text-xs font-black text-emerald-500 mb-2 uppercase tracking-widest flex items-center gap-1.5">
-                      <span>✓</span> Veredito
-                    </h4>
-                    <div className="text-sm text-gray-300"><MathRenderer content={q.resolution.technicalVerdict} /></div>
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-black text-amber-500 mb-2 uppercase tracking-widest flex items-center gap-1.5">
-                      <span>⚠️</span> Análise de Distratores
-                    </h4>
-                    <div className="text-sm text-gray-300"><MathRenderer content={q.resolution.distractorAnalysis} /></div>
-                  </div>
+                  {/* Card do Gabarito Oficial // Veredito */}
+                  {(() => {
+                    const correctOption = q.options.find(o => o.isCorrect);
+                    return (
+                      <div className="p-4 rounded-xl bg-emerald-950/30 border border-emerald-500/40 space-y-2.5">
+                        <div className="flex items-center justify-between gap-2 flex-wrap">
+                          <div className="flex items-center gap-2">
+                            <span className="px-2.5 py-0.5 rounded bg-emerald-900/80 border border-emerald-500/50 text-emerald-300 font-mono text-xs font-black">
+                              {correctOption ? `ALTERNATIVA ${correctOption.letter}` : 'CORRETO'}
+                            </span>
+                            <span className="text-xs font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1">
+                              <span>✅</span> Gabarito Oficial // Veredito
+                            </span>
+                          </div>
+                        </div>
+                        {correctOption && (
+                          <div className="text-xs text-emerald-200/90 font-medium pl-3 border-l-2 border-emerald-500/50 py-0.5">
+                            <MathRenderer content={correctOption.text} />
+                          </div>
+                        )}
+                        <div className="text-sm text-gray-200 leading-relaxed pt-1">
+                          <MathRenderer content={q.resolution.technicalVerdict} />
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Micro-Cards de Distratores */}
+                  {(() => {
+                    const parsedDistractors = parseDistractorAnalysis(q.resolution.distractorAnalysis, q.options);
+                    const incorrectOptions = q.options.filter(o => !o.isCorrect);
+
+                    if (parsedDistractors.success) {
+                      return (
+                        <div className="space-y-3 pt-1">
+                          <h4 className="text-xs font-black text-amber-400 uppercase tracking-widest flex items-center gap-1.5">
+                            <span>⚠️</span> Análise Cirúrgica dos Distratores
+                          </h4>
+                          <div className="grid grid-cols-1 gap-3">
+                            {incorrectOptions.map(opt => {
+                              const isUserChoice = answeredLetter === opt.letter;
+                              const explanation = parsedDistractors.items[opt.letter.toUpperCase()];
+
+                              return (
+                                <div 
+                                  key={opt.letter}
+                                  className={`p-4 rounded-xl transition-all space-y-2.5 ${
+                                    isUserChoice 
+                                      ? 'border-2 border-red-500 bg-red-950/40 shadow-[0_0_20px_rgba(239,68,68,0.2)]' 
+                                      : 'bg-slate-950/80 border border-slate-800'
+                                  }`}
+                                >
+                                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                                    <div className="flex items-center gap-2">
+                                      <span className={`px-2 py-0.5 rounded font-mono text-xs font-bold border ${
+                                        isUserChoice 
+                                          ? 'bg-red-900 border-red-500 text-red-200' 
+                                          : 'bg-slate-800 border-slate-700 text-slate-300'
+                                      }`}>
+                                        ALTERNATIVA {opt.letter}
+                                      </span>
+                                      <span className="text-xs font-bold text-red-400 flex items-center gap-1">
+                                        <span>❌</span> Incorreta
+                                      </span>
+                                    </div>
+                                    {isUserChoice && (
+                                      <span className="px-2 py-0.5 rounded-full bg-red-950 border border-red-500 text-red-300 font-mono text-[10px] font-black animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.4)]">
+                                        ⚠️ SUA ESCOLHA // DANO RECEBIDO
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  <div className="text-xs text-slate-300 pl-3 border-l-2 border-slate-700 py-0.5">
+                                    <MathRenderer content={opt.text} />
+                                  </div>
+
+                                  {explanation && (
+                                    <div className="text-xs text-gray-300 leading-relaxed pt-1 bg-slate-900/60 p-2.5 rounded-lg border border-slate-800/80">
+                                      <MathRenderer content={explanation} />
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    // Fallback Gracioso Defensivo
+                    return (
+                      <div className="space-y-3 pt-1">
+                        <h4 className="text-xs font-black text-amber-400 uppercase tracking-widest flex items-center gap-1.5">
+                          <span>⚠️</span> Análise Cirúrgica dos Distratores
+                        </h4>
+                        <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 space-y-3">
+                          {answeredLetter && !q.options.find(o => o.letter === answeredLetter)?.isCorrect && (
+                            <div className="p-2.5 rounded-lg border-2 border-red-500 bg-red-950/40 text-red-300 text-xs font-mono mb-2 flex items-center gap-2">
+                              <span>⚠️</span>
+                              <span>Você marcou a Alternativa {answeredLetter} (Incorreta). Confira os fundamentos abaixo:</span>
+                            </div>
+                          )}
+                          <div className="text-sm text-gray-300 leading-relaxed">
+                            <MathRenderer content={parsedDistractors.fullText} />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               </details>
             </div>

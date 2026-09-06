@@ -105,6 +105,32 @@ export const db = {
     });
   },
 
+  async clearAllHistoricErrors(): Promise<number> {
+    const database = await openDB();
+    return new Promise((resolve, reject) => {
+      const transaction = database.transaction('history', 'readwrite');
+      const store = transaction.objectStore('history');
+      const request = store.openCursor();
+      let clearedCount = 0;
+
+      request.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+        if (cursor) {
+          const session = cursor.value as StudySessionRecord;
+          if (session.details?.sessionErrors && session.details.sessionErrors.length > 0) {
+            session.details.sessionErrors = [];
+            cursor.update(session);
+            clearedCount++;
+          }
+          cursor.continue();
+        } else {
+          resolve(clearedCount);
+        }
+      };
+      request.onerror = () => reject(new Error('Falha ao limpar historico de erros'));
+    });
+  },
+
   async getHistoryByCard(cardId: string): Promise<StudySessionRecord[]> {
     const database = await openDB();
     return new Promise((resolve, reject) => {
