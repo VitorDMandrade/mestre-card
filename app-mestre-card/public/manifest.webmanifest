@@ -1,0 +1,18 @@
+{
+  "name": "Mestre Card V16 - QG de Revisão Tática",
+  "short_name": "Mestre Card",
+  "description": "HUD de Hiper-Revisão e Motor TRI Local-First",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#06090e",
+  "theme_color": "#06090e",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

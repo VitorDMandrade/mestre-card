@@ -10,6 +10,17 @@ export const StructureSection = ({ card }: StructureSectionProps) => {
 
   if (!structure) return null;
 
+  if (!structure.type) {
+    const s = structure as any;
+    if ('formulaChamber' in s || 'variables' in s) {
+      // @ts-ignore
+      structure.type = 'quantitative';
+    } else if ('causalChain' in s || 'comparisonTable' in s) {
+      // @ts-ignore
+      structure.type = 'qualitative';
+    }
+  }
+
   return (
     <section id="sec-03" className="mb-12 scroll-mt-24">
       <h2 className="text-2xl font-black text-white mb-6 border-b border-slate-800 pb-4 flex items-center gap-3">

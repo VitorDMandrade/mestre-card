@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Fundo Militar / Terminal Dark -->
+  <rect width="512" height="512" fill="#06090e" />
+
+  <!-- Radar / Círculos Concêntricos -->
+  <circle cx="256" cy="256" r="200" fill="none" stroke="#10b981" stroke-width="2" stroke-dasharray="10 10" opacity="0.3" />
+  <circle cx="256" cy="256" r="150" fill="none" stroke="#10b981" stroke-width="1.5" opacity="0.2" />
+  <circle cx="256" cy="256" r="100" fill="none" stroke="#10b981" stroke-width="1" opacity="0.1" />
+
+  <!-- Eixos do Radar -->
+  <line x1="256" y1="56" x2="256" y2="456" stroke="#10b981" stroke-width="2" stroke-dasharray="5 5" opacity="0.2" />
+  <line x1="56" y1="256" x2="456" y2="256" stroke="#10b981" stroke-width="2" stroke-dasharray="5 5" opacity="0.2" />
+
+  <!-- Hexágono Tático (Borda Ciano Brilhante) -->
+  <polygon points="256,40 440,148 440,364 256,472 72,364 72,148" fill="none" stroke="#38bdf8" stroke-width="8" />
+  
+  <!-- Brilho Interno Hexágono -->
+  <polygon points="256,55 425,155 425,357 256,457 87,357 87,155" fill="none" stroke="#38bdf8" stroke-width="2" opacity="0.4" />
+
+  <!-- Letra M Tática e Angular -->
+  <path d="M156 360 L156 160 L256 260 L356 160 L356 360" fill="none" stroke="#f8fafc" stroke-width="32" stroke-linejoin="miter" stroke-linecap="square" />
+  <path d="M156 360 L156 160 L256 260 L356 160 L356 360" fill="none" stroke="#38bdf8" stroke-width="8" stroke-linejoin="miter" stroke-linecap="square" opacity="0.8" />
+</svg>
