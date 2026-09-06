@@ -61,7 +61,7 @@ O JSON gerado deve satisfazer rigorosamente as seguintes especificações quanti
       1. *Premissa Central* (1 frase sintética com o conceito nuclear em negrito).
       2. *Encadeamento & Evidências* (desenvolvimento denso, com fatos, mecanismos e KaTeX).
       3. *Ponto de Inflexão / Cuidado de Prova* (micro-conclusão prática desarmando pegadinhas recorrentes).
-  - `highlight`: Chip de destaque tático em alto contraste (ex: `"Aço / Eletricidade / Petróleo"` ou `"Ocupação Efetiva // Fronteiras Artificiais"`).
+  - `highlight`: 2 a 4 conceitos-chave operacionais separados por `" // "` (ex: `"Ocupação Efetiva // Partilha da África // Fronteiras Artificiais"`). A interface do MestreCard utilizará esses termos para gerar automaticamente as tags de navegação rápida no topo da página e os painéis táticos dos blocos.
 - `triagePatterns`: Exatamente **3 Padrões de Questões de Banca** (Rotas A, B e C), contendo:
   - `id`: `"route-a"`, `"route-b"`, `"route-c"`.
   - `name`: Título do padrão de cobrança da banca (ex: `"Padrão A: Ideologia & Discurso Justificador"`).
@@ -91,7 +91,8 @@ Adapte **OBRIGATORIAMENTE** a natureza desta seção à matéria:
 
 #### SEC.04 // MACETES, ARMADILHAS & RADAR DE GATILHOS
 - `mnemonics`: Exatamente **3 Mnemônicos Práticos e Operacionais** em cards dedicados. No campo `rule`, separe os itens da regra com `" // "` (ex: `"M - Matérias-primas... // E - Excedente de capital... // C - Consumidores..."`), permitindo que a interface do MestreCard separe automaticamente cada termo com badges anatômicos estilizados.
-- `blindSpots`: Exatamente **2 a 3 Pontos Cegos Clássicos na TRI** — dissecando profundamente as pegadinhas conceituais refinadas que derrubam mais de 75% dos vestibulandos, explicando a armadilha e como desarmá-la.
+- `blindSpots`: Exatamente **2 a 3 Pontos Cegos Clássicos na TRI** — dissecando profundamente as pegadinhas conceituais refinadas que derrubam mais de 75% dos vestibulandos. Formate OBRIGATORIAMENTE o campo `analysis` dividindo a armadilha do fato com `" // "`:
+  `"❌ O Mito da Banca: <A ilusão ou falso cognato induzido pelo distrator> // ✅ A Realidade de Prova: <O fato histórico/científico real e a chave de acerto>"` (permitindo que o MestreCard monte automaticamente a autópsia visual com cartões vermelho e verde lado a lado).
 - `triggerWords`: Exatamente **4 a 6 Palavras-Gatilho (Trigger Words)** com:
   - `trigger`: Expressão ou palavra-chave do enunciado.
   - `context`: Contexto típico onde a banca a insere.

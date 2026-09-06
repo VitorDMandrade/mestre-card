@@ -71,6 +71,52 @@ export const RadarSection = ({ card, soundEnabled }: RadarSectionProps) => {
     return <MathRenderer content={rule} />;
   };
 
+  const renderBlindSpotAnalysis = (analysis: string) => {
+    if (!analysis) return null;
+
+    let myth = '';
+    let fact = '';
+
+    if (analysis.includes('//')) {
+      const parts = analysis.split(/\s*\/\/\s*/);
+      myth = parts[0];
+      fact = parts.slice(1).join(' ');
+    } else {
+      // Detecta contraponto textual: "Na verdade,", "A realidade é", "Em contrapartida,"
+      const match = analysis.match(/(Na verdade[,\:]?|Em contrapartida[,\:]?|A realidade [ée][,\:]?|Contudo[,\:]?)/i);
+      if (match && match.index && match.index > 25) {
+        myth = analysis.slice(0, match.index).trim();
+        fact = analysis.slice(match.index).trim();
+      }
+    }
+
+    if (myth && fact) {
+      return (
+        <div className="space-y-2.5 mt-2">
+          <div className="bg-red-950/40 border-l-2 border-red-500/80 p-2.5 rounded-r-lg shadow-sm">
+            <div className="flex items-center gap-1 text-[10px] font-mono font-bold text-red-400 uppercase tracking-wider mb-1">
+              <span>❌</span> <span>A Armadilha / O Mito da Banca:</span>
+            </div>
+            <div className="text-xs text-slate-300 leading-relaxed">
+              <MathRenderer content={myth} />
+            </div>
+          </div>
+
+          <div className="bg-emerald-950/30 border-l-2 border-emerald-400/80 p-2.5 rounded-r-lg shadow-sm">
+            <div className="flex items-center gap-1 text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-wider mb-1">
+              <span>✅</span> <span>A Realidade Cobrada na Prova:</span>
+            </div>
+            <div className="text-xs text-slate-200 leading-relaxed font-medium">
+              <MathRenderer content={fact} />
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return <MathRenderer content={analysis} />;
+  };
+
   return (
     <section id="sec-04" className="mb-12 scroll-mt-24">
       <h2 className="text-2xl font-black text-white mb-6 border-b border-slate-800 pb-4 flex items-center gap-3">
@@ -152,7 +198,7 @@ export const RadarSection = ({ card, soundEnabled }: RadarSectionProps) => {
                   </h4>
                 </div>
                 <div className="text-gray-300 text-xs sm:text-sm leading-relaxed relative z-10">
-                  <MathRenderer content={spot.analysis} />
+                  {renderBlindSpotAnalysis(spot.analysis)}
                 </div>
               </div>
             ))}
