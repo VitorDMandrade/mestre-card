@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { LabQuestion, BossFight } from '../../types/mestre-card';
 import { MathRenderer } from '../MathRenderer';
 import { playSound, playDamageSound, playVictorySound } from '../../lib/audio';
@@ -16,15 +16,17 @@ export const LabSection = ({ questions, hardcoreQuestions, bossFight, isHardcore
   const [answeredQs, setAnsweredQs] = useState<Record<string, 'A' | 'B' | 'C' | 'D'>>({});
   const hasHardcore = Array.isArray(hardcoreQuestions) && hardcoreQuestions.length > 0;
   const [selectedTab, setSelectedTab] = useState<'standard' | 'hardcore'>(isHardcore && hasHardcore ? 'hardcore' : 'standard');
+  const [prevHardcore, setPrevHardcore] = useState(isHardcore);
 
-  // Synchronize tab when isHardcore toggles in StudyHUD
-  useEffect(() => {
+  // Synchronize tab cleanly when isHardcore toggles in StudyHUD
+  if (isHardcore !== prevHardcore) {
+    setPrevHardcore(isHardcore);
     if (isHardcore && hasHardcore) {
       setSelectedTab('hardcore');
     } else if (!isHardcore) {
       setSelectedTab('standard');
     }
-  }, [isHardcore, hasHardcore]);
+  }
 
   const activeQuestions = selectedTab === 'hardcore' && hasHardcore ? hardcoreQuestions : questions;
   const isViewingHardcore = selectedTab === 'hardcore' && hasHardcore;
@@ -41,7 +43,7 @@ export const LabSection = ({ questions, hardcoreQuestions, bossFight, isHardcore
         playSound(true, soundEnabled);
       }
     } else {
-      if (isHardcore) {
+      if (isHardcore || isViewingHardcore) {
         playDamageSound(soundEnabled);
         onApplyDamage(20);
       } else {
@@ -117,10 +119,10 @@ export const LabSection = ({ questions, hardcoreQuestions, bossFight, isHardcore
           const isAnswered = !!answeredLetter;
 
           return (
-            <div key={q.id} className={`bg-slate-900 border rounded-2xl p-6 transition-all ${
+            <div key={q.id} className={`rounded-2xl p-6 transition-all ${
               isViewingHardcore 
-                ? 'border-red-900/60 hover:border-red-500/50 shadow-[0_0_25px_rgba(239,68,68,0.08)]' 
-                : 'border-slate-700/80 hover:border-slate-600'
+                ? 'border-2 border-red-500/50 bg-gradient-to-b from-red-950/20 to-slate-900 shadow-[0_0_25px_rgba(239,68,68,0.15)]' 
+                : 'bg-slate-900 border border-slate-700/80 hover:border-slate-600'
             }`}>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
@@ -131,8 +133,8 @@ export const LabSection = ({ questions, hardcoreQuestions, bossFight, isHardcore
                   }`}>
                     Q{String(i+1).padStart(2, '0')}{isViewingHardcore ? ' HC' : ''}
                   </div>
-                  <div className={`text-sm font-medium ${isViewingHardcore ? 'text-red-300/90' : 'text-slate-400'}`}>
-                    {isViewingHardcore ? '⚡ 2ª Fase / Aprofundamento' : 'Treinamento Padrão'}
+                  <div className={`text-sm font-medium ${isViewingHardcore ? 'text-red-300/90 font-mono text-xs' : 'text-slate-400'}`}>
+                    {isViewingHardcore ? '⚡ 2ª Fase / Rigor Analítico' : 'Treinamento Padrão'}
                   </div>
                 </div>
                 {isAnswered && (

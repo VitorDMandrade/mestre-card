@@ -136,4 +136,16 @@ export interface StudySessionRecord {
   timestamp: number;
   score: number;
   stats: TRIStatistics;
+  details?: {
+    sessionErrors?: Array<{
+      game: 'G1' | 'G3' | 'G5';
+      prompt: string;
+      userWrongAnswer: string;
+      explanation: string;
+      timestamp?: number;
+      cardId?: string;
+      cardTitle?: string;
+    }>;
+    [key: string]: any;
+  };
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { db } from './lib/db';
-import type { MestreCardData } from './types/mestre-card';
+import type { MestreCardData, StudySessionRecord } from './types/mestre-card';
 import { sanitizeAndParseJSON, validateImportPayload, exportFullBackup, exportSingleCardJSON, exportFilteredBackup, parseBackupFile } from './lib/importer';
 import type { ParsedImport } from './lib/importer';
 import { Dashboard } from './components/Dashboard';
@@ -17,7 +17,19 @@ function App() {
   
   const [cards, setCards] = useState<MestreCardData[]>([]);
   const [historyMap, setHistoryMap] = useState<Record<string, number>>({});
+  const [allHistory, setAllHistory] = useState<StudySessionRecord[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+
+  // Priority Combat Queue State (ADR-28 / Eixo 3)
+  const [queueState, setQueueState] = useState<{
+    active: boolean;
+    cardIds: string[];
+    currentIndex: number;
+  }>({
+    active: false,
+    cardIds: [],
+    currentIndex: 0
+  });
 
   const showToast = (message: string, type: 'success' | 'info' | 'error' = 'success') => {
     setToast({ message, type });
@@ -32,10 +44,10 @@ function App() {
   const loadCards = async () => {
     try {
       const allCards = await db.getAllCards();
-      const allHistory = await db.getAllHistory();
+      const historyRecords = await db.getAllHistory();
       
       const newHistoryMap: Record<string, number> = {};
-      for (const session of allHistory) {
+      for (const session of historyRecords) {
         if (!newHistoryMap[session.cardId] || session.score > newHistoryMap[session.cardId]) {
           newHistoryMap[session.cardId] = session.score;
         }
@@ -43,6 +55,7 @@ function App() {
 
       setCards(allCards);
       setHistoryMap(newHistoryMap);
+      setAllHistory(historyRecords);
       setIsLoaded(true);
     } catch (e) {
       console.error('Falha ao carregar dados do IndexedDB', e);
@@ -155,11 +168,46 @@ function App() {
   };
 
   const handleSelectCard = (id: string) => {
+    if (queueState.active) {
+      setQueueState({ active: false, cardIds: [], currentIndex: 0 });
+    }
     setActiveCardId(id);
     setCurrentView('study');
   };
 
+  const handleStartQueue = (cardIds: string[]) => {
+    if (!cardIds || cardIds.length === 0) return;
+    setQueueState({
+      active: true,
+      cardIds,
+      currentIndex: 0
+    });
+    setActiveCardId(cardIds[0]);
+    setCurrentView('study');
+    showToast(`⚡ Fila de repescagem iniciada: 1/${cardIds.length} alvos`, 'info');
+  };
+
+  const handleNextInQueue = () => {
+    if (!queueState.active) return;
+    const nextIdx = queueState.currentIndex + 1;
+    if (nextIdx < queueState.cardIds.length) {
+      const nextCardId = queueState.cardIds[nextIdx];
+      setQueueState(prev => ({ ...prev, currentIndex: nextIdx }));
+      setActiveCardId(nextCardId);
+      showToast(`🎯 Alvo ${nextIdx + 1}/${queueState.cardIds.length} engajado`, 'info');
+    } else {
+      setQueueState({ active: false, cardIds: [], currentIndex: 0 });
+      setActiveCardId(null);
+      setCurrentView('dashboard');
+      loadCards();
+      showToast('⚡ Fila de repescagem concluída com sucesso!', 'success');
+    }
+  };
+
   const handleBackToDashboard = () => {
+    if (queueState.active) {
+      setQueueState({ active: false, cardIds: [], currentIndex: 0 });
+    }
     setActiveCardId(null);
     setCurrentView('dashboard');
     loadCards(); // refresh history if they played
@@ -205,6 +253,7 @@ function App() {
           <Dashboard 
             cards={cards}
             historyMap={historyMap}
+            allHistory={allHistory}
             onSelectCard={handleSelectCard}
             onDeleteCard={handleDeleteCard}
             onImportCard={handleImportCard}
@@ -212,6 +261,7 @@ function App() {
             onExportBackup={handleExportBackup}
             onExportSingleCard={handleExportSingleCard}
             onExportFiltered={handleExportFiltered}
+            onStartQueue={handleStartQueue}
           />
         )}
         
@@ -219,6 +269,12 @@ function App() {
           <StudyView 
             card={activeCard}
             onBack={handleBackToDashboard}
+            queueInfo={queueState.active ? {
+              current: queueState.currentIndex + 1,
+              total: queueState.cardIds.length,
+              hasNext: queueState.currentIndex < queueState.cardIds.length - 1
+            } : null}
+            onNextQueueItem={handleNextInQueue}
           />
         )}
 

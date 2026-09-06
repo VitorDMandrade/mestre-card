@@ -9,6 +9,8 @@ interface StudyHUDProps {
   soundEnabled: boolean;
   onToggleSound: () => void;
   bestScore: StudySessionRecord | null;
+  queueInfo?: { current: number; total: number; hasNext: boolean } | null;
+  onNextQueueItem?: () => void;
 }
 
 export const StudyHUD = ({ 
@@ -17,7 +19,9 @@ export const StudyHUD = ({
   onToggleHardcore,
   soundEnabled,
   onToggleSound,
-  bestScore
+  bestScore,
+  queueInfo,
+  onNextQueueItem
 }: StudyHUDProps) => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeHash, setActiveHash] = useState('sec-01');
@@ -86,17 +90,36 @@ export const StudyHUD = ({
       <div className="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-md border-b border-slate-800 mb-8 pt-4 pb-0 shadow-lg safe-top">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-full">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
-                <span className="text-xs font-mono text-emerald-400 font-bold uppercase tracking-widest">Sessão Ativa</span>
-              </div>
+            <div className="flex items-center gap-3 flex-wrap">
+              {queueInfo ? (
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-950/80 border border-red-500/70 text-red-300 shadow-[0_0_15px_rgba(239,68,68,0.25)] animate-pulse">
+                  <span className="text-xs font-mono font-black tracking-wider">
+                    🎯 ALVO {queueInfo.current}/{queueInfo.total}
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-full">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+                  <span className="text-xs font-mono text-emerald-400 font-bold uppercase tracking-widest">Sessão Ativa</span>
+                </div>
+              )}
               
               {bestScore && (
                 <div className="flex items-center gap-2 bg-indigo-900/30 border border-indigo-500/30 px-3 py-1.5 rounded-full">
                   <span className="text-xs font-mono text-indigo-300">🏆 Recorde:</span>
                   <span className="text-xs font-black text-indigo-400">{bestScore.score} pts</span>
                 </div>
+              )}
+
+              {queueInfo && onNextQueueItem && (
+                <button
+                  onClick={onNextQueueItem}
+                  className="px-3 py-1 rounded-full bg-red-950/80 border border-red-500 text-red-300 hover:bg-red-900 text-xs font-mono font-bold transition-all flex items-center gap-1.5 shadow-[0_0_12px_rgba(239,68,68,0.3)] hover:scale-105 active:scale-95 cursor-pointer"
+                  title="Avançar para o próximo alvo da fila de repescagem"
+                >
+                  <span>{queueInfo.hasNext ? 'PRÓXIMO ALVO' : 'CONCLUIR FILA'}</span>
+                  <span>➔</span>
+                </button>
               )}
             </div>
 

@@ -134,6 +134,16 @@ export const ArcadeEngine = ({
           speed: result.axes[2],
           immunity: result.axes[4],
           totalScore: result.score
+        },
+        details: {
+          penalty: result.penalty,
+          verdict: result.verdict,
+          sessionErrors: sessionErrors.map(e => ({
+            ...e,
+            timestamp: Date.now(),
+            cardId: card.id,
+            cardTitle: card.title
+          }))
         }
       });
       onSessionSaved?.();

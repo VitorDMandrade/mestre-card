@@ -1,9 +1,10 @@
 import { useState, useMemo, useRef } from 'react';
-import type { MestreCardData } from '../types/mestre-card';
+import type { MestreCardData, StudySessionRecord } from '../types/mestre-card';
 
 interface DashboardProps {
   cards: MestreCardData[];
   historyMap: Record<string, number>;
+  allHistory?: StudySessionRecord[];
   onSelectCard: (id: string) => void;
   onDeleteCard: (id: string) => void;
   onImportCard: (jsonStr: string) => void | Promise<void>;
@@ -11,6 +12,7 @@ interface DashboardProps {
   onExportBackup: () => void;
   onExportSingleCard?: (card: MestreCardData) => void;
   onExportFiltered?: (cards: MestreCardData[], categoryLabel: string) => void;
+  onStartQueue?: (cardIds: string[]) => void;
 }
 
 export type SubjectCategory = 'TODOS' | 'BIOLOGIA' | 'QUÍMICA' | 'FÍSICA' | 'MATEMÁTICA' | 'HUMANAS' | 'LINGUAGENS' | 'OUTROS';
@@ -40,13 +42,15 @@ export function resolveCategory(topic: string = '', title: string = ''): Subject
 export const Dashboard: React.FC<DashboardProps> = ({ 
   cards, 
   historyMap, 
+  allHistory = [],
   onSelectCard, 
   onDeleteCard, 
   onImportCard, 
   onImportFile, 
   onExportBackup,
   onExportSingleCard,
-  onExportFiltered
+  onExportFiltered,
+  onStartQueue
 }) => {
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
   const [jsonInput, setJsonInput] = useState('');
@@ -55,6 +59,51 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [isProcessingFile, setIsProcessingFile] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Global Error Modal state (Deck de Repescagem Direta)
+  const [isGlobalErrorModalOpen, setIsGlobalErrorModalOpen] = useState(false);
+  const [revealedErrorIdxs, setRevealedErrorIdxs] = useState<Set<number>>(new Set());
+  const [dismissedErrorIdxs, setDismissedErrorIdxs] = useState<Set<number>>(new Set());
+
+  // Extract all historical errors from allHistory
+  const historicErrors = useMemo(() => {
+    if (!allHistory) return [];
+    const errors: Array<{
+      game: 'G1' | 'G3' | 'G5';
+      prompt: string;
+      userWrongAnswer: string;
+      explanation: string;
+      cardId?: string;
+      cardTitle?: string;
+      timestamp?: number;
+    }> = [];
+    
+    for (const session of allHistory) {
+      if (session.details?.sessionErrors && Array.isArray(session.details.sessionErrors)) {
+        for (const err of session.details.sessionErrors) {
+          errors.push({
+            ...err,
+            cardId: err.cardId || session.cardId,
+            timestamp: err.timestamp || session.timestamp
+          });
+        }
+      }
+    }
+    return errors;
+  }, [allHistory]);
+
+  const activeHistoricErrors = useMemo(() => {
+    return historicErrors.filter((_, idx) => !dismissedErrorIdxs.has(idx));
+  }, [historicErrors, dismissedErrorIdxs]);
+
+  const toggleRevealError = (idx: number) => {
+    setRevealedErrorIdxs(prev => {
+      const next = new Set(prev);
+      if (next.has(idx)) next.delete(idx);
+      else next.add(idx);
+      return next;
+    });
+  };
 
   const uniqueTopics = new Set(cards.map(c => c.topic)).size;
 
@@ -188,6 +237,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         <div className="flex flex-wrap gap-2 justify-end">
+          {activeHistoricErrors.length > 0 && (
+            <button 
+              onClick={() => setIsGlobalErrorModalOpen(true)}
+              className="bg-red-500/15 hover:bg-red-500/25 border border-red-500/60 text-red-300 px-3.5 py-2 rounded-lg text-xs font-mono font-bold transition-all uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_15px_rgba(239,68,68,0.25)] animate-pulse hover:animate-none cursor-pointer"
+              title="Abrir Caderno de Erros Global de sessões anteriores">
+              <span>🚨</span>
+              <span>MODO REPESCAGEM: {activeHistoricErrors.length} ERROS HISTÓRICOS</span>
+            </button>
+          )}
+
           <button 
             onClick={() => setIsTerminalOpen(!isTerminalOpen)}
             className="bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 px-4 py-2 rounded-lg text-xs font-mono font-bold transition-colors uppercase tracking-widest">
@@ -410,6 +469,20 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
       </div>
 
+      {/* Fila de Combate Prioritário */}
+      {onStartQueue && filteredCards.length > 0 && (triFilter === 'critical' || triFilter === 'pending') && (
+        <div className="flex justify-center -my-2 animate-fade-in">
+          <button
+            onClick={() => onStartQueue(filteredCards.map(c => c.id))}
+            className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-mono font-bold text-xs shadow-xl shadow-red-600/30 hover:shadow-red-600/50 transition-all uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer border border-red-400/40 hover:scale-[1.02] active:scale-98"
+          >
+            <span>⚡</span>
+            <span>INICIAR FILA DE REPESCAGEM ({filteredCards.length} ALVOS)</span>
+            <span>➔</span>
+          </button>
+        </div>
+      )}
+
       {/* Grid Tático */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {cards.length === 0 ? (
@@ -503,6 +576,142 @@ export const Dashboard: React.FC<DashboardProps> = ({
           })
         )}
       </div>
+
+      {/* Modal Militar: Caderno de Erros Global (Modo Repescagem Tática) */}
+      {isGlobalErrorModalOpen && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 animate-fade-in backdrop-blur-md">
+          <div className="bg-slate-900 border-2 border-red-500/80 p-6 rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-[0_0_40px_rgba(239,68,68,0.3)]">
+            <div className="flex justify-between items-start border-b border-red-500/30 pb-4 mb-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded bg-red-500/20 text-red-400 font-mono text-[10px] font-bold border border-red-500/40">
+                    REPESCAGEM GLOBAL
+                  </span>
+                  <h3 className="text-lg font-black text-white tracking-tight">
+                    🚨 CADERNO DE ERROS HISTÓRICOS
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-400 font-mono mt-1">
+                  Revisão ativa das {activeHistoricErrors.length} falhas cognitivas registradas em combate.
+                </p>
+              </div>
+              <button
+                onClick={() => setIsGlobalErrorModalOpen(false)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer text-sm"
+                title="Fechar modal"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Ações Rápidas do Modal */}
+            <div className="flex items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-800 text-xs font-mono">
+              <span className="text-slate-400">
+                {activeHistoricErrors.length} falhas disponíveis para retestagem
+              </span>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    if (revealedErrorIdxs.size === activeHistoricErrors.length) {
+                      setRevealedErrorIdxs(new Set());
+                    } else {
+                      setRevealedErrorIdxs(new Set(activeHistoricErrors.map((_, i) => i)));
+                    }
+                  }}
+                  className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] transition-colors cursor-pointer"
+                >
+                  {revealedErrorIdxs.size === activeHistoricErrors.length ? '🙈 Ocultar Gabaritos' : '👁️ Revelar Todos'}
+                </button>
+                <button
+                  onClick={() => setDismissedErrorIdxs(new Set(historicErrors.map((_, i) => i)))}
+                  className="px-2.5 py-1 rounded bg-red-950/60 border border-red-800/50 hover:bg-red-900 text-red-300 text-[11px] transition-colors cursor-pointer"
+                  title="Marcar todas as falhas como revisadas nesta sessão"
+                >
+                  🧹 Limpar Fila
+                </button>
+              </div>
+            </div>
+
+            {/* Lista de Falhas com Auto-teste */}
+            <div className="flex-1 overflow-y-auto space-y-4 pr-1 scrollbar-thin">
+              {activeHistoricErrors.length === 0 ? (
+                <div className="py-12 text-center text-emerald-400 font-mono text-sm space-y-2">
+                  <div className="text-4xl">🛡️</div>
+                  <p className="font-bold">TODAS AS FALHAS FORAM REVISADAS OU NENHUM ERRO REGISTRADO!</p>
+                  <p className="text-xs text-slate-500">Mantenha a consistência em combate.</p>
+                </div>
+              ) : (
+                activeHistoricErrors.map((err, idx) => {
+                  const isRevealed = revealedErrorIdxs.has(idx);
+                  return (
+                    <div key={idx} className="p-4 rounded-xl bg-slate-950/80 border border-red-900/50 space-y-2.5 text-xs font-mono">
+                      <div className="flex items-center justify-between text-[10px] text-slate-400">
+                        <div className="flex items-center gap-2">
+                          <span className="px-1.5 py-0.5 rounded bg-red-950 border border-red-800 text-red-300 font-bold">
+                            {err.game === 'G1' ? 'G1: MORTE SÚBITA' : err.game === 'G3' ? 'G3: PRESSÃO TRI' : 'G5: O INFILTRADO'}
+                          </span>
+                          {err.cardTitle && (
+                            <span className="text-slate-300 font-semibold truncate max-w-[200px]">
+                              [{err.cardTitle}]
+                            </span>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => setDismissedErrorIdxs(prev => new Set(prev).add(idx))}
+                          className="text-slate-500 hover:text-slate-300 text-[10px] underline cursor-pointer"
+                        >
+                          Marcar Revisado
+                        </button>
+                      </div>
+
+                      <p className="text-slate-100 font-sans text-xs font-semibold leading-relaxed">
+                        {err.prompt}
+                      </p>
+
+                      <div className="p-2 rounded bg-red-950/40 border-l-2 border-l-red-500 text-red-300 text-[11px]">
+                        <span className="font-bold text-red-400">Sua Escolha Anterior: </span>
+                        <span>{err.userWrongAnswer}</span>
+                      </div>
+
+                      {isRevealed ? (
+                        <div className="p-2.5 rounded bg-emerald-950/30 border-l-2 border-l-emerald-500 text-emerald-300 text-[11px] animate-fade-in space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-emerald-400">Correção Tática / Gabarito:</span>
+                            <button
+                              onClick={() => toggleRevealError(idx)}
+                              className="text-[10px] text-emerald-400/70 hover:text-emerald-300 underline cursor-pointer"
+                            >
+                              Ocultar
+                            </button>
+                          </div>
+                          <p className="leading-relaxed">{err.explanation}</p>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => toggleRevealError(idx)}
+                          className="w-full py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-dashed border-slate-700 text-slate-400 hover:text-cyan-300 text-[11px] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <span>👁️</span>
+                          <span>Auto-Teste: Revelar Gabarito Tático</span>
+                        </button>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            <div className="pt-4 mt-4 border-t border-slate-800 flex justify-end gap-3">
+              <button
+                onClick={() => setIsGlobalErrorModalOpen(false)}
+                className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-xs font-bold transition-colors cursor-pointer"
+              >
+                FECHAR
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
