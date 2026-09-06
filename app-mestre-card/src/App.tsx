@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { db } from './lib/db';
 import type { MestreCardData } from './types/mestre-card';
-import { sanitizeAndParseJSON, validateMestreCard, exportAllCardsAsJSON } from './lib/importer';
+import { sanitizeAndParseJSON, validateImportPayload, exportFullBackup } from './lib/importer';
 import { Dashboard } from './components/Dashboard';
 import { StudyView } from './components/StudyView';
 import 'katex/dist/katex.min.css';
@@ -11,15 +11,26 @@ function App() {
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
   
   const [cards, setCards] = useState<MestreCardData[]>([]);
+  const [historyMap, setHistoryMap] = useState<Record<string, number>>({});
   const [isLoaded, setIsLoaded] = useState(false);
 
   const loadCards = async () => {
     try {
-      const all = await db.getAllCards();
-      setCards(all);
+      const allCards = await db.getAllCards();
+      const allHistory = await db.getAllHistory();
+      
+      const newHistoryMap: Record<string, number> = {};
+      for (const session of allHistory) {
+        if (!newHistoryMap[session.cardId] || session.score > newHistoryMap[session.cardId]) {
+          newHistoryMap[session.cardId] = session.score;
+        }
+      }
+
+      setCards(allCards);
+      setHistoryMap(newHistoryMap);
       setIsLoaded(true);
     } catch (e) {
-      console.error('Falha ao carregar cards do IndexedDB', e);
+      console.error('Falha ao carregar dados do IndexedDB', e);
     }
   };
 
@@ -30,10 +41,17 @@ function App() {
   const handleImportCard = async (jsonStr: string) => {
     try {
       const rawObj = sanitizeAndParseJSON(jsonStr);
-      const validCard = validateMestreCard(rawObj);
-      await db.saveCard(validCard);
-      await loadCards();
-      alert(`CARD INJETADO COM SUCESSO: [${validCard.title}]`);
+      const parsed = validateImportPayload(rawObj);
+
+      if (parsed.type === 'backup') {
+        await db.bulkImportData(parsed.data.cards, parsed.data.history);
+        await loadCards();
+        alert(`BACKUP RESTAURADO COM SUCESSO: ${parsed.data.cards.length} cards e ${parsed.data.history.length} sessões.`);
+      } else {
+        await db.saveCard(parsed.data);
+        await loadCards();
+        alert(`CARD INJETADO COM SUCESSO: [${parsed.data.title}]`);
+      }
     } catch (err: any) {
       console.error(err);
       alert(`FALHA DE INGESTÃO: ${err.message}`);
@@ -51,8 +69,15 @@ function App() {
     }
   };
 
-  const handleExportBackup = () => {
-    exportAllCardsAsJSON(cards);
+  const handleExportBackup = async () => {
+    try {
+      const allCards = await db.getAllCards();
+      const allHistory = await db.getAllHistory();
+      exportFullBackup(allCards, allHistory);
+    } catch (err) {
+      console.error('Falha ao exportar backup', err);
+      alert('Erro ao exportar backup.');
+    }
   };
 
   const handleSelectCard = (id: string) => {
@@ -63,6 +88,7 @@ function App() {
   const handleBackToDashboard = () => {
     setActiveCardId(null);
     setCurrentView('dashboard');
+    loadCards(); // refresh history if they played
   };
 
   if (!isLoaded) {
@@ -80,6 +106,7 @@ function App() {
       {currentView === 'dashboard' && (
         <Dashboard 
           cards={cards}
+          historyMap={historyMap}
           onSelectCard={handleSelectCard}
           onDeleteCard={handleDeleteCard}
           onImportCard={handleImportCard}

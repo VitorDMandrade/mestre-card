@@ -145,5 +145,44 @@ export const db = {
       transaction.oncomplete = () => resolve();
       request.onerror = () => reject(new Error('Erro na requisição setSetting'));
     });
+  },
+
+  async getAllHistory(): Promise<StudySessionRecord[]> {
+    const database = await openDB();
+    return new Promise((resolve, reject) => {
+      const transaction = database.transaction('history', 'readonly');
+      const store = transaction.objectStore('history');
+      const request = store.getAll();
+
+      transaction.onerror = () => reject(new Error('Erro na transação getAllHistory'));
+      request.onerror = () => reject(new Error('Erro na requisição getAllHistory'));
+
+      request.onsuccess = () => resolve(request.result || []);
+    });
+  },
+
+  async bulkImportData(cards: MestreCardData[], history: StudySessionRecord[]): Promise<void> {
+    const database = await openDB();
+    return new Promise((resolve, reject) => {
+      const transaction = database.transaction(['cards', 'history'], 'readwrite');
+      const cardsStore = transaction.objectStore('cards');
+      const historyStore = transaction.objectStore('history');
+
+      transaction.onerror = () => reject(new Error('Erro na transação bulkImportData'));
+      transaction.onabort = () => reject(new Error('Transação bulkImportData abortada'));
+      transaction.oncomplete = () => resolve();
+
+      try {
+        for (const card of cards) {
+          cardsStore.put(card);
+        }
+        for (const session of history) {
+          historyStore.put(session);
+        }
+      } catch (err) {
+        transaction.abort();
+        reject(err);
+      }
+    });
   }
 };

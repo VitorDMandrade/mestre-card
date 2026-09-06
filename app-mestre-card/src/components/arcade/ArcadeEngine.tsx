@@ -12,9 +12,10 @@ import { db } from '../../lib/db';
 
 interface ArcadeEngineProps {
   card: MestreCardData;
+  onSessionSaved?: () => void;
 }
 
-export const ArcadeEngine = ({ card }: ArcadeEngineProps) => {
+export const ArcadeEngine = ({ card, onSessionSaved }: ArcadeEngineProps) => {
   const [activeTab, setActiveTab] = useState<'g1' | 'g2' | 'g3' | 'g4' | 'g5'>('g1');
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [isHardcore, setIsHardcore] = useState(false);
@@ -120,6 +121,7 @@ export const ArcadeEngine = ({ card }: ArcadeEngineProps) => {
           totalScore: result.score
         }
       });
+      onSessionSaved?.();
     } catch (err) {
       console.error('Failed to save session to DB:', err);
     }

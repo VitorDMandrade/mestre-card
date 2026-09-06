@@ -3,6 +3,8 @@ import type { FC } from 'react';
 import type { MestreCardData } from '../types/mestre-card';
 import { MathRenderer } from './MathRenderer';
 import { ArcadeEngine } from './arcade/ArcadeEngine';
+import { db } from '../lib/db';
+
 interface StudyViewProps {
   card: MestreCardData;
   onBack: () => void;
@@ -10,13 +12,33 @@ interface StudyViewProps {
 
 export const StudyView: FC<StudyViewProps> = ({ card, onBack }) => {
   const [seconds, setSeconds] = useState(0);
+  const [bestScore, setBestScore] = useState<number | null>(null);
+  const [lastDate, setLastDate] = useState<string | null>(null);
+
+  const loadTelemetry = async () => {
+    try {
+      const history = await db.getHistoryByCard(card.id);
+      if (history.length > 0) {
+        const latest = history.reduce((prev, curr) => (prev.timestamp > curr.timestamp ? prev : curr));
+        const maxScore = Math.max(...history.map(h => h.score));
+        setBestScore(maxScore);
+        setLastDate(new Date(latest.timestamp).toLocaleDateString('pt-BR'));
+      } else {
+        setBestScore(null);
+        setLastDate(null);
+      }
+    } catch (err) {
+      console.error('Failed to load telemetry', err);
+    }
+  };
 
   useEffect(() => {
+    loadTelemetry();
     const interval = setInterval(() => {
       setSeconds(s => s + 1);
     }, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [card.id]);
 
   const formatTime = (totalSeconds: number) => {
     const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
@@ -50,6 +72,15 @@ export const StudyView: FC<StudyViewProps> = ({ card, onBack }) => {
         </div>
         
         <div className="flex items-center gap-3">
+          {bestScore !== null ? (
+            <span className="px-2.5 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/40 text-cyan-300 font-mono text-xs font-bold">
+              Recorde: {bestScore} pts ({lastDate})
+            </span>
+          ) : (
+            <span className="px-2.5 py-1 rounded-full bg-slate-900 border border-slate-800 text-slate-500 font-mono text-xs">
+              Sem registro prévio
+            </span>
+          )}
           <span className="text-[10px] text-slate-500 font-mono hidden sm:block">TEMPO DE OPERAÇÃO</span>
           <div className="bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-emerald-400 font-mono font-bold glow-emerald">
             {formatTime(seconds)}
@@ -130,7 +161,7 @@ export const StudyView: FC<StudyViewProps> = ({ card, onBack }) => {
 
           {/* Arcade Engine */}
           <div id="arcade" className="pb-20">
-            <ArcadeEngine card={card} />
+            <ArcadeEngine card={card} onSessionSaved={loadTelemetry} />
           </div>
 
         </div>

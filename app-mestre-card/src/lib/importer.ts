@@ -1,4 +1,15 @@
-import type { MestreCardData } from '../types/mestre-card';
+import type { MestreCardData, StudySessionRecord } from '../types/mestre-card';
+
+export interface UnifiedBackupPayload {
+  schemaVersion: "1.0";
+  exportedAt: number;
+  cards: MestreCardData[];
+  history: StudySessionRecord[];
+}
+
+export type ParsedImport = 
+  | { type: 'backup'; data: UnifiedBackupPayload }
+  | { type: 'single_card'; data: MestreCardData };
 
 export function sanitizeAndParseJSON(rawInput: string): unknown {
   try {
@@ -84,14 +95,35 @@ export function validateMestreCard(data: any): MestreCardData {
   return card;
 }
 
-export function exportAllCardsAsJSON(cards: MestreCardData[]): void {
-  const dataStr = JSON.stringify(cards, null, 2);
+export function validateImportPayload(rawObj: any): ParsedImport {
+  if (rawObj && rawObj.schemaVersion === "1.0" && Array.isArray(rawObj.cards) && Array.isArray(rawObj.history)) {
+    return {
+      type: 'backup',
+      data: rawObj as UnifiedBackupPayload
+    };
+  }
+  
+  return {
+    type: 'single_card',
+    data: validateMestreCard(rawObj)
+  };
+}
+
+export function exportFullBackup(cards: MestreCardData[], history: StudySessionRecord[]): void {
+  const payload: UnifiedBackupPayload = {
+    schemaVersion: "1.0",
+    exportedAt: Date.now(),
+    cards,
+    history
+  };
+
+  const dataStr = JSON.stringify(payload, null, 2);
   const blob = new Blob([dataStr], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   
   const link = document.createElement('a');
   link.href = url;
-  link.download = `mestre-cards-backup-${new Date().toISOString().split('T')[0]}.json`;
+  link.download = `mestre-card-full-backup-${new Date().toISOString().split('T')[0]}.json`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

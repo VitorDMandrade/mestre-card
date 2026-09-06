@@ -3,13 +3,14 @@ import type { MestreCardData } from '../types/mestre-card';
 
 interface DashboardProps {
   cards: MestreCardData[];
+  historyMap: Record<string, number>;
   onSelectCard: (id: string) => void;
   onDeleteCard: (id: string) => void;
   onImportCard: (jsonStr: string) => void;
   onExportBackup: () => void;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ cards, onSelectCard, onDeleteCard, onImportCard, onExportBackup }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ cards, historyMap, onSelectCard, onDeleteCard, onImportCard, onExportBackup }) => {
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
   const [jsonInput, setJsonInput] = useState('');
 
@@ -87,31 +88,51 @@ export const Dashboard: React.FC<DashboardProps> = ({ cards, onSelectCard, onDel
             [ NENHUM DADO TÁTICO ENCONTRADO NO BANCO ]
           </div>
         ) : (
-          cards.map(card => (
-            <div key={card.id} className="glass-card p-5 rounded-2xl border border-slate-700/50 hover:border-cyan-500/30 transition-all flex flex-col">
-              <div className="flex justify-between items-start mb-3">
-                <span className="px-2 py-1 rounded bg-slate-800 text-slate-300 font-mono text-[10px] uppercase font-bold tracking-wider">
-                  {card.topic}
-                </span>
-                <span className="text-[10px] text-slate-500 font-mono">
-                  {new Date(card.updatedAt).toLocaleDateString()}
-                </span>
-              </div>
-              
-              <h2 className="text-lg font-bold text-white mb-4 line-clamp-2">
-                {card.title}
-              </h2>
+          cards.map(card => {
+            const score = historyMap[card.id];
+            return (
+              <div key={card.id} className="glass-card p-5 rounded-2xl border border-slate-700/50 hover:border-cyan-500/30 transition-all flex flex-col">
+                <div className="flex justify-between items-start mb-3">
+                  <span className="px-2 py-1 rounded bg-slate-800 text-slate-300 font-mono text-[10px] uppercase font-bold tracking-wider">
+                    {card.topic}
+                  </span>
+                  <span className="text-[10px] text-slate-500 font-mono">
+                    {new Date(card.updatedAt).toLocaleDateString()}
+                  </span>
+                </div>
+                
+                <h2 className="text-lg font-bold text-white mb-4 line-clamp-2">
+                  {card.title}
+                </h2>
 
-              <div className="flex gap-4 mb-6 border-t border-b border-slate-800/50 py-3">
-                <div className="text-center">
-                  <p className="text-[10px] text-slate-500 font-mono">TEORIA</p>
-                  <p className="text-sm font-bold text-slate-300">{card.sec02_theory?.blocks?.length || 0}</p>
+                <div className="flex gap-4 mb-4 border-t border-b border-slate-800/50 py-3">
+                  <div className="text-center">
+                    <p className="text-[10px] text-slate-500 font-mono">TEORIA</p>
+                    <p className="text-sm font-bold text-slate-300">{card.sec02_theory?.blocks?.length || 0}</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-[10px] text-slate-500 font-mono">LAB</p>
+                    <p className="text-sm font-bold text-slate-300">{card.sec05_lab?.questions?.length || 0}</p>
+                  </div>
                 </div>
-                <div className="text-center">
-                  <p className="text-[10px] text-slate-500 font-mono">LAB</p>
-                  <p className="text-sm font-bold text-slate-300">{card.sec05_lab?.questions?.length || 0}</p>
+
+                <div className="mb-4">
+                  {score !== undefined ? (
+                    <span className={`px-2.5 py-1 rounded-full font-mono text-xs font-bold border ${
+                      score >= 800 
+                        ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-400 glow-emerald' 
+                        : score >= 600
+                        ? 'bg-amber-950/60 border-amber-500/40 text-amber-400'
+                        : 'bg-red-950/60 border-red-500/40 text-red-400'
+                    }`}>
+                      TRI: {score} pts
+                    </span>
+                  ) : (
+                    <span className="px-2.5 py-1 rounded-full bg-slate-900 border border-slate-800 text-slate-500 font-mono text-xs">
+                      TRI: PENDENTE
+                    </span>
+                  )}
                 </div>
-              </div>
 
               <div className="mt-auto flex gap-2">
                 <button 
@@ -126,7 +147,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ cards, onSelectCard, onDel
                 </button>
               </div>
             </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>
