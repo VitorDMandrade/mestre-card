@@ -4,12 +4,29 @@ import { MathRenderer } from '../MathRenderer';
 
 interface TheorySectionProps {
   card: MestreCardData;
+  textSize?: 'sm' | 'md' | 'lg';
 }
 
-export const TheorySection = ({ card }: TheorySectionProps) => {
+export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => {
   const [activeRoute, setActiveRoute] = useState<string>(card.sec02_theory.triagePatterns[0]?.id || 'route-a');
 
   const activePattern = card.sec02_theory.triagePatterns.find(p => p.id === activeRoute);
+
+  const textScaleClass = {
+    sm: 'text-xs md:text-sm',
+    md: 'text-sm md:text-base',
+    lg: 'text-base md:text-lg'
+  }[textSize || 'md'];
+
+  // Derivação autônoma ou consumo direto das 3 premissas de Ancoragem Rápida
+  const quickAnchors: string[] = card.sec02_theory.quickAnchoring || 
+    (card.sec02_theory.blocks || []).slice(0, 3).map(b => {
+      if (b.highlight) {
+        return `**${b.title}**: ${b.highlight}`;
+      }
+      const firstSentence = b.content.split(/\. |\.\n/)[0]?.trim();
+      return `**${b.title}**: ${firstSentence ? firstSentence + '.' : b.content}`;
+    });
 
   return (
     <>
@@ -51,6 +68,28 @@ export const TheorySection = ({ card }: TheorySectionProps) => {
           <span className="text-blue-500">02.</span> DOSSIÊ TEÓRICO
         </h2>
 
+        {/* Box Tático de Ancoragem Rápida (15s) */}
+        {quickAnchors.length > 0 && (
+          <div className="bg-cyan-950/20 border border-cyan-500/30 rounded-xl p-3.5 mb-6 shadow-[0_0_15px_rgba(6,182,212,0.08)]">
+            <div className="flex items-center gap-2 mb-2.5">
+              <span className="text-cyan-400 text-sm animate-pulse">⚡</span>
+              <h3 className="font-mono text-xs font-black tracking-wider text-cyan-400 uppercase">
+                ANCORAGEM RÁPIDA (15s) // PREMISSAS INEGOCIÁVEIS
+              </h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {quickAnchors.slice(0, 3).map((anchor, idx) => (
+                <div key={idx} className="flex items-start gap-2 bg-slate-900/60 p-2.5 rounded-lg border border-cyan-500/15">
+                  <span className="text-cyan-400 font-mono text-xs font-bold shrink-0 mt-0.5">0{idx + 1}.</span>
+                  <div className="text-xs text-slate-300 leading-relaxed font-medium">
+                    <MathRenderer content={anchor} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Blocos de Dossiê */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
           {card.sec02_theory.blocks.map((block) => (
@@ -59,7 +98,7 @@ export const TheorySection = ({ card }: TheorySectionProps) => {
                 {String(block.number).padStart(2, '0')}
               </div>
               <h3 className="text-lg font-bold text-blue-400 mb-3 relative z-10">{block.title}</h3>
-              <div className="text-gray-300 leading-relaxed text-sm md:text-base relative z-10">
+              <div className={`max-w-3xl leading-relaxed text-gray-300 relative z-10 space-y-3 ${textScaleClass}`}>
                 <MathRenderer content={block.content} />
               </div>
               {block.highlight && (

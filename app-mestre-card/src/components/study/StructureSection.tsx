@@ -29,30 +29,96 @@ export const StructureSection = ({ card }: StructureSectionProps) => {
 
       {structure.type === 'qualitative' && (
         <div className="space-y-6">
-          {/* Encadeamento Causal */}
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6">
-            <h3 className="text-lg font-black text-white mb-4 flex items-center gap-2">
-              <span className="text-blue-500">🔗</span> MACRO-ENCADEAMENTO CAUSAL
-            </h3>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
-                <div className="text-xs font-black text-amber-500 mb-2 uppercase">1. Causas Base</div>
-                <div className="text-gray-300 text-sm"><MathRenderer content={structure.causalChain.causes} /></div>
-              </div>
-              <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
-                <div className="text-xs font-black text-blue-400 mb-2 uppercase">2. Agentes</div>
-                <div className="text-gray-300 text-sm"><MathRenderer content={structure.causalChain.agents} /></div>
-              </div>
-              <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
-                <div className="text-xs font-black text-emerald-400 mb-2 uppercase">3. Mecanismos</div>
-                <div className="text-gray-300 text-sm"><MathRenderer content={structure.causalChain.mechanisms} /></div>
-              </div>
-              <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
-                <div className="text-xs font-black text-red-400 mb-2 uppercase">4. Consequências</div>
-                <div className="text-gray-300 text-sm"><MathRenderer content={structure.causalChain.consequences} /></div>
-              </div>
+          {/* Stepper Tático Conectado (Cadeia Causal 01 a 05) */}
+          <div className="bg-slate-900/90 border border-slate-700/80 rounded-2xl p-6 shadow-lg">
+            <div className="flex items-center justify-between gap-4 mb-6 border-b border-slate-800 pb-3">
+              <h3 className="text-lg font-black text-white flex items-center gap-2">
+                <span className="text-cyan-400">🔗</span> STEPPER CAUSAL TÁTICO
+              </h3>
+              <span className="text-xs font-mono text-cyan-400/80 bg-cyan-950/50 px-2.5 py-1 rounded border border-cyan-500/30">
+                01 ➔ 05 FLUXO CONECTADO
+              </span>
             </div>
+
+            {/* Layout Híbrido: Mobile Vertical com Linha / Desktop Horizontal com Setas Conectoras */}
+            {(() => {
+              const steps = [
+                {
+                  num: '01',
+                  title: 'Causas Materiais',
+                  badgeClass: 'bg-amber-950/60 border-amber-500/40 text-amber-300',
+                  titleClass: 'text-amber-400',
+                  content: structure.causalChain.causes
+                },
+                {
+                  num: '02',
+                  title: 'Agentes Históricos',
+                  badgeClass: 'bg-blue-950/60 border-blue-500/40 text-blue-300',
+                  titleClass: 'text-blue-400',
+                  content: structure.causalChain.agents
+                },
+                {
+                  num: '03',
+                  title: 'Mecanismos de Ação',
+                  badgeClass: 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300',
+                  titleClass: 'text-emerald-400',
+                  content: structure.causalChain.mechanisms
+                },
+                {
+                  num: '04',
+                  title: 'Consequências Diretas',
+                  badgeClass: 'bg-red-950/60 border-red-500/40 text-red-300',
+                  titleClass: 'text-red-400',
+                  content: structure.causalChain.consequences
+                },
+                {
+                  num: '05',
+                  title: 'Desdobramentos',
+                  badgeClass: 'bg-purple-950/60 border-purple-500/40 text-purple-300',
+                  titleClass: 'text-purple-400',
+                  content: structure.causalChain.unfoldings || 
+                    structure.causalChain.developments || 
+                    structure.causalChain.desdobramentos || 
+                    'Impactos estruturais de longo prazo e desdobramentos críticos articulados aos nós anteriores.'
+                }
+              ];
+
+              return (
+                <div className="relative border-l-2 border-cyan-500/30 pl-4 space-y-4 md:border-l-0 md:pl-0 md:space-y-0 md:flex md:items-stretch md:gap-2">
+                  {steps.map((step, idx) => (
+                    <div key={step.num} className="contents md:flex md:flex-1 md:items-stretch">
+                      {/* Card do Passo */}
+                      <div className="w-full bg-slate-950/80 border border-slate-800 hover:border-cyan-500/50 rounded-xl p-4 flex flex-col justify-between transition-all duration-200 shadow-[0_0_15px_rgba(0,0,0,0.3)] hover:shadow-[0_0_15px_rgba(6,182,212,0.15)] relative group">
+                        <div>
+                          {/* Cabeçalho do Nó */}
+                          <div className="flex items-center justify-between gap-2 mb-2.5">
+                            <span className={`px-2 py-0.5 rounded font-mono text-xs font-black border ${step.badgeClass}`}>
+                              NÓ {step.num}
+                            </span>
+                            <div className="w-2 h-2 rounded-full bg-cyan-400/60 group-hover:bg-cyan-400 group-hover:shadow-[0_0_8px_rgba(34,211,238,0.8)] transition-all"></div>
+                          </div>
+                          
+                          <h4 className={`text-xs font-black uppercase tracking-wider mb-2 ${step.titleClass}`}>
+                            {step.num}. {step.title}
+                          </h4>
+
+                          <div className="text-gray-300 text-xs sm:text-sm leading-relaxed">
+                            <MathRenderer content={step.content} />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Seta Conectora Tática no Desktop */}
+                      {idx < steps.length - 1 && (
+                        <div className="hidden md:flex items-center justify-center text-cyan-400/70 font-mono text-base select-none shrink-0 px-1">
+                          <span className="drop-shadow-[0_0_8px_rgba(34,211,238,0.6)]">➔</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
 
           {/* Tabela Comparativa */}

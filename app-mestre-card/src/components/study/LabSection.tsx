@@ -23,11 +23,11 @@ export function parseDistractorAnalysis(
   const incorrectOptions = options.filter(o => !o.isCorrect);
   const incorrectLetters = incorrectOptions.map(o => o.letter.toUpperCase());
 
-  const regex = /(?:(?:A\s+alternativa|Alternativa|Letra|Opção)\s+([A-D])|(?:\b|^)([A-D])\s*[\)\:\-\–])/gi;
+  const regex = /(?:[•\-\*]?\s*\[(?:Alternativa|Letra|Opção)?\s*([A-D])\]|(?:A\s+alternativa|Alternativa|Letra|Opção)\s+([A-D])|(?:\b|^)([A-D])\s*[\)\:\-\–])/gi;
   const matches: Array<{ letter: string; index: number }> = [];
   let m: RegExpExecArray | null;
   while ((m = regex.exec(analysisText)) !== null) {
-    const letter = (m[1] || m[2]).toUpperCase();
+    const letter = (m[1] || m[2] || m[3]).toUpperCase();
     if (incorrectLetters.includes(letter)) {
       matches.push({ letter, index: m.index });
     }

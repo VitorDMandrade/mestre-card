@@ -27,7 +27,15 @@ export interface QuantitativeStructure {
 
 export interface QualitativeStructure {
   type: 'qualitative';
-  causalChain: { causes: string; agents: string; mechanisms: string; consequences: string };
+  causalChain: { 
+    causes: string; 
+    agents: string; 
+    mechanisms: string; 
+    consequences: string;
+    unfoldings?: string;
+    developments?: string;
+    desdobramentos?: string;
+  };
   comparisonTable: { header: string[]; rows: string[][] };
 }
 
@@ -100,6 +108,7 @@ export interface MestreCardData {
   sec02_theory: {
     blocks: TheoryBlock[];
     triagePatterns: TriagePattern[];
+    quickAnchoring?: string[];
   };
   sec03_structure: QuantitativeStructure | QualitativeStructure;
   sec04_radar: {

@@ -1,6 +1,23 @@
-import { useEffect, useState } from 'react';
-import type { StudySessionRecord } from '../../types/mestre-card';
+import { useEffect, useState, useRef } from 'react';
+import type { StudySessionRecord, TheoryBlock } from '../../types/mestre-card';
 import { playClickSound } from '../../lib/audio';
+
+export function sanitizeForSpeech(rawText: string): string {
+  if (!rawText) return '';
+  return rawText
+    .replace(/\$\$[\s\S]*?\$\$/g, ' fórmula matemática ')
+    .replace(/\$([^\$]+)\$/g, '$1')
+    .replace(/\*\*/g, '')
+    .replace(/\*/g, '')
+    .replace(/#{1,6}\s+/g, '')
+    .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
+    .replace(/•/g, '')
+    .replace(/➔/g, ' levando a ')
+    .replace(/❌/g, ' erro: ')
+    .replace(/✅/g, ' correto: ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 
 interface StudyHUDProps {
   hp: number;
@@ -11,6 +28,9 @@ interface StudyHUDProps {
   bestScore: StudySessionRecord | null;
   queueInfo?: { current: number; total: number; hasNext: boolean } | null;
   onNextQueueItem?: () => void;
+  textSize?: 'sm' | 'md' | 'lg';
+  onTextSizeChange?: (size: 'sm' | 'md' | 'lg') => void;
+  theoryBlocks?: TheoryBlock[];
 }
 
 export const StudyHUD = ({ 
@@ -21,10 +41,94 @@ export const StudyHUD = ({
   onToggleSound,
   bestScore,
   queueInfo,
-  onNextQueueItem
+  onNextQueueItem,
+  textSize = 'md',
+  onTextSizeChange,
+  theoryBlocks
 }: StudyHUDProps) => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeHash, setActiveHash] = useState('sec-01');
+  const [speechState, setSpeechState] = useState<'idle' | 'playing' | 'paused'>('idle');
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+
+  // Strict cleanup of SpeechSynthesis on unmount or card changes
+  useEffect(() => {
+    return () => {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        utteranceRef.current = null;
+      }
+    };
+  }, [theoryBlocks]);
+
+  const handlePlaySpeech = () => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+      alert('A síntese de voz (Web Speech API) não está disponível neste navegador.');
+      return;
+    }
+
+    if (speechState === 'playing') {
+      window.speechSynthesis.pause();
+      setSpeechState('paused');
+      return;
+    }
+
+    if (speechState === 'paused') {
+      window.speechSynthesis.resume();
+      setSpeechState('playing');
+      return;
+    }
+
+    // speechState === 'idle'
+    window.speechSynthesis.cancel();
+
+    const blocks = theoryBlocks || [];
+    if (blocks.length === 0) {
+      alert('Nenhum bloco de teoria disponível para leitura.');
+      return;
+    }
+
+    const rawScript = blocks
+      .map(b => `Bloco ${b.number}: ${b.title}. ${b.content}. ${b.highlight ? 'Destaque tático: ' + b.highlight + '.' : ''}`)
+      .join(' ');
+
+    const cleanScript = sanitizeForSpeech(rawScript);
+    const utterance = new SpeechSynthesisUtterance(cleanScript);
+    utterance.lang = 'pt-BR';
+    utterance.rate = 1.05;
+    utterance.pitch = 1.0;
+
+    utterance.onstart = () => {
+      setSpeechState('playing');
+    };
+    utterance.onend = () => {
+      setSpeechState('idle');
+      utteranceRef.current = null;
+    };
+    utterance.onerror = (e) => {
+      console.warn('SpeechSynthesis event/interruption:', e);
+      setSpeechState('idle');
+      utteranceRef.current = null;
+    };
+    utterance.onpause = () => {
+      setSpeechState('paused');
+    };
+    utterance.onresume = () => {
+      setSpeechState('playing');
+    };
+
+    utteranceRef.current = utterance;
+    window.speechSynthesis.speak(utterance);
+    setSpeechState('playing');
+  };
+
+  const handleStopSpeech = () => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      utteranceRef.current = null;
+    }
+    setSpeechState('idle');
+  };
 
   // Scroll Progress Bar calculation
   useEffect(() => {
@@ -123,7 +227,101 @@ export const StudyHUD = ({
               )}
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5 flex-wrap">
+              {/* Narração Nativa por Voz (Web Speech API) */}
+              <div className="flex items-center gap-1">
+                {speechState === 'idle' && (
+                  <button 
+                    onClick={handlePlaySpeech}
+                    className="px-2.5 py-1 rounded bg-slate-900 border border-slate-700 hover:border-cyan-500/60 text-cyan-400 hover:text-cyan-300 text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm hover:shadow-[0_0_10px_rgba(6,182,212,0.2)]"
+                    title="Ouvir Dossiê Teórico sintetizado por voz nativa"
+                  >
+                    <span>🎧</span>
+                    <span className="hidden sm:inline">Ouvir Dossiê</span>
+                    <span className="sm:hidden">Ouvir</span>
+                  </button>
+                )}
+
+                {speechState === 'playing' && (
+                  <div className="flex items-center gap-1">
+                    <button 
+                      onClick={handlePlaySpeech}
+                      className="px-2.5 py-1 rounded bg-cyan-950 border border-cyan-400 text-cyan-300 text-xs font-mono font-bold flex items-center gap-1.5 transition-all shadow-[0_0_12px_rgba(6,182,212,0.4)] animate-pulse cursor-pointer"
+                      title="Pausar leitura"
+                    >
+                      <span>⏸️</span>
+                      <span className="hidden sm:inline">Pausar</span>
+                    </button>
+                    <button 
+                      onClick={handleStopSpeech}
+                      className="px-2 py-1 rounded bg-red-950/80 border border-red-500/60 text-red-300 hover:bg-red-900 text-xs font-mono font-bold transition-all cursor-pointer"
+                      title="Interromper leitura"
+                    >
+                      <span>⏹️</span>
+                    </button>
+                  </div>
+                )}
+
+                {speechState === 'paused' && (
+                  <div className="flex items-center gap-1">
+                    <button 
+                      onClick={handlePlaySpeech}
+                      className="px-2.5 py-1 rounded bg-amber-950/80 border border-amber-500/60 text-amber-300 text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+                      title="Retomar leitura"
+                    >
+                      <span>▶️</span>
+                      <span className="hidden sm:inline">Retomar</span>
+                    </button>
+                    <button 
+                      onClick={handleStopSpeech}
+                      className="px-2 py-1 rounded bg-red-950/80 border border-red-500/60 text-red-300 hover:bg-red-900 text-xs font-mono font-bold transition-all cursor-pointer"
+                      title="Interromper leitura"
+                    >
+                      <span>⏹️</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Controle de Escala Tipográfica Militar */}
+              {onTextSizeChange && (
+                <div className="flex items-center bg-slate-900 border border-slate-700/80 rounded p-0.5 gap-0.5" title="Escala Tipográfica de Leitura">
+                  <button
+                    onClick={() => onTextSizeChange('sm')}
+                    className={`font-mono text-xs px-2 py-0.5 rounded transition-all cursor-pointer ${
+                      textSize === 'sm'
+                        ? 'bg-cyan-950 border border-cyan-400 text-cyan-300 font-bold shadow-[0_0_8px_rgba(34,211,238,0.3)]'
+                        : 'bg-slate-900 border border-slate-700 hover:border-cyan-500/50 text-slate-300'
+                    }`}
+                    title="Fonte Compacta (sm)"
+                  >
+                    A-
+                  </button>
+                  <button
+                    onClick={() => onTextSizeChange('md')}
+                    className={`font-mono text-xs px-2 py-0.5 rounded transition-all cursor-pointer ${
+                      textSize === 'md'
+                        ? 'bg-cyan-950 border border-cyan-400 text-cyan-300 font-bold shadow-[0_0_8px_rgba(34,211,238,0.3)]'
+                        : 'bg-slate-900 border border-slate-700 hover:border-cyan-500/50 text-slate-300'
+                    }`}
+                    title="Fonte Padrão (md)"
+                  >
+                    A
+                  </button>
+                  <button
+                    onClick={() => onTextSizeChange('lg')}
+                    className={`font-mono text-xs px-2 py-0.5 rounded transition-all cursor-pointer ${
+                      textSize === 'lg'
+                        ? 'bg-cyan-950 border border-cyan-400 text-cyan-300 font-bold shadow-[0_0_8px_rgba(34,211,238,0.3)]'
+                        : 'bg-slate-900 border border-slate-700 hover:border-cyan-500/50 text-slate-300'
+                    }`}
+                    title="Fonte Ampliada (lg)"
+                  >
+                    A+
+                  </button>
+                </div>
+              )}
+
               <button 
                 onClick={() => {
                   playClickSound(soundEnabled);

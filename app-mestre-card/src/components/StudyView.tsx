@@ -26,6 +26,7 @@ export const StudyView: FC<StudyViewProps> = ({ card, onBack, queueInfo, onNextQ
   const [hp, setHp] = useState(100);
   const [isHardcore, setIsHardcore] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [textSize, setTextSize] = useState<'sm' | 'md' | 'lg'>('md');
 
   const loadTelemetry = async () => {
     try {
@@ -110,11 +111,14 @@ export const StudyView: FC<StudyViewProps> = ({ card, onBack, queueInfo, onNextQ
         bestScore={bestSession}
         queueInfo={queueInfo}
         onNextQueueItem={onNextQueueItem}
+        textSize={textSize}
+        onTextSizeChange={setTextSize}
+        theoryBlocks={card.sec02_theory?.blocks}
       />
 
       <div className="max-w-6xl mx-auto px-4 pb-20 space-y-12">
         <ErrorBoundary fallbackTitle="Erro na Seção de Teoria">
-          <TheorySection card={card} />
+          <TheorySection card={card} textSize={textSize} />
         </ErrorBoundary>
         
         <ErrorBoundary fallbackTitle="Erro na Seção de Estrutura">
