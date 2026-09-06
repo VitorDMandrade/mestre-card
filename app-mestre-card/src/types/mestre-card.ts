@@ -1,4 +1,7 @@
 export interface MestreCardData {
+  id: string;
+  createdAt: number;
+  updatedAt: number;
   title: string;
   theme: string;
   skills: string[];
@@ -46,3 +49,12 @@ export interface TRIStatistics {
   immunity: number;
   totalScore: number;
 }
+
+export interface StudySessionRecord {
+  id: string;
+  cardId: string;
+  timestamp: number;
+  score: number;
+  stats: TRIStatistics;
+}
+

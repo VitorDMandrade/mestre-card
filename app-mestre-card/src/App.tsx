@@ -1,8 +1,49 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
+import { db } from './lib/db';
+import { MestreCardData } from './types/mestre-card';
 
 function App() {
+  const [storageStatus, setStorageStatus] = useState<string>('OFFLINE');
+
+  useEffect(() => {
+    const testDB = async () => {
+      try {
+        await db.setSetting('test_ready', true);
+        const mockCard: MestreCardData = {
+          id: 'test-card-1',
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+          title: 'Teste IndexedDB',
+          theme: 'Testes',
+          skills: [],
+          theoryBlocks: [],
+          labItems: [],
+          arcadeGameState: {
+            questionsData: [],
+            matchData: [],
+            tfData: [],
+            orderData: [],
+            oddData: []
+          }
+        };
+        await db.saveCard(mockCard);
+        
+        const retrieved = await db.getCard('test-card-1');
+        if (retrieved && retrieved.id === 'test-card-1') {
+          setStorageStatus('ONLINE');
+        } else {
+          setStorageStatus('ERROR');
+        }
+      } catch (e) {
+        console.error('Falha no IndexedDB:', e);
+        setStorageStatus('ERROR');
+      }
+    };
+    testDB();
+  }, []);
+
   return (
     <div className="min-h-screen flex items-center justify-center p-8">
       <div className="glass-card max-w-2xl w-full p-8 rounded-2xl border border-slate-700/50">
@@ -11,14 +52,17 @@ function App() {
           <span className="px-2.5 py-1 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-mono text-xs font-bold tracking-widest glow-cyan">
             SYS.INIT // MESTRE CARD V16
           </span>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight">
+          <span className={`px-2.5 py-1 rounded border font-mono text-xs font-bold tracking-widest ${storageStatus === 'ONLINE' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 glow-emerald' : 'bg-red-500/10 border-red-500/30 text-red-400'}`}>
+            [STORAGE_STATUS: {storageStatus}]
+          </span>
+          <h1 className="text-2xl font-extrabold text-white tracking-tight ml-auto">
             Ambiente Tático HUD
           </h1>
         </div>
 
         <div className="space-y-6">
           <p className="text-slate-300 leading-relaxed text-sm">
-            O ambiente HUD Militar V16 foi inicializado com sucesso. O motor de renderização matemática segura está ativo.
+            O ambiente HUD Militar V16 foi inicializado com sucesso. O motor de renderização matemática segura está ativo. O banco de dados nativo está {storageStatus === 'ONLINE' ? 'operacional' : 'falhando'}.
           </p>
 
           <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-6 glow-amber">
