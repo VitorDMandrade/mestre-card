@@ -1,0 +1,305 @@
+import { useState, useEffect } from 'react';
+import type { MestreCardData } from '../../types/mestre-card';
+import { GameTimeline } from './GameTimeline';
+import { GameMatch } from './GameMatch';
+import { GameTrueFalse } from './GameTrueFalse';
+import { GameOrder } from './GameOrder';
+import { GameOdd } from './GameOdd';
+import { RadarChart } from './RadarChart';
+import { calculateTRIScore } from '../../lib/tri-engine';
+import type { TRICalculationInput, TRIScoreResult } from '../../lib/tri-engine';
+import { db } from '../../lib/db';
+
+interface ArcadeEngineProps {
+  card: MestreCardData;
+}
+
+export const ArcadeEngine = ({ card }: ArcadeEngineProps) => {
+  const [activeTab, setActiveTab] = useState<'g1' | 'g2' | 'g3' | 'g4' | 'g5'>('g1');
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [isHardcore, setIsHardcore] = useState(false);
+  const [hp, setHp] = useState(100);
+  
+  // Game state tracking
+  const [g1Results, setG1Results] = useState<{ hit: boolean; difficulty: string }[]>([]);
+  const [g3TimeSaved, setG3TimeSaved] = useState(0);
+  const [g4Attempts, setG4Attempts] = useState(0);
+  const [g5Hits, setG5Hits] = useState(0);
+
+  const [gamesStatus, setGamesStatus] = useState({ g1: false, g2: false, g3: false, g4: false, g5: false });
+  const [triResult, setTriResult] = useState<TRIScoreResult | null>(null);
+
+  // Keyboard navigation for tabs
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
+
+      if (e.key === ',' || e.key === '.') {
+        const tabs = ['g1', 'g2', 'g3', 'g4', 'g5'] as const;
+        const currentIdx = tabs.indexOf(activeTab);
+        let nextIdx = e.key === '.' ? currentIdx + 1 : currentIdx - 1;
+        if (nextIdx >= tabs.length) nextIdx = 0;
+        if (nextIdx < 0) nextIdx = tabs.length - 1;
+        setActiveTab(tabs[nextIdx]);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeTab]);
+
+  const toggleHardcore = () => {
+    setIsHardcore(!isHardcore);
+    setHp(100);
+  };
+
+  const handleDamage = (amount: number) => {
+    if (!isHardcore) return;
+    setHp(prev => {
+      const next = Math.max(0, prev - amount);
+      if (next <= 0) {
+        setTimeout(() => {
+          alert("⚠️ COLAPSO DO SISTEMA! Seu HP zerou no Modo Sobrevivência. Recalibre a teoria e tente novamente.");
+          setHp(100);
+        }, 100);
+        return 0;
+      }
+      return next;
+    });
+  };
+
+  const handleG1Complete = (results: { hit: boolean; difficulty: string }[]) => {
+    setG1Results(results);
+    setGamesStatus(prev => ({ ...prev, g1: true }));
+  };
+
+  const handleG2Complete = () => {
+    setGamesStatus(prev => ({ ...prev, g2: true }));
+  };
+
+  const handleG3Complete = (timeSaved: number) => {
+    setG3TimeSaved(timeSaved);
+    setGamesStatus(prev => ({ ...prev, g3: true }));
+  };
+
+  const handleG4Complete = (attempts: number) => {
+    setG4Attempts(attempts);
+    setGamesStatus(prev => ({ ...prev, g4: true }));
+  };
+
+  const handleG5Complete = (hits: number) => {
+    setG5Hits(hits);
+    setGamesStatus(prev => ({ ...prev, g5: true }));
+  };
+
+  const calculateFinalScore = async () => {
+    const input: TRICalculationInput = {
+      g1Results,
+      g3TimeSaved,
+      g3TotalQuestions: card.sec07_arcade?.tfData?.length || 0,
+      g4TotalAttempts: g4Attempts,
+      g4TotalSequences: card.sec07_arcade?.orderData?.[0]?.steps.length || 0,
+      g5TotalHits: g5Hits,
+      g5TotalQuestions: card.sec07_arcade?.oddData?.length || 0,
+    };
+    const result = calculateTRIScore(input);
+    setTriResult(result);
+
+    // Save to IndexedDB
+    try {
+      await db.saveStudySession({
+        id: crypto.randomUUID(),
+        cardId: card.id,
+        timestamp: Date.now(),
+        score: result.score,
+        stats: {
+          accuracy: result.axes[0],
+          coherenceScore: result.axes[1],
+          speed: result.axes[2],
+          immunity: result.axes[4],
+          totalScore: result.score
+        }
+      });
+    } catch (err) {
+      console.error('Failed to save session to DB:', err);
+    }
+  };
+
+  const { questionsData, matchData, tfData, orderData, oddData } = card.sec07_arcade || {};
+
+  const mappedMatchData = (matchData || []).map((m, i) => ({
+    id: String(i),
+    term: m.left,
+    definition: m.right
+  }));
+
+  const mappedOrderData = (orderData?.[0]?.steps || []).map((s, i) => ({
+    id: String(i),
+    step: s,
+    explanation: ''
+  }));
+
+  const mappedOddData = oddData?.map(o => ({
+    theme: o.question,
+    options: o.options
+  })) || [];
+
+  return (
+    <section id="sec-arcade" className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-[0_0_25px_-4px_rgba(56,189,248,0.25)] scroll-mt-20">
+      {/* Header and Controls */}
+      <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
+        <h2 className="text-2xl font-black text-white">🕹️ Pentágono Revisional (Arcade)</h2>
+        
+        <div className="flex items-center gap-3 flex-wrap">
+          <span className="hidden sm:inline-block text-xs font-mono text-gray-500">
+            Teclas: [,] e [.] abas, [1-5] opções, [V/F], [Espaço] Avançar
+          </span>
+          
+          <button 
+            onClick={() => setSoundEnabled(!soundEnabled)}
+            className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-colors ${soundEnabled ? 'bg-emerald-600 text-white' : 'bg-slate-700 text-slate-400'}`}
+          >
+            {soundEnabled ? '🔊 Som Ativado' : '🔇 Som Desativado'}
+          </button>
+
+          <button 
+            onClick={toggleHardcore}
+            className={`px-3 py-1.5 rounded-full border text-xs font-mono transition-all flex items-center gap-1.5 ${
+              isHardcore 
+                ? 'bg-red-950/80 border-red-500 text-red-300 shadow-[0_0_15px_rgba(239,68,68,0.2)]' 
+                : 'bg-slate-900/90 border-slate-700 text-slate-400 hover:border-red-500/50 hover:text-red-300'
+            }`}
+          >
+            <span>{isHardcore ? '🔥' : '🛡️'}</span>
+            <span>{isHardcore ? 'Modo Sobrevivência' : 'Modo Normal'}</span>
+          </button>
+
+          {isHardcore && (
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-red-950/40 border border-red-500/40 text-xs font-mono animate-fade-in">
+              <span className="text-red-400 font-bold">HP:</span>
+              <div className="w-20 bg-slate-800 rounded-full h-2 overflow-hidden border border-red-900/60">
+                <div 
+                  className="bg-gradient-to-r from-red-600 to-rose-500 h-full transition-all duration-300" 
+                  style={{ width: `${hp}%` }}
+                />
+              </div>
+              <span className="text-white font-bold">{hp}</span>
+            </div>
+          )}
+
+          <button 
+            onClick={calculateFinalScore}
+            className="bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white px-3.5 py-1.5 rounded-xl font-bold text-xs font-mono shadow-[0_4px_14px_0_rgba(14,165,233,0.39)] transition-all"
+          >
+            📊 Score TRI
+          </button>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex flex-wrap gap-2 mb-6 border-b border-slate-800 pb-4">
+        {[
+          { id: 'g1', label: '1. Morte Súbita', color: 'blue' },
+          { id: 'g2', label: '2. Conexão Neural', color: 'emerald' },
+          { id: 'g3', label: '3. Pressão TRI', color: 'red' },
+          { id: 'g4', label: '4. Ordenação Tática', color: 'amber' },
+          { id: 'g5', label: '5. O Infiltrado', color: 'purple' },
+        ].map(t => {
+          const isActive = activeTab === t.id;
+          const isDone = gamesStatus[t.id as keyof typeof gamesStatus];
+          return (
+            <button 
+              key={t.id}
+              onClick={() => setActiveTab(t.id as any)}
+              className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-all border ${
+                isActive 
+                  ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.5)] transform -translate-y-px' 
+                  : 'bg-slate-800 text-gray-400 border-slate-700 hover:bg-slate-700'
+              }`}
+            >
+              {isDone && <span className="mr-1">✅</span>}
+              {t.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Viewport */}
+      <div>
+        {activeTab === 'g1' && (
+          <GameTimeline 
+            questions={questionsData || []} 
+            soundEnabled={soundEnabled} 
+            onDamage={handleDamage}
+            onComplete={handleG1Complete}
+          />
+        )}
+        {activeTab === 'g2' && (
+          <GameMatch 
+            matchData={mappedMatchData} 
+            soundEnabled={soundEnabled} 
+            onDamage={handleDamage}
+            onComplete={handleG2Complete}
+          />
+        )}
+        {activeTab === 'g3' && (
+          <GameTrueFalse 
+            tfData={tfData || []} 
+            soundEnabled={soundEnabled} 
+            onDamage={handleDamage}
+            onComplete={handleG3Complete}
+          />
+        )}
+        {activeTab === 'g4' && (
+          <GameOrder 
+            orderData={mappedOrderData} 
+            soundEnabled={soundEnabled} 
+            onDamage={handleDamage}
+            onComplete={handleG4Complete}
+          />
+        )}
+        {activeTab === 'g5' && (
+          <GameOdd 
+            oddData={mappedOddData} 
+            soundEnabled={soundEnabled} 
+            onDamage={handleDamage}
+            onComplete={handleG5Complete}
+          />
+        )}
+      </div>
+
+      {/* Final Score Modal */}
+      {triResult && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 animate-fade-in backdrop-blur-sm">
+          <div className="bg-slate-900 border-2 border-blue-500 p-8 rounded-2xl text-center max-w-md w-full shadow-[0_0_30px_rgba(59,130,246,0.3)]">
+            <h2 className="text-3xl font-black text-white mb-2 tracking-tight">SCORE TRI FINAL</h2>
+            <div className="text-6xl font-black text-blue-400 mb-4 tracking-tighter shadow-blue-500/20 drop-shadow-lg">
+              {triResult.score}
+            </div>
+            
+            <div className="text-xl font-bold text-gray-300 mb-4">
+              {triResult.verdict}
+            </div>
+
+            {triResult.penalty > 0 && (
+              <div className="text-xs text-red-400 mb-6 font-bold border border-red-500/30 bg-red-900/20 p-3 rounded-lg">
+                ⚠️ ALERTA TRI: Padrão de inconsistência detectado. Penalidade: -{triResult.penalty}pts.
+              </div>
+            )}
+
+            <div className="mb-6 flex justify-center">
+              <RadarChart values={triResult.axes} size={280} />
+            </div>
+
+            <button 
+              onClick={() => setTriResult(null)}
+              className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold w-full transition-colors uppercase tracking-widest text-sm"
+            >
+              FECHAR RELATÓRIO
+            </button>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+};

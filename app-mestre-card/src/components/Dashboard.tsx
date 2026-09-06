@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { MestreCardData } from '../types/mestre-card';
+import { useState } from 'react';
+import type { MestreCardData } from '../types/mestre-card';
 
 interface DashboardProps {
   cards: MestreCardData[];
@@ -13,7 +13,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ cards, onSelectCard, onDel
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
   const [jsonInput, setJsonInput] = useState('');
 
-  const uniqueTopics = new Set(cards.map(c => c.theme)).size;
+  const uniqueTopics = new Set(cards.map(c => c.topic)).size;
 
   const handleImport = () => {
     onImportCard(jsonInput);
@@ -68,7 +68,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ cards, onSelectCard, onDel
           </div>
           <textarea 
             className="w-full h-40 bg-slate-950/80 border border-slate-800 rounded-xl p-4 font-mono text-xs text-emerald-400/90 focus:outline-none focus:border-cyan-500/50 resize-none mb-4"
-            placeholder="{\n  \"title\": \"Nova Matéria...\"\n}"
+            placeholder={'{\n  "title": "Nova Matéria..."\n}'}
             value={jsonInput}
             onChange={(e) => setJsonInput(e.target.value)}
           />
@@ -91,7 +91,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ cards, onSelectCard, onDel
             <div key={card.id} className="glass-card p-5 rounded-2xl border border-slate-700/50 hover:border-cyan-500/30 transition-all flex flex-col">
               <div className="flex justify-between items-start mb-3">
                 <span className="px-2 py-1 rounded bg-slate-800 text-slate-300 font-mono text-[10px] uppercase font-bold tracking-wider">
-                  {card.theme}
+                  {card.topic}
                 </span>
                 <span className="text-[10px] text-slate-500 font-mono">
                   {new Date(card.updatedAt).toLocaleDateString()}
@@ -105,11 +105,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ cards, onSelectCard, onDel
               <div className="flex gap-4 mb-6 border-t border-b border-slate-800/50 py-3">
                 <div className="text-center">
                   <p className="text-[10px] text-slate-500 font-mono">TEORIA</p>
-                  <p className="text-sm font-bold text-slate-300">{card.theoryBlocks.length}</p>
+                  <p className="text-sm font-bold text-slate-300">{card.sec02_theory?.blocks?.length || 0}</p>
                 </div>
                 <div className="text-center">
                   <p className="text-[10px] text-slate-500 font-mono">LAB</p>
-                  <p className="text-sm font-bold text-slate-300">{card.labItems.length}</p>
+                  <p className="text-sm font-bold text-slate-300">{card.sec05_lab?.questions?.length || 0}</p>
                 </div>
               </div>
 

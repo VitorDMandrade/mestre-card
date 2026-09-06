@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { MestreCardData } from '../types/mestre-card';
+import { useEffect, useState } from 'react';
+import type { FC } from 'react';
+import type { MestreCardData } from '../types/mestre-card';
 import { MathRenderer } from './MathRenderer';
-
+import { ArcadeEngine } from './arcade/ArcadeEngine';
 interface StudyViewProps {
   card: MestreCardData;
   onBack: () => void;
 }
 
-export const StudyView: React.FC<StudyViewProps> = ({ card, onBack }) => {
+export const StudyView: FC<StudyViewProps> = ({ card, onBack }) => {
   const [seconds, setSeconds] = useState(0);
 
   useEffect(() => {
@@ -41,7 +42,7 @@ export const StudyView: React.FC<StudyViewProps> = ({ card, onBack }) => {
           </button>
           <div className="h-6 w-px bg-slate-800"></div>
           <span className="px-2 py-1 rounded bg-slate-800 text-slate-300 font-mono text-[10px] uppercase font-bold tracking-wider">
-            {card.theme}
+            {card.topic}
           </span>
           <h2 className="text-lg font-bold text-white hidden md:block">
             {card.title}
@@ -93,7 +94,7 @@ export const StudyView: React.FC<StudyViewProps> = ({ card, onBack }) => {
             </div>
             
             <div className="space-y-6">
-              {card.theoryBlocks.map((block, index) => (
+              {(card.sec02_theory?.blocks || []).map((block, index) => (
                 <div key={index} className="glass-card p-6 rounded-2xl border border-slate-700/50">
                   <h4 className="text-md font-bold text-cyan-400 mb-4 border-b border-slate-800 pb-2">{block.title}</h4>
                   <MathRenderer content={block.content} />
@@ -110,30 +111,27 @@ export const StudyView: React.FC<StudyViewProps> = ({ card, onBack }) => {
             </div>
 
             <div className="grid gap-4">
-              {card.labItems.map((item, index) => (
+              {(card.sec05_lab?.questions || []).map((item, index) => (
                 <div key={index} className="bg-slate-900/80 border border-slate-800 rounded-xl p-5 border-l-4 border-l-amber-500">
-                  <span className="text-[10px] text-amber-500 font-mono uppercase tracking-widest block mb-2">{item.type}</span>
-                  <MathRenderer content={item.content} />
+                  <span className="text-[10px] text-amber-500 font-mono uppercase tracking-widest block mb-2">QUESTÃO {index + 1}</span>
+                  <MathRenderer content={item.enunciado} />
+                  <div className="mt-4 space-y-2">
+                    {item.options.map((opt, oIdx) => (
+                      <div key={oIdx} className="p-3 bg-slate-950/50 rounded-lg border border-slate-800 flex gap-3">
+                        <span className="font-bold text-amber-500">{opt.letter}</span>
+                        <div className="flex-1"><MathRenderer content={opt.text} /></div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
           </section>
 
-          {/* Arcade Placeholder */}
-          <section id="arcade" className="scroll-mt-28 pb-20">
-             <div className="flex items-center gap-3 mb-6">
-              <span className="w-8 h-8 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center font-bold border border-red-500/30">3</span>
-              <h3 className="text-xl font-bold text-white">Pentágono Revisional</h3>
-            </div>
-
-            <div className="glass-card p-10 rounded-2xl border border-red-500/30 bg-red-950/10 text-center flex flex-col items-center justify-center">
-              <span className="text-4xl mb-4">⚔️</span>
-              <h4 className="text-lg font-bold text-red-400 mb-2">[SISTEMA DE COMBATE: ETAPA 5]</h4>
-              <p className="text-sm text-slate-400 max-w-md">
-                O motor do Arcade Engine (Timeline, Match, True/False, Order, Odd One Out) será plugado nesta seção durante a próxima fase de desenvolvimento.
-              </p>
-            </div>
-          </section>
+          {/* Arcade Engine */}
+          <div id="arcade" className="pb-20">
+            <ArcadeEngine card={card} />
+          </div>
 
         </div>
       </div>

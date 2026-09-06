@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { db } from './lib/db';
-import { MestreCardData } from './types/mestre-card';
+import type { MestreCardData } from './types/mestre-card';
 import { sanitizeAndParseJSON, validateMestreCard, exportAllCardsAsJSON } from './lib/importer';
 import { Dashboard } from './components/Dashboard';
 import { StudyView } from './components/StudyView';

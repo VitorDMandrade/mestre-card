@@ -1,4 +1,4 @@
-import { MestreCardData, StudySessionRecord } from '../types/mestre-card';
+import type { MestreCardData, StudySessionRecord } from '../types/mestre-card';
 
 const DB_NAME = 'MestreCardDB';
 const DB_VERSION = 1;

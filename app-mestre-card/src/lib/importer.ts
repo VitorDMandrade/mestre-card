@@ -1,4 +1,4 @@
-import { MestreCardData } from '../types/mestre-card';
+import type { MestreCardData } from '../types/mestre-card';
 
 export function sanitizeAndParseJSON(rawInput: string): unknown {
   try {
@@ -40,7 +40,6 @@ export function validateMestreCard(data: any): MestreCardData {
     throw new Error('O campo "title" é obrigatório e deve ser string.');
   }
 
-  // topic no schema costuma vir, senao default
   const topic = typeof data.topic === 'string' ? data.topic : (data.theme || 'Sem Tópico');
 
   const card: MestreCardData = {
@@ -48,11 +47,32 @@ export function validateMestreCard(data: any): MestreCardData {
     createdAt: data.createdAt || Date.now(),
     updatedAt: Date.now(),
     title: data.title,
-    theme: topic, // Mapeando theme como topic/theme
-    skills: Array.isArray(data.skills) ? data.skills : [],
-    theoryBlocks: Array.isArray(data.theoryBlocks) ? data.theoryBlocks : [],
-    labItems: Array.isArray(data.labItems) ? data.labItems : [],
-    arcadeGameState: data.arcadeGameState || {
+    topic: topic,
+    sec01_header: data.sec01_header || {
+      triWeight: 'Média',
+      skills: [],
+      thematicAxes: []
+    },
+    sec02_theory: data.sec02_theory || {
+      blocks: [],
+      triagePatterns: []
+    },
+    sec03_structure: data.sec03_structure || {
+      type: 'qualitative',
+      causalChain: { causes: '', agents: '', mechanisms: '', consequences: '' },
+      comparisonTable: { header: [], rows: [] }
+    },
+    sec04_radar: data.sec04_radar || {
+      mnemonics: [],
+      blindSpots: [],
+      triggerWords: []
+    },
+    sec05_lab: data.sec05_lab || {
+      questions: [],
+      bossFight: { title: '', context: '', options: [], stepByStepResolution: '' }
+    },
+    sec06_recall: data.sec06_recall || [],
+    sec07_arcade: data.sec07_arcade || {
       questionsData: [],
       matchData: [],
       tfData: [],
