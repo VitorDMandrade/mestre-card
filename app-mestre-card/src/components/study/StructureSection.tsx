@@ -1,0 +1,159 @@
+import type { MestreCardData } from '../../types/mestre-card';
+import { MathRenderer } from '../MathRenderer';
+
+interface StructureSectionProps {
+  card: MestreCardData;
+}
+
+export const StructureSection = ({ card }: StructureSectionProps) => {
+  const structure = card.sec03_structure;
+
+  if (!structure) return null;
+
+  return (
+    <section id="sec-03" className="mb-12 scroll-mt-24">
+      <h2 className="text-2xl font-black text-white mb-6 border-b border-slate-800 pb-4 flex items-center gap-3">
+        <span className="text-blue-500">03.</span> MOTOR ESTRUTURAL
+      </h2>
+
+      {structure.type === 'qualitative' && (
+        <div className="space-y-6">
+          {/* Encadeamento Causal */}
+          <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6">
+            <h3 className="text-lg font-black text-white mb-4 flex items-center gap-2">
+              <span className="text-blue-500">🔗</span> MACRO-ENCADEAMENTO CAUSAL
+            </h3>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                <div className="text-xs font-black text-amber-500 mb-2 uppercase">1. Causas Base</div>
+                <div className="text-gray-300 text-sm"><MathRenderer content={structure.causalChain.causes} /></div>
+              </div>
+              <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                <div className="text-xs font-black text-blue-400 mb-2 uppercase">2. Agentes</div>
+                <div className="text-gray-300 text-sm"><MathRenderer content={structure.causalChain.agents} /></div>
+              </div>
+              <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                <div className="text-xs font-black text-emerald-400 mb-2 uppercase">3. Mecanismos</div>
+                <div className="text-gray-300 text-sm"><MathRenderer content={structure.causalChain.mechanisms} /></div>
+              </div>
+              <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                <div className="text-xs font-black text-red-400 mb-2 uppercase">4. Consequências</div>
+                <div className="text-gray-300 text-sm"><MathRenderer content={structure.causalChain.consequences} /></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Tabela Comparativa */}
+          {structure.comparisonTable && (
+            <div className="bg-slate-900 border border-slate-700 rounded-2xl overflow-hidden">
+              <div className="bg-slate-950 p-4 border-b border-slate-800">
+                <h3 className="text-lg font-black text-white flex items-center gap-2">
+                  <span className="text-purple-500">⚖️</span> QUADRO COMPARATIVO TÁTICO
+                </h3>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-slate-900 border-b border-slate-700">
+                      {structure.comparisonTable.header.map((th, i) => (
+                        <th key={i} className="p-4 text-xs font-black text-gray-400 uppercase tracking-wider">{th}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800">
+                    {structure.comparisonTable.rows.map((row, i) => (
+                      <tr key={i} className="hover:bg-slate-800/30 transition-colors">
+                        {row.map((cell, j) => (
+                          <td key={j} className={`p-4 text-sm ${j === 0 ? 'font-bold text-gray-200' : 'text-gray-400'}`}>
+                            <MathRenderer content={cell} />
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {structure.type === 'quantitative' && (
+        <div className="space-y-6">
+          {/* Formula Chamber */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {structure.formulaChamber.map((formula, i) => (
+              <div key={i} className="bg-slate-900/80 border border-blue-900/50 rounded-2xl p-6 shadow-[0_0_20px_rgba(59,130,246,0.1)] relative overflow-hidden group">
+                <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+                <h3 className="text-blue-400 font-bold mb-4 uppercase tracking-wider text-sm">{formula.title}</h3>
+                <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center mb-4 overflow-x-auto">
+                  <div className="text-xl md:text-2xl text-white py-2">
+                    <MathRenderer content={`$$${formula.latex}$$`} />
+                  </div>
+                </div>
+                {formula.notes && (
+                  <div className="text-gray-400 text-sm">
+                    <MathRenderer content={formula.notes} />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Variáveis */}
+          <div className="bg-slate-900 border border-slate-700 rounded-2xl overflow-hidden">
+            <div className="bg-slate-950 p-4 border-b border-slate-800">
+              <h3 className="text-lg font-black text-white flex items-center gap-2">
+                <span className="text-amber-500">📐</span> DISSECAÇÃO ANATÔMICA (S.I.)
+              </h3>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-slate-900 border-b border-slate-700">
+                    <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-wider w-24">Variável</th>
+                    <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-wider">Significado</th>
+                    <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-wider w-32">Unidade S.I.</th>
+                    <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-wider hidden md:table-cell">Conversões</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-800">
+                  {structure.variables.map((v, i) => (
+                    <tr key={i} className="hover:bg-slate-800/30 transition-colors">
+                      <td className="p-4 text-center border-r border-slate-800">
+                        <div className="bg-slate-950 px-2 py-1 rounded inline-block">
+                          <MathRenderer content={`$${v.symbol}$`} />
+                        </div>
+                      </td>
+                      <td className="p-4 text-sm text-gray-300 font-medium">{v.meaning}</td>
+                      <td className="p-4 text-sm text-emerald-400 font-mono font-bold"><MathRenderer content={`$${v.siUnit}$`} /></td>
+                      <td className="p-4 text-sm text-gray-500 hidden md:table-cell"><MathRenderer content={v.conversions} /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Proporcionalidade */}
+          {structure.proportionality.length > 0 && (
+            <div className="bg-slate-900/80 border border-purple-900/40 rounded-2xl p-6">
+              <h3 className="text-purple-400 font-bold mb-4 uppercase tracking-wider text-sm flex items-center gap-2">
+                <span>🔄</span> ANÁLISE DE PROPORCIONALIDADE
+              </h3>
+              <ul className="space-y-3">
+                {structure.proportionality.map((prop, i) => (
+                  <li key={i} className="flex gap-3 text-sm text-gray-300 items-start">
+                    <span className="text-purple-500 mt-0.5">▪</span>
+                    <span><MathRenderer content={prop} /></span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+    </section>
+  );
+};

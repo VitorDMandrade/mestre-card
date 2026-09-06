@@ -1,9 +1,15 @@
 import { useEffect, useState } from 'react';
 import type { FC } from 'react';
-import type { MestreCardData } from '../types/mestre-card';
-import { MathRenderer } from './MathRenderer';
-import { ArcadeEngine } from './arcade/ArcadeEngine';
+import type { MestreCardData, StudySessionRecord } from '../types/mestre-card';
 import { db } from '../lib/db';
+
+import { StudyHUD } from './study/StudyHUD';
+import { TheorySection } from './study/TheorySection';
+import { StructureSection } from './study/StructureSection';
+import { RadarSection } from './study/RadarSection';
+import { LabSection } from './study/LabSection';
+import { RecallSection } from './study/RecallSection';
+import { ArcadeEngine } from './arcade/ArcadeEngine';
 
 interface StudyViewProps {
   card: MestreCardData;
@@ -11,21 +17,21 @@ interface StudyViewProps {
 }
 
 export const StudyView: FC<StudyViewProps> = ({ card, onBack }) => {
-  const [seconds, setSeconds] = useState(0);
-  const [bestScore, setBestScore] = useState<number | null>(null);
-  const [lastDate, setLastDate] = useState<string | null>(null);
+  const [bestSession, setBestSession] = useState<StudySessionRecord | null>(null);
+  
+  // Lifted States
+  const [hp, setHp] = useState(100);
+  const [isHardcore, setIsHardcore] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
 
   const loadTelemetry = async () => {
     try {
       const history = await db.getHistoryByCard(card.id);
       if (history.length > 0) {
-        const latest = history.reduce((prev, curr) => (prev.timestamp > curr.timestamp ? prev : curr));
-        const maxScore = Math.max(...history.map(h => h.score));
-        setBestScore(maxScore);
-        setLastDate(new Date(latest.timestamp).toLocaleDateString('pt-BR'));
+        const maxScoreRecord = history.reduce((prev, curr) => (prev.score > curr.score ? prev : curr));
+        setBestSession(maxScoreRecord);
       } else {
-        setBestScore(null);
-        setLastDate(null);
+        setBestSession(null);
       }
     } catch (err) {
       console.error('Failed to load telemetry', err);
@@ -34,29 +40,33 @@ export const StudyView: FC<StudyViewProps> = ({ card, onBack }) => {
 
   useEffect(() => {
     loadTelemetry();
-    const interval = setInterval(() => {
-      setSeconds(s => s + 1);
-    }, 1000);
-    return () => clearInterval(interval);
   }, [card.id]);
 
-  const formatTime = (totalSeconds: number) => {
-    const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
-    const s = (totalSeconds % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
+  const toggleHardcore = () => {
+    setIsHardcore(!isHardcore);
+    setHp(100);
   };
 
-  const scrollTo = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  const handleDamage = (amount: number) => {
+    if (!isHardcore) return;
+    setHp(prev => {
+      const next = Math.max(0, prev - amount);
+      if (next <= 0) {
+        setTimeout(() => {
+          alert("⚠️ COLAPSO DO SISTEMA! Seu HP zerou no Modo Sobrevivência. Recalibre a teoria e tente novamente.");
+          setHp(100);
+        }, 100);
+        return 0;
+      }
+      return next;
+    });
   };
 
   return (
-    <div className="max-w-7xl mx-auto h-screen flex flex-col pb-8">
-      
-      {/* Header Fixo */}
-      <div className="sticky top-0 z-50 bg-[#0a0f18]/90 backdrop-blur-md border-b border-slate-800/80 p-4 mb-8 flex justify-between items-center shadow-2xl">
-        <div className="flex items-center gap-4">
+    <div className="min-h-screen bg-[#050810]">
+      {/* Header Fixo Global de Navegação (Retornar) */}
+      <div className="bg-[#0a0f18] border-b border-slate-800 p-4 flex items-center justify-between z-50 relative">
+        <div className="max-w-6xl mx-auto w-full flex items-center gap-4 px-4">
           <button 
             onClick={onBack}
             className="text-slate-400 hover:text-white font-mono text-sm tracking-widest transition-colors flex items-center gap-2">
@@ -66,105 +76,50 @@ export const StudyView: FC<StudyViewProps> = ({ card, onBack }) => {
           <span className="px-2 py-1 rounded bg-slate-800 text-slate-300 font-mono text-[10px] uppercase font-bold tracking-wider">
             {card.topic}
           </span>
-          <h2 className="text-lg font-bold text-white hidden md:block">
+          <h1 className="text-lg font-bold text-white hidden md:block">
             {card.title}
-          </h2>
-        </div>
-        
-        <div className="flex items-center gap-3">
-          {bestScore !== null ? (
-            <span className="px-2.5 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/40 text-cyan-300 font-mono text-xs font-bold">
-              Recorde: {bestScore} pts ({lastDate})
-            </span>
-          ) : (
-            <span className="px-2.5 py-1 rounded-full bg-slate-900 border border-slate-800 text-slate-500 font-mono text-xs">
-              Sem registro prévio
-            </span>
-          )}
-          <span className="text-[10px] text-slate-500 font-mono hidden sm:block">TEMPO DE OPERAÇÃO</span>
-          <div className="bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-emerald-400 font-mono font-bold glow-emerald">
-            {formatTime(seconds)}
-          </div>
+          </h1>
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col lg:flex-row gap-8 px-4 md:px-8">
+      {/* HUD Tático (Fixo no topo da área de estudo) */}
+      <StudyHUD 
+        hp={hp}
+        isHardcore={isHardcore}
+        onToggleHardcore={toggleHardcore}
+        soundEnabled={soundEnabled}
+        onToggleSound={() => setSoundEnabled(!soundEnabled)}
+        bestScore={bestSession}
+      />
+
+      <div className="max-w-6xl mx-auto px-4 pb-20 space-y-12">
+        <TheorySection card={card} />
         
-        {/* Sumário Lateral */}
-        <div className="w-full lg:w-64 flex-shrink-0">
-          <div className="sticky top-28 glass-card p-5 rounded-2xl border border-slate-700/50">
-            <h3 className="text-xs font-mono font-bold text-slate-500 mb-4 tracking-widest uppercase">Índice Tático</h3>
-            <ul className="space-y-2 font-mono text-sm">
-              <li>
-                <button onClick={() => scrollTo('theory')} className="text-slate-300 hover:text-cyan-400 transition-colors w-full text-left">
-                  1. Módulos Teóricos
-                </button>
-              </li>
-              <li>
-                <button onClick={() => scrollTo('lab')} className="text-slate-300 hover:text-amber-400 transition-colors w-full text-left">
-                  2. Laboratório Prático
-                </button>
-              </li>
-              <li>
-                <button onClick={() => scrollTo('arcade')} className="text-slate-300 hover:text-red-400 transition-colors w-full text-left">
-                  3. Pentágono Revisional
-                </button>
-              </li>
-            </ul>
-          </div>
-        </div>
+        <StructureSection card={card} />
+        
+        <RadarSection card={card} soundEnabled={soundEnabled} />
+        
+        <LabSection 
+          questions={card.sec05_lab?.questions || []}
+          bossFight={card.sec05_lab?.bossFight}
+          isHardcore={isHardcore}
+          soundEnabled={soundEnabled}
+          onApplyDamage={handleDamage}
+        />
+        
+        <RecallSection card={card} />
 
-        {/* Coluna Principal */}
-        <div className="flex-1 max-w-3xl space-y-12">
-          
-          {/* Teoria */}
-          <section id="theory" className="scroll-mt-28">
-            <div className="flex items-center gap-3 mb-6">
-              <span className="w-8 h-8 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold border border-cyan-500/30">1</span>
-              <h3 className="text-xl font-bold text-white">Módulos Teóricos</h3>
-            </div>
-            
-            <div className="space-y-6">
-              {(card.sec02_theory?.blocks || []).map((block, index) => (
-                <div key={index} className="glass-card p-6 rounded-2xl border border-slate-700/50">
-                  <h4 className="text-md font-bold text-cyan-400 mb-4 border-b border-slate-800 pb-2">{block.title}</h4>
-                  <MathRenderer content={block.content} />
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Laboratório */}
-          <section id="lab" className="scroll-mt-28">
-            <div className="flex items-center gap-3 mb-6">
-              <span className="w-8 h-8 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold border border-amber-500/30">2</span>
-              <h3 className="text-xl font-bold text-white">Laboratório Prático</h3>
-            </div>
-
-            <div className="grid gap-4">
-              {(card.sec05_lab?.questions || []).map((item, index) => (
-                <div key={index} className="bg-slate-900/80 border border-slate-800 rounded-xl p-5 border-l-4 border-l-amber-500">
-                  <span className="text-[10px] text-amber-500 font-mono uppercase tracking-widest block mb-2">QUESTÃO {index + 1}</span>
-                  <MathRenderer content={item.enunciado} />
-                  <div className="mt-4 space-y-2">
-                    {item.options.map((opt, oIdx) => (
-                      <div key={oIdx} className="p-3 bg-slate-950/50 rounded-lg border border-slate-800 flex gap-3">
-                        <span className="font-bold text-amber-500">{opt.letter}</span>
-                        <div className="flex-1"><MathRenderer content={opt.text} /></div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Arcade Engine */}
-          <div id="arcade" className="pb-20">
-            <ArcadeEngine card={card} onSessionSaved={loadTelemetry} />
-          </div>
-
-        </div>
+        {/* Arcade Sub-engine */}
+        <ArcadeEngine 
+          card={card} 
+          onSessionSaved={loadTelemetry}
+          isHardcore={isHardcore}
+          hp={hp}
+          soundEnabled={soundEnabled}
+          onToggleSound={() => setSoundEnabled(!soundEnabled)}
+          onToggleHardcore={toggleHardcore}
+          onApplyDamage={handleDamage}
+        />
       </div>
     </div>
   );

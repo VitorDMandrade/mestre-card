@@ -13,13 +13,25 @@ import { db } from '../../lib/db';
 interface ArcadeEngineProps {
   card: MestreCardData;
   onSessionSaved?: () => void;
+  isHardcore: boolean;
+  hp: number;
+  soundEnabled: boolean;
+  onToggleSound: () => void;
+  onToggleHardcore: () => void;
+  onApplyDamage: (amount: number) => void;
 }
 
-export const ArcadeEngine = ({ card, onSessionSaved }: ArcadeEngineProps) => {
+export const ArcadeEngine = ({ 
+  card, 
+  onSessionSaved,
+  isHardcore,
+  hp,
+  soundEnabled,
+  onToggleSound,
+  onToggleHardcore,
+  onApplyDamage
+}: ArcadeEngineProps) => {
   const [activeTab, setActiveTab] = useState<'g1' | 'g2' | 'g3' | 'g4' | 'g5'>('g1');
-  const [soundEnabled, setSoundEnabled] = useState(true);
-  const [isHardcore, setIsHardcore] = useState(false);
-  const [hp, setHp] = useState(100);
   
   // Game state tracking
   const [g1Results, setG1Results] = useState<{ hit: boolean; difficulty: string }[]>([]);
@@ -49,25 +61,7 @@ export const ArcadeEngine = ({ card, onSessionSaved }: ArcadeEngineProps) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [activeTab]);
 
-  const toggleHardcore = () => {
-    setIsHardcore(!isHardcore);
-    setHp(100);
-  };
 
-  const handleDamage = (amount: number) => {
-    if (!isHardcore) return;
-    setHp(prev => {
-      const next = Math.max(0, prev - amount);
-      if (next <= 0) {
-        setTimeout(() => {
-          alert("⚠️ COLAPSO DO SISTEMA! Seu HP zerou no Modo Sobrevivência. Recalibre a teoria e tente novamente.");
-          setHp(100);
-        }, 100);
-        return 0;
-      }
-      return next;
-    });
-  };
 
   const handleG1Complete = (results: { hit: boolean; difficulty: string }[]) => {
     setG1Results(results);
@@ -158,14 +152,14 @@ export const ArcadeEngine = ({ card, onSessionSaved }: ArcadeEngineProps) => {
           </span>
           
           <button 
-            onClick={() => setSoundEnabled(!soundEnabled)}
+            onClick={onToggleSound}
             className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-colors ${soundEnabled ? 'bg-emerald-600 text-white' : 'bg-slate-700 text-slate-400'}`}
           >
             {soundEnabled ? '🔊 Som Ativado' : '🔇 Som Desativado'}
           </button>
 
           <button 
-            onClick={toggleHardcore}
+            onClick={onToggleHardcore}
             className={`px-3 py-1.5 rounded-full border text-xs font-mono transition-all flex items-center gap-1.5 ${
               isHardcore 
                 ? 'bg-red-950/80 border-red-500 text-red-300 shadow-[0_0_15px_rgba(239,68,68,0.2)]' 
@@ -232,7 +226,7 @@ export const ArcadeEngine = ({ card, onSessionSaved }: ArcadeEngineProps) => {
           <GameTimeline 
             questions={questionsData || []} 
             soundEnabled={soundEnabled} 
-            onDamage={handleDamage}
+            onDamage={onApplyDamage}
             onComplete={handleG1Complete}
           />
         )}
@@ -240,7 +234,7 @@ export const ArcadeEngine = ({ card, onSessionSaved }: ArcadeEngineProps) => {
           <GameMatch 
             matchData={mappedMatchData} 
             soundEnabled={soundEnabled} 
-            onDamage={handleDamage}
+            onDamage={onApplyDamage}
             onComplete={handleG2Complete}
           />
         )}
@@ -248,7 +242,7 @@ export const ArcadeEngine = ({ card, onSessionSaved }: ArcadeEngineProps) => {
           <GameTrueFalse 
             tfData={tfData || []} 
             soundEnabled={soundEnabled} 
-            onDamage={handleDamage}
+            onDamage={onApplyDamage}
             onComplete={handleG3Complete}
           />
         )}
@@ -256,7 +250,7 @@ export const ArcadeEngine = ({ card, onSessionSaved }: ArcadeEngineProps) => {
           <GameOrder 
             orderData={mappedOrderData} 
             soundEnabled={soundEnabled} 
-            onDamage={handleDamage}
+            onDamage={onApplyDamage}
             onComplete={handleG4Complete}
           />
         )}
@@ -264,7 +258,7 @@ export const ArcadeEngine = ({ card, onSessionSaved }: ArcadeEngineProps) => {
           <GameOdd 
             oddData={mappedOddData} 
             soundEnabled={soundEnabled} 
-            onDamage={handleDamage}
+            onDamage={onApplyDamage}
             onComplete={handleG5Complete}
           />
         )}
