@@ -154,3 +154,34 @@ export function exportFullBackup(cards: MestreCardData[], history: StudySessionR
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
+
+export function parseBackupFile(file: File): Promise<ParsedImport> {
+  return new Promise((resolve, reject) => {
+    if (!file) {
+      return reject(new Error('Nenhum arquivo fornecido.'));
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      try {
+        const text = event.target?.result as string;
+        if (!text || typeof text !== 'string') {
+          throw new Error('Conteúdo do arquivo está vazio ou ilegível.');
+        }
+        const rawObj = sanitizeAndParseJSON(text);
+        const parsed = validateImportPayload(rawObj);
+        resolve(parsed);
+      } catch (err: any) {
+        reject(new Error(`Falha ao decodificar [${file.name}]: ${err.message}`));
+      }
+    };
+
+    reader.onerror = () => {
+      reject(new Error(`Erro de leitura do arquivo [${file.name}]: ${reader.error?.message || 'Falha de I/O'}`));
+    };
+
+    reader.readAsText(file, 'utf-8');
+  });
+}
+

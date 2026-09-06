@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { db } from './lib/db';
 import type { MestreCardData } from './types/mestre-card';
-import { sanitizeAndParseJSON, validateImportPayload, exportFullBackup } from './lib/importer';
+import { sanitizeAndParseJSON, validateImportPayload, exportFullBackup, parseBackupFile } from './lib/importer';
+import type { ParsedImport } from './lib/importer';
 import { Dashboard } from './components/Dashboard';
 import { StudyView } from './components/StudyView';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -12,10 +13,21 @@ function App() {
   const [currentView, setCurrentView] = useState<'dashboard' | 'study'>('dashboard');
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' | 'error' } | null>(null);
   
   const [cards, setCards] = useState<MestreCardData[]>([]);
   const [historyMap, setHistoryMap] = useState<Record<string, number>>({});
   const [isLoaded, setIsLoaded] = useState(false);
+
+  const showToast = (message: string, type: 'success' | 'info' | 'error' = 'success') => {
+    setToast({ message, type });
+  };
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 6000);
+    return () => clearTimeout(timer);
+  }, [toast]);
 
   const loadCards = async () => {
     try {
@@ -56,23 +68,45 @@ function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  const processImportParsed = async (parsed: ParsedImport) => {
+    if (parsed.type === 'backup') {
+      const res = await db.smartMergeData(parsed.data.cards, parsed.data.history);
+      await loadCards();
+      showToast(
+        `⚡ Sincronização concluída: +${res.addedCards} novos, ${res.updatedCards} atualizados, ${res.addedSessions} sessões TRI integradas (${res.skippedCards} locais preservados).`,
+        'success'
+      );
+    } else {
+      const res = await db.smartMergeData([parsed.data], []);
+      await loadCards();
+      if (res.addedCards > 0) {
+        showToast(`✓ Card adicionado com sucesso: [${parsed.data.title}]`, 'success');
+      } else if (res.updatedCards > 0) {
+        showToast(`✓ Card atualizado para versão mais recente: [${parsed.data.title}]`, 'success');
+      } else {
+        showToast(`ℹ️ Card [${parsed.data.title}] já possui versão igual ou mais recente no banco.`, 'info');
+      }
+    }
+  };
+
   const handleImportCard = async (jsonStr: string) => {
     try {
       const rawObj = sanitizeAndParseJSON(jsonStr);
       const parsed = validateImportPayload(rawObj);
-
-      if (parsed.type === 'backup') {
-        await db.bulkImportData(parsed.data.cards, parsed.data.history);
-        await loadCards();
-        alert(`BACKUP RESTAURADO COM SUCESSO: ${parsed.data.cards.length} cards e ${parsed.data.history.length} sessões.`);
-      } else {
-        await db.saveCard(parsed.data);
-        await loadCards();
-        alert(`CARD INJETADO COM SUCESSO: [${parsed.data.title}]`);
-      }
+      await processImportParsed(parsed);
     } catch (err: any) {
       console.error(err);
-      alert(`FALHA DE INGESTÃO: ${err.message}`);
+      showToast(`FALHA DE INGESTÃO: ${err.message}`, 'error');
+    }
+  };
+
+  const handleImportFile = async (file: File) => {
+    try {
+      const parsed = await parseBackupFile(file);
+      await processImportParsed(parsed);
+    } catch (err: any) {
+      console.error(err);
+      showToast(`FALHA NO ARQUIVO [${file.name}]: ${err.message}`, 'error');
     }
   };
 
@@ -122,6 +156,29 @@ function App() {
   return (
     <ErrorBoundary fallbackTitle="Falha de Execução no MestreCard">
       <div className="min-h-screen py-8">
+        {/* Tactical Toast Notification */}
+        {toast && (
+          <div className={`fixed top-5 left-1/2 -translate-x-1/2 z-50 max-w-lg w-[90%] px-4 py-3 rounded-xl border shadow-2xl backdrop-blur-md flex items-center justify-between gap-3 animate-fade-in font-mono text-xs ${
+            toast.type === 'error'
+              ? 'bg-red-950/95 border-red-500/80 text-red-200 shadow-red-900/30'
+              : toast.type === 'info'
+              ? 'bg-slate-900/95 border-cyan-500/60 text-cyan-300 shadow-cyan-900/30'
+              : 'bg-emerald-950/95 border-emerald-500/60 text-emerald-200 shadow-emerald-900/30'
+          }`}>
+            <div className="flex items-center gap-2.5">
+              <span className="text-base">{toast.type === 'error' ? '❌' : toast.type === 'info' ? 'ℹ️' : '🚀'}</span>
+              <span className="font-semibold leading-relaxed">{toast.message}</span>
+            </div>
+            <button 
+              onClick={() => setToast(null)}
+              className="text-slate-400 hover:text-white text-sm px-2 py-0.5 rounded hover:bg-slate-800 transition-colors cursor-pointer"
+              title="Fechar"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
         {currentView === 'dashboard' && (
           <Dashboard 
             cards={cards}
@@ -129,6 +186,7 @@ function App() {
             onSelectCard={handleSelectCard}
             onDeleteCard={handleDeleteCard}
             onImportCard={handleImportCard}
+            onImportFile={handleImportFile}
             onExportBackup={handleExportBackup}
           />
         )}

@@ -162,27 +162,89 @@ export const db = {
   },
 
   async bulkImportData(cards: MestreCardData[], history: StudySessionRecord[]): Promise<void> {
+    await this.smartMergeData(cards, history);
+  },
+
+  async smartMergeData(
+    incomingCards: MestreCardData[],
+    incomingHistory: StudySessionRecord[]
+  ): Promise<SmartMergeResult> {
     const database = await openDB();
     return new Promise((resolve, reject) => {
       const transaction = database.transaction(['cards', 'history'], 'readwrite');
       const cardsStore = transaction.objectStore('cards');
       const historyStore = transaction.objectStore('history');
 
-      transaction.onerror = () => reject(new Error('Erro na transação bulkImportData'));
-      transaction.onabort = () => reject(new Error('Transação bulkImportData abortada'));
-      transaction.oncomplete = () => resolve();
+      let addedCards = 0;
+      let updatedCards = 0;
+      let skippedCards = 0;
+      let addedSessions = 0;
 
-      try {
-        for (const card of cards) {
-          cardsStore.put(card);
+      transaction.onerror = () => reject(new Error('Erro na transação smartMergeData'));
+      transaction.onabort = () => reject(new Error('Transação smartMergeData abortada'));
+      transaction.oncomplete = () => {
+        resolve({ addedCards, updatedCards, skippedCards, addedSessions });
+      };
+
+      const getAllCardsReq = cardsStore.getAll();
+      const getAllHistoryReq = historyStore.getAll();
+
+      getAllCardsReq.onerror = () => reject(new Error('Erro ao carregar cards locais para mesclagem'));
+      getAllHistoryReq.onerror = () => reject(new Error('Erro ao carregar histórico local para mesclagem'));
+
+      let existingCardsMap: Map<string, MestreCardData> | null = null;
+      let existingHistoryIds: Set<string> | null = null;
+
+      const executeMerge = () => {
+        if (existingCardsMap === null || existingHistoryIds === null) return;
+
+        try {
+          // 1. Merge não-destrutivo de cards por timestamp updatedAt
+          for (const card of incomingCards) {
+            const existing = existingCardsMap.get(card.id);
+            if (!existing) {
+              cardsStore.put(card);
+              addedCards++;
+            } else if (card.updatedAt > existing.updatedAt) {
+              cardsStore.put(card);
+              updatedCards++;
+            } else {
+              skippedCards++;
+            }
+          }
+
+          // 2. União cumulativa de histórico de sessões TRI por id
+          for (const session of incomingHistory) {
+            if (!existingHistoryIds.has(session.id)) {
+              historyStore.put(session);
+              addedSessions++;
+            }
+          }
+        } catch (err) {
+          transaction.abort();
+          reject(err);
         }
-        for (const session of history) {
-          historyStore.put(session);
-        }
-      } catch (err) {
-        transaction.abort();
-        reject(err);
-      }
+      };
+
+      getAllCardsReq.onsuccess = () => {
+        const list: MestreCardData[] = getAllCardsReq.result || [];
+        existingCardsMap = new Map(list.map(c => [c.id, c]));
+        executeMerge();
+      };
+
+      getAllHistoryReq.onsuccess = () => {
+        const list: StudySessionRecord[] = getAllHistoryReq.result || [];
+        existingHistoryIds = new Set(list.map(s => s.id));
+        executeMerge();
+      };
     });
   }
 };
+
+export interface SmartMergeResult {
+  addedCards: number;
+  updatedCards: number;
+  skippedCards: number;
+  addedSessions: number;
+}
+

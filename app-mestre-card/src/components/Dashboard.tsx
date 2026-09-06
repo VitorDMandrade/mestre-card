@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import type { MestreCardData } from '../types/mestre-card';
 
 interface DashboardProps {
@@ -6,7 +6,8 @@ interface DashboardProps {
   historyMap: Record<string, number>;
   onSelectCard: (id: string) => void;
   onDeleteCard: (id: string) => void;
-  onImportCard: (jsonStr: string) => void;
+  onImportCard: (jsonStr: string) => void | Promise<void>;
+  onImportFile?: (file: File) => void | Promise<void>;
   onExportBackup: () => void;
 }
 
@@ -34,18 +35,39 @@ export function resolveCategory(topic: string = '', title: string = ''): Subject
   return 'OUTROS';
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ cards, historyMap, onSelectCard, onDeleteCard, onImportCard, onExportBackup }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ cards, historyMap, onSelectCard, onDeleteCard, onImportCard, onImportFile, onExportBackup }) => {
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
   const [jsonInput, setJsonInput] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<SubjectCategory>('TODOS');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isProcessingFile, setIsProcessingFile] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const uniqueTopics = new Set(cards.map(c => c.topic)).size;
 
-  const handleImport = () => {
-    onImportCard(jsonInput);
+  const handleImport = async () => {
+    if (!jsonInput.trim()) return;
+    await onImportCard(jsonInput);
     setJsonInput('');
     setIsTerminalOpen(false);
+  };
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsProcessingFile(true);
+      if (onImportFile) {
+        await onImportFile(file);
+      }
+      setIsTerminalOpen(false);
+    } finally {
+      setIsProcessingFile(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
   };
 
   // Dynamic counter for categories
@@ -126,24 +148,78 @@ export const Dashboard: React.FC<DashboardProps> = ({ cards, historyMap, onSelec
         </div>
       </div>
 
-      {/* Terminal Retrátil */}
+      {/* Terminal Retrátil de Ingestão & Sincronização */}
       {isTerminalOpen && (
-        <div className="glass-card p-6 rounded-2xl border border-cyan-500/30 bg-cyan-950/10 animate-fade-in">
-          <div className="flex items-center gap-2 mb-4">
-             <span className="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-400 font-mono text-[10px] font-bold">TERMINAL ATIVO</span>
-             <p className="text-slate-300 text-sm font-mono">Cole o payload estruturado (Markdown suportado)</p>
+        <div className="glass-card p-6 rounded-2xl border border-cyan-500/30 bg-cyan-950/20 animate-fade-in space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-cyan-500/20 pb-4">
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-400 font-mono text-[10px] font-bold">TERMINAL ATIVO</span>
+              <p className="text-white text-sm font-bold font-mono">INGESTÃO & SINCRONIZAÇÃO TÁTICA</p>
+            </div>
+            <span className="text-[11px] font-mono text-cyan-400/90 bg-cyan-950/60 px-2.5 py-1 rounded border border-cyan-500/30">
+              SMART MERGE ATIVO // NÃO-DESTRUTIVO
+            </span>
           </div>
-          <textarea 
-            className="w-full h-40 bg-slate-950/80 border border-slate-800 rounded-xl p-4 font-mono text-xs text-emerald-400/90 focus:outline-none focus:border-cyan-500/50 resize-none mb-4"
-            placeholder={'{\n  "title": "Nova Matéria..."\n}'}
-            value={jsonInput}
-            onChange={(e) => setJsonInput(e.target.value)}
-          />
-          <button 
-            onClick={handleImport}
-            className="w-full bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-3 rounded-xl font-bold text-sm font-mono transition-colors tracking-widest">
-            PROCESSAR E ARMAZENAR NO BANCO
-          </button>
+
+          {/* Opção 1 (Primária / Mobile): Upload Direto de Arquivo .JSON */}
+          <div className="p-5 rounded-xl bg-slate-900/90 border-2 border-dashed border-cyan-500/40 hover:border-cyan-400/70 transition-all flex flex-col items-center justify-center text-center gap-3">
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              accept=".json,application/json" 
+              onChange={handleFileSelect} 
+              className="hidden" 
+            />
+            <div className="w-12 h-12 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-2xl">
+              📁
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-white font-mono uppercase tracking-wider">
+                Upload Direto de Arquivo de Backup (.JSON)
+              </h3>
+              <p className="text-xs text-slate-400 font-mono mt-1 max-w-md">
+                Solução nativa para mobile e backups completos. Sem risco de travamento ou truncamento de área de transferência.
+              </p>
+            </div>
+            <button
+              disabled={isProcessingFile}
+              onClick={() => fileInputRef.current?.click()}
+              className="mt-1 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs font-mono shadow-lg shadow-cyan-500/25 transition-all uppercase tracking-wider flex items-center gap-2 cursor-pointer disabled:opacity-50"
+            >
+              {isProcessingFile ? (
+                <>
+                  <span className="animate-spin">⏳</span>
+                  <span>PROCESSANDO ARQUIVO...</span>
+                </>
+              ) : (
+                <>
+                  <span>⚡</span>
+                  <span>SUBIR ARQUIVO (.JSON)</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* Opção 2 (Secundária): Colar Payload Manualmente */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
+              <span className="h-px flex-1 bg-slate-800"></span>
+              <span>OU COLE O TEXTO/JSON MANUALMENTE</span>
+              <span className="h-px flex-1 bg-slate-800"></span>
+            </div>
+            <textarea 
+              className="w-full h-28 bg-slate-950/80 border border-slate-800 rounded-xl p-4 font-mono text-xs text-emerald-400/90 focus:outline-none focus:border-cyan-500/50 resize-none"
+              placeholder={'{\n  "title": "Nova Matéria..."\n}'}
+              value={jsonInput}
+              onChange={(e) => setJsonInput(e.target.value)}
+            />
+            <button 
+              onClick={handleImport}
+              disabled={!jsonInput.trim()}
+              className="w-full bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed text-cyan-300 border border-slate-700 px-4 py-2.5 rounded-xl font-bold text-xs font-mono transition-colors tracking-widest uppercase">
+              PROCESSAR TEXTO COLADO
+            </button>
+          </div>
         </div>
       )}
 
