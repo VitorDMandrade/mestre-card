@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { playSound } from '../../lib/audio';
+import { playSound, playClickSound, playDamageSound, playVictorySound } from '../../lib/audio';
 
 export interface OrderItem {
   id: string;
@@ -39,27 +39,34 @@ export const GameOrder = ({ orderData, soundEnabled, onDamage, onComplete }: Gam
     }
   }, [orderData]);
 
+  const handleResetSequence = () => {
+    playClickSound(soundEnabled);
+    setAssembledItems([]);
+    setShuffledItems(shuffleArray(orderData));
+  };
+
   const handleItemClick = (item: OrderItem) => {
     if (isFinished || isErrorBlink) return;
 
     // Check if this is the correct next step
-    // The expected next item is orderData[assembledItems.length]
     const expectedItem = orderData[assembledItems.length];
 
     if (item.id === expectedItem.id) {
       // Correct!
-      playSound(true, soundEnabled);
       const newAssembled = [...assembledItems, item];
       setAssembledItems(newAssembled);
       setShuffledItems(prev => prev.filter(i => i.id !== item.id));
 
       if (newAssembled.length === orderData.length) {
+        playVictorySound(soundEnabled);
         setIsFinished(true);
         onComplete(attempts);
+      } else {
+        playSound(true, soundEnabled);
       }
     } else {
       // Incorrect!
-      playSound(false, soundEnabled);
+      playDamageSound(soundEnabled);
       onDamage(20);
       setAttempts(a => a + 1);
       setIsErrorBlink(true);
@@ -101,9 +108,19 @@ export const GameOrder = ({ orderData, soundEnabled, onDamage, onComplete }: Gam
         <span className="text-xs font-bold text-amber-400 bg-amber-400/10 px-3 py-1 rounded-md border border-amber-500/20">
           G4: Ordenação Tática
         </span>
-        <span className="text-xs font-mono font-bold text-gray-400">
-          Tentativa: <span className="text-white">{attempts}</span>
-        </span>
+        <div className="flex items-center gap-3">
+          {assembledItems.length > 0 && !isErrorBlink && (
+            <button
+              onClick={handleResetSequence}
+              className="text-xs font-mono text-amber-400/80 hover:text-amber-300 bg-amber-950/40 hover:bg-amber-900/40 border border-amber-500/30 px-2.5 py-1 rounded transition-colors flex items-center gap-1.5"
+            >
+              <span>↺</span> Reiniciar Montagem
+            </button>
+          )}
+          <span className="text-xs font-mono font-bold text-gray-400">
+            Tentativa: <span className="text-white">{attempts}</span>
+          </span>
+        </div>
       </div>
 
       <p className="text-sm text-gray-400 mb-4">
@@ -128,9 +145,11 @@ export const GameOrder = ({ orderData, soundEnabled, onDamage, onComplete }: Gam
       </div>
 
       {/* Assembled Sequence */}
-      <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">
-        Sua Sequência ({assembledItems.length}/{orderData.length})
-      </h3>
+      <div className="flex justify-between items-center mb-3">
+        <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest">
+          Sua Sequência ({assembledItems.length}/{orderData.length})
+        </h3>
+      </div>
       
       <div className="flex flex-col gap-2 flex-1">
         {assembledItems.length === 0 && (
@@ -156,3 +175,4 @@ export const GameOrder = ({ orderData, soundEnabled, onDamage, onComplete }: Gam
     </div>
   );
 };
+

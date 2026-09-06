@@ -5,11 +5,13 @@ import { sanitizeAndParseJSON, validateImportPayload, exportFullBackup } from '.
 import { Dashboard } from './components/Dashboard';
 import { StudyView } from './components/StudyView';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal';
 import 'katex/dist/katex.min.css';
 
 function App() {
   const [currentView, setCurrentView] = useState<'dashboard' | 'study'>('dashboard');
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   
   const [cards, setCards] = useState<MestreCardData[]>([]);
   const [historyMap, setHistoryMap] = useState<Record<string, number>>({});
@@ -37,6 +39,21 @@ function App() {
 
   useEffect(() => {
     loadCards();
+  }, []);
+
+  // Global listener for shortcut modal (?)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
+
+      if (e.key === '?' || (e.shiftKey && e.key === '/')) {
+        e.preventDefault();
+        setIsShortcutsOpen(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const handleImportCard = async (jsonStr: string) => {
@@ -122,9 +139,26 @@ function App() {
             onBack={handleBackToDashboard}
           />
         )}
+
+        {/* Floating Keyboard Shortcuts Trigger */}
+        <button
+          onClick={() => setIsShortcutsOpen(true)}
+          aria-label="Atalhos do Teclado"
+          className="fixed bottom-6 left-6 z-40 px-3 py-2 rounded-full bg-slate-900/90 hover:bg-slate-800 border border-slate-700 hover:border-cyan-500/50 text-slate-400 hover:text-cyan-300 shadow-lg backdrop-blur-md transition-all text-xs font-mono flex items-center gap-2 group"
+        >
+          <span>⌨️</span>
+          <span className="hidden sm:inline">Atalhos</span>
+          <kbd className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-[10px] text-cyan-400 font-bold">?</kbd>
+        </button>
+
+        <KeyboardShortcutsModal 
+          isOpen={isShortcutsOpen} 
+          onClose={() => setIsShortcutsOpen(false)} 
+        />
       </div>
     </ErrorBoundary>
   );
 }
 
 export default App;
+

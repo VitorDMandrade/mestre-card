@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { playSound } from '../../lib/audio';
+import { playSound, playDamageSound, playClickSound } from '../../lib/audio';
 
 export interface TrueFalseQuestion {
   statement: string;
@@ -87,6 +87,7 @@ export const GameTrueFalse = ({ tfData, soundEnabled, onDamage, onComplete }: Ga
   });
 
   const nextQuestion = () => {
+    playClickSound(soundEnabled);
     setShowFeedback(null);
     setTimeLeft(15);
     
@@ -107,7 +108,7 @@ export const GameTrueFalse = ({ tfData, soundEnabled, onDamage, onComplete }: Ga
       setShowFeedback(true);
       setTotalTimeSaved(prev => prev + timeLeft);
     } else {
-      playSound(false, soundEnabled);
+      playDamageSound(soundEnabled);
       setShowFeedback(false);
       onDamage(20);
       setPunishTime(5); // 5s lockout
@@ -140,11 +141,14 @@ export const GameTrueFalse = ({ tfData, soundEnabled, onDamage, onComplete }: Ga
       <div className="bg-slate-950 p-5 rounded-xl border border-red-500/30 min-h-[300px] flex flex-col items-center justify-center">
         <h3 className="text-red-400 font-bold text-xl mb-4">G3: Pressão TRI</h3>
         <p className="text-gray-400 text-sm mb-8 text-center max-w-sm">
-          Você terá exatos 15 segundos por afirmação. Julgue rapidamente usando <kbd className="bg-slate-800 px-2 py-1 rounded">V</kbd> ou <kbd className="bg-slate-800 px-2 py-1 rounded">F</kbd>. O tempo poupado será convertido em bônus.
+          Você terá exatos 15 segundos por afirmação. Julgue rapidamente usando <kbd className="bg-slate-800 px-2 py-1 rounded font-mono">V</kbd> ou <kbd className="bg-slate-800 px-2 py-1 rounded font-mono">F</kbd>. O tempo poupado será convertido em bônus.
         </p>
         <button 
-          onClick={() => setHasStarted(true)}
-          className="bg-red-600 hover:bg-red-500 text-white font-bold px-6 py-3 rounded-xl uppercase tracking-widest text-sm transition-colors shadow-[0_0_15px_rgba(220,38,38,0.4)]"
+          onClick={() => {
+            playClickSound(soundEnabled);
+            setHasStarted(true);
+          }}
+          className="bg-red-600 hover:bg-red-500 text-white font-bold px-6 py-3 rounded-xl uppercase tracking-widest text-sm transition-all shadow-[0_0_20px_rgba(220,38,38,0.4)] hover:scale-105 active:scale-95"
         >
           Iniciar Pressão TRI
         </button>
@@ -154,31 +158,42 @@ export const GameTrueFalse = ({ tfData, soundEnabled, onDamage, onComplete }: Ga
 
   const currentQ = tfData[step];
   const progressPct = (timeLeft / 15) * 100;
+  const isCritical = timeLeft <= 4;
 
   return (
-    <div className="bg-slate-950 p-5 rounded-xl border border-red-500/30 min-h-[300px] flex flex-col">
+    <div className={`bg-slate-950 p-5 rounded-xl border transition-all duration-300 min-h-[300px] flex flex-col ${isCritical ? 'border-red-500/80 shadow-[0_0_25px_rgba(239,68,68,0.2)]' : 'border-red-500/30'}`}>
       <div className="flex justify-between items-center mb-4">
         <span className="text-xs font-bold text-red-400 bg-red-400/10 px-3 py-1 rounded-md border border-red-500/20">
           Afirmação {step + 1}/{tfData.length}
         </span>
-        <span className="text-xs font-mono font-bold text-gray-400">
-          Tempo Poupado: <span className="text-emerald-400">{totalTimeSaved}s</span>
-        </span>
+        <div className="flex items-center gap-3">
+          {isCritical && (
+            <span className="text-[10px] font-mono uppercase font-bold text-red-400 bg-red-950/80 border border-red-500/60 px-2 py-0.5 rounded animate-pulse">
+              ⚠️ TEMPO CRÍTICO
+            </span>
+          )}
+          <span className="text-xs font-mono font-bold text-gray-400">
+            Tempo Poupado: <span className="text-emerald-400">{totalTimeSaved}s</span>
+          </span>
+        </div>
       </div>
       
       {/* Timer Bar */}
-      <div className="w-full bg-slate-800 rounded-full h-2 mb-2 overflow-hidden">
+      <div className="w-full bg-slate-800 rounded-full h-2.5 mb-2 overflow-hidden border border-slate-700/50">
         <div 
-          className={`h-full transition-all duration-1000 linear ${timeLeft < 5 ? 'bg-red-500 animate-pulse' : 'bg-red-500'}`} 
+          className={`h-full transition-all duration-1000 linear ${isCritical ? 'bg-gradient-to-r from-red-600 to-rose-500 animate-pulse' : 'bg-red-500'}`} 
           style={{ width: `${progressPct}%` }}
         />
       </div>
-      <div className="text-right text-xs font-mono font-bold text-gray-400 mb-6">
-        {timeLeft}s ... 0s
+      <div className="flex justify-between items-center text-xs font-mono font-bold mb-6">
+        <span className="text-slate-500">GATILHO 15s</span>
+        <span className={`transition-all ${isCritical ? 'text-red-400 font-black text-sm animate-pulse' : 'text-gray-400'}`}>
+          {timeLeft}s
+        </span>
       </div>
       
       <div className="flex-1 flex flex-col items-center justify-center mb-6">
-        <h3 className="text-xl text-white font-bold text-center px-4">
+        <h3 className="text-xl text-white font-bold text-center px-4 leading-relaxed">
           "{currentQ.statement}"
         </h3>
       </div>
@@ -187,21 +202,22 @@ export const GameTrueFalse = ({ tfData, soundEnabled, onDamage, onComplete }: Ga
         <div className="grid grid-cols-2 gap-4">
           <button 
             onClick={() => handleAnswer(true)}
-            className="p-4 bg-slate-800 hover:bg-emerald-900/40 rounded-xl border border-slate-700 hover:border-emerald-500/50 transition-all text-white font-bold flex flex-col items-center gap-2 group"
+            className={`p-4 bg-slate-900/90 hover:bg-emerald-950/60 rounded-xl border transition-all text-white font-bold flex flex-col items-center gap-2 group hover:scale-[1.02] active:scale-95 ${isCritical ? 'border-emerald-500/60 shadow-[0_0_15px_rgba(16,185,129,0.2)]' : 'border-slate-700 hover:border-emerald-500/50'}`}
           >
             <span className="text-2xl group-hover:scale-110 transition-transform">✅</span>
-            <span>VERDADEIRO (V)</span>
+            <span className="font-mono text-sm tracking-wider">VERDADEIRO (V)</span>
           </button>
           <button 
             onClick={() => handleAnswer(false)}
-            className="p-4 bg-slate-800 hover:bg-red-900/40 rounded-xl border border-slate-700 hover:border-red-500/50 transition-all text-white font-bold flex flex-col items-center gap-2 group"
+            className={`p-4 bg-slate-900/90 hover:bg-red-950/60 rounded-xl border transition-all text-white font-bold flex flex-col items-center gap-2 group hover:scale-[1.02] active:scale-95 ${isCritical ? 'border-red-500/60 shadow-[0_0_15px_rgba(239,68,68,0.2)]' : 'border-slate-700 hover:border-red-500/50'}`}
           >
             <span className="text-2xl group-hover:scale-110 transition-transform">❌</span>
-            <span>FALSO (F)</span>
+            <span className="font-mono text-sm tracking-wider">FALSO (F)</span>
           </button>
         </div>
       ) : (
         <div className={`p-4 rounded-xl border ${showFeedback ? 'bg-emerald-900/20 border-emerald-500/30' : 'bg-red-900/20 border-red-500/30'}`}>
+
           <div className="flex items-center gap-2 mb-2">
             <span className="text-xl">{showFeedback ? '✅' : '❌'}</span>
             <span className={`font-bold ${showFeedback ? 'text-emerald-400' : 'text-red-400'}`}>
