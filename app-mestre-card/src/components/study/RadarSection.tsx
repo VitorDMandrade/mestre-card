@@ -22,21 +22,69 @@ export const RadarSection = ({ card, soundEnabled }: RadarSectionProps) => {
 
   const radar = card.sec04_radar;
 
+  const renderMnemonicRule = (rule: string) => {
+    if (!rule) return null;
+
+    // Se o mnemônico tiver itens separados por '//' ou quebras de linha
+    const items = rule
+      .split(/\s*\/\/\s*|\n+/)
+      .map(s => s.trim())
+      .filter(Boolean);
+
+    if (items.length > 1) {
+      return (
+        <div className="space-y-2 mt-2">
+          {items.map((item, idx) => {
+            // Extrai letra ou número inicial destacado, ex: "**M**atérias..." ou "[M] Matérias..."
+            let letterBadge = '';
+            let text = item;
+
+            const letterMatch = item.match(/^\*{0,2}([A-Z0-9À-Ú])\*{0,2}(.*)$/i);
+            if (letterMatch && letterMatch[1]) {
+              letterBadge = letterMatch[1].toUpperCase();
+              text = letterMatch[2].replace(/^\*{0,2}/, '').trim();
+              text = text.replace(/^[:\-–—]\s*/, '');
+            }
+
+            return (
+              <div 
+                key={idx} 
+                className="p-2.5 rounded-lg bg-slate-950/70 border border-slate-800/80 hover:border-cyan-500/40 flex items-start gap-2.5 transition-all text-xs"
+              >
+                {letterBadge ? (
+                  <span className="w-6 h-6 rounded-md bg-cyan-950 border border-cyan-500/50 text-cyan-300 font-mono font-black flex items-center justify-center shrink-0 shadow-[0_0_8px_rgba(6,182,212,0.25)] text-xs">
+                    {letterBadge}
+                  </span>
+                ) : (
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 mt-1.5 shrink-0"></span>
+                )}
+                <div className="text-slate-300 leading-relaxed font-sans flex-1">
+                  <MathRenderer content={text} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
+    return <MathRenderer content={rule} />;
+  };
+
   return (
     <section id="sec-04" className="mb-12 scroll-mt-24">
       <h2 className="text-2xl font-black text-white mb-6 border-b border-slate-800 pb-4 flex items-center gap-3">
         <span className="text-blue-500">04.</span> RADAR DE GATILHOS
       </h2>
 
-      {/* Bento Grid Assimétrico */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        {/* Coluna de Destaque (2 colunas no desktop): Mnemônicos Agrupados & Acrônimos Dissecados */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in pb-12">
+        {/* Coluna de Mnemônicos (2 colunas no desktop) */}
         <div className="md:col-span-2 space-y-4">
-          <div className="flex items-center justify-between gap-2 bg-slate-900/90 border border-slate-800 px-4 py-2.5 rounded-xl">
+          <div className="flex items-center justify-between gap-4 border-b border-slate-800 pb-3">
             <div className="flex items-center gap-2">
-              <span className="text-cyan-400 font-mono text-sm">💡</span>
-              <h3 className="text-xs font-black uppercase tracking-wider text-cyan-300 font-mono">
-                MNEMÔNICOS & ÂNCORAS COGNITIVAS
+              <span className="text-cyan-400 text-lg">🧠</span>
+              <h3 className="text-base font-black uppercase tracking-wider text-white">
+                ÂNCORAS MNEMÔNICAS TRI
               </h3>
             </div>
             <span className="text-[10px] font-mono bg-cyan-950 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded">
@@ -69,7 +117,7 @@ export const RadarSection = ({ card, soundEnabled }: RadarSectionProps) => {
                   </div>
                 </div>
                 <div className="text-gray-300 text-xs sm:text-sm leading-relaxed border-t border-slate-800/80 pt-2.5">
-                  <MathRenderer content={mn.rule} />
+                  {renderMnemonicRule(mn.rule)}
                 </div>
               </div>
             ))}

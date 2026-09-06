@@ -30,52 +30,84 @@ export const StructureSection = ({ card }: StructureSectionProps) => {
       {structure.type === 'qualitative' && (
         <div className="space-y-6">
           {/* Stepper Tático Conectado (Cadeia Causal 01 a 05) */}
-          <div className="bg-slate-900/90 border border-slate-700/80 rounded-2xl p-6 shadow-lg">
-            <div className="flex items-center justify-between gap-4 mb-6 border-b border-slate-800 pb-3">
-              <h3 className="text-lg font-black text-white flex items-center gap-2">
-                <span className="text-cyan-400">🔗</span> STEPPER CAUSAL TÁTICO
-              </h3>
-              <span className="text-xs font-mono text-cyan-400/80 bg-cyan-950/50 px-2.5 py-1 rounded border border-cyan-500/30">
+          <div className="bg-slate-900/90 border border-slate-700/80 rounded-2xl p-6 shadow-xl">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 border-b border-slate-800 pb-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-cyan-400 text-lg">🔗</span>
+                  <h3 className="text-lg font-black text-white tracking-tight">
+                    MATRIZ CAUSAL TÁTICA // ENCADINHAMENTO ESTRUTURAL
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-400 font-mono mt-1">
+                  Mecanismos causais integrados de 01 a 05 sem colapso de contexto.
+                </p>
+              </div>
+              <span className="text-xs font-mono text-cyan-400 bg-cyan-950/60 px-3 py-1 rounded-lg border border-cyan-500/30 self-start sm:self-auto">
                 01 ➔ 05 FLUXO CONECTADO
               </span>
             </div>
 
-            {/* Layout Híbrido: Mobile Vertical com Linha / Desktop Horizontal com Setas Conectoras */}
             {(() => {
               const steps = [
                 {
                   num: '01',
+                  icon: '🏛️',
                   title: 'Causas Materiais',
-                  badgeClass: 'bg-amber-950/60 border-amber-500/40 text-amber-300',
+                  subtitle: 'Origens & Pressões Estruturais',
+                  badgeClass: 'bg-amber-950/70 border-amber-500/50 text-amber-300',
+                  borderHover: 'hover:border-amber-500/50',
                   titleClass: 'text-amber-400',
+                  glow: 'rgba(245, 158, 11, 0.15)',
+                  nextTarget: '02. Agentes Históricos',
                   content: structure.causalChain.causes
                 },
                 {
                   num: '02',
+                  icon: '👥',
                   title: 'Agentes Históricos',
-                  badgeClass: 'bg-blue-950/60 border-blue-500/40 text-blue-300',
+                  subtitle: 'Grupos, Nações & Classes de Poder',
+                  badgeClass: 'bg-blue-950/70 border-blue-500/50 text-blue-300',
+                  borderHover: 'hover:border-blue-500/50',
                   titleClass: 'text-blue-400',
+                  glow: 'rgba(59, 130, 246, 0.15)',
+                  nextTarget: '03. Mecanismos de Ação',
                   content: structure.causalChain.agents
                 },
                 {
                   num: '03',
+                  icon: '⚙️',
                   title: 'Mecanismos de Ação',
-                  badgeClass: 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300',
+                  subtitle: 'Leis, Guerras & Tratados Operacionais',
+                  badgeClass: 'bg-emerald-950/70 border-emerald-500/50 text-emerald-300',
+                  borderHover: 'hover:border-emerald-500/50',
                   titleClass: 'text-emerald-400',
+                  glow: 'rgba(16, 185, 129, 0.15)',
+                  nextTarget: '04. Consequências Diretas',
                   content: structure.causalChain.mechanisms
                 },
                 {
                   num: '04',
+                  icon: '💥',
                   title: 'Consequências Diretas',
-                  badgeClass: 'bg-red-950/60 border-red-500/40 text-red-300',
+                  subtitle: 'Rupturas & Impactos Imediatos',
+                  badgeClass: 'bg-red-950/70 border-red-500/50 text-red-300',
+                  borderHover: 'hover:border-red-500/50',
                   titleClass: 'text-red-400',
+                  glow: 'rgba(239, 68, 68, 0.15)',
+                  nextTarget: '05. Desdobramentos',
                   content: structure.causalChain.consequences
                 },
                 {
                   num: '05',
+                  icon: '🌐',
                   title: 'Desdobramentos',
-                  badgeClass: 'bg-purple-950/60 border-purple-500/40 text-purple-300',
+                  subtitle: 'Efeitos Estruturais de Longo Prazo',
+                  badgeClass: 'bg-purple-950/70 border-purple-500/50 text-purple-300',
+                  borderHover: 'hover:border-purple-500/50',
                   titleClass: 'text-purple-400',
+                  glow: 'rgba(168, 85, 247, 0.15)',
+                  nextTarget: 'Consolidação Plena na TRI',
                   content: structure.causalChain.unfoldings || 
                     structure.causalChain.developments || 
                     structure.causalChain.desdobramentos || 
@@ -84,38 +116,74 @@ export const StructureSection = ({ card }: StructureSectionProps) => {
               ];
 
               return (
-                <div className="relative border-l-2 border-cyan-500/30 pl-4 space-y-4 md:border-l-0 md:pl-0 md:space-y-0 md:flex md:items-stretch md:gap-2">
-                  {steps.map((step, idx) => (
-                    <div key={step.num} className="contents md:flex md:flex-1 md:items-stretch">
-                      {/* Card do Passo */}
-                      <div className="w-full bg-slate-950/80 border border-slate-800 hover:border-cyan-500/50 rounded-xl p-4 flex flex-col justify-between transition-all duration-200 shadow-[0_0_15px_rgba(0,0,0,0.3)] hover:shadow-[0_0_15px_rgba(6,182,212,0.15)] relative group">
-                        <div>
-                          {/* Cabeçalho do Nó */}
-                          <div className="flex items-center justify-between gap-2 mb-2.5">
-                            <span className={`px-2 py-0.5 rounded font-mono text-xs font-black border ${step.badgeClass}`}>
-                              NÓ {step.num}
-                            </span>
-                            <div className="w-2 h-2 rounded-full bg-cyan-400/60 group-hover:bg-cyan-400 group-hover:shadow-[0_0_8px_rgba(34,211,238,0.8)] transition-all"></div>
-                          </div>
-                          
-                          <h4 className={`text-xs font-black uppercase tracking-wider mb-2 ${step.titleClass}`}>
-                            {step.num}. {step.title}
-                          </h4>
-
-                          <div className="text-gray-300 text-xs sm:text-sm leading-relaxed">
-                            <MathRenderer content={step.content} />
-                          </div>
-                        </div>
+                <div className="space-y-6">
+                  {/* Trilha de Conexão Rápida no Topo (Pipeline Progressivo) */}
+                  <div className="hidden lg:grid grid-cols-5 gap-2 p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-xs font-mono">
+                    {steps.map((step, idx) => (
+                      <div key={step.num} className="flex items-center gap-2">
+                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold border ${step.badgeClass}`}>
+                          {step.num}
+                        </span>
+                        <span className="text-slate-300 truncate font-semibold">
+                          {step.title}
+                        </span>
+                        {idx < steps.length - 1 && (
+                          <span className="text-slate-600 ml-auto mr-1">➔</span>
+                        )}
                       </div>
+                    ))}
+                  </div>
 
-                      {/* Seta Conectora Tática no Desktop */}
-                      {idx < steps.length - 1 && (
-                        <div className="hidden md:flex items-center justify-center text-cyan-400/70 font-mono text-base select-none shrink-0 px-1">
-                          <span className="drop-shadow-[0_0_8px_rgba(34,211,238,0.6)]">➔</span>
+                  {/* Grade Espaçosa de Cartões Causais (Zero Amontoamento) */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {steps.map((step, idx) => {
+                      // O último passo ganha destaque visual expandido se for ímpar na última linha
+                      const isLast = idx === steps.length - 1;
+                      return (
+                        <div 
+                          key={step.num}
+                          className={`bg-slate-950/80 border border-slate-800/90 ${step.borderHover} rounded-2xl p-5 flex flex-col justify-between transition-all duration-300 shadow-md hover:shadow-xl relative group ${
+                            isLast ? 'md:col-span-2 lg:col-span-2' : ''
+                          }`}
+                        >
+                          <div>
+                            {/* Header do Card */}
+                            <div className="flex items-center justify-between gap-2 mb-3">
+                              <div className="flex items-center gap-2">
+                                <span className="text-lg">{step.icon}</span>
+                                <span className={`px-2 py-0.5 rounded font-mono text-[11px] font-black border ${step.badgeClass}`}>
+                                  NÓ {step.num}
+                                </span>
+                              </div>
+                              <span className="text-[10px] font-mono text-slate-500">
+                                ETAPA {idx + 1}/5
+                              </span>
+                            </div>
+
+                            <h4 className={`text-sm font-black uppercase tracking-wide mb-1 ${step.titleClass}`}>
+                              {step.num}. {step.title}
+                            </h4>
+                            <p className="text-[11px] text-slate-400 font-mono mb-3.5">
+                              {step.subtitle}
+                            </p>
+
+                            <div className="text-slate-300 text-sm leading-relaxed border-t border-slate-800/80 pt-3.5 font-sans">
+                              <MathRenderer content={step.content} />
+                            </div>
+                          </div>
+
+                          {/* Rodapé Tático de Conexão Causal */}
+                          <div className="mt-4 pt-3 border-t border-slate-800/60 flex items-center justify-between text-[11px] font-mono text-slate-500">
+                            <span>Fluxo de Causa:</span>
+                            <span className="text-cyan-400/80 font-bold flex items-center gap-1">
+                              <span>➔</span>
+                              <span>{step.nextTarget}</span>
+                            </span>
+                          </div>
                         </div>
-                      )}
-                    </div>
-                  ))}
+                      );
+                    })}
+                  </div>
                 </div>
               );
             })()}

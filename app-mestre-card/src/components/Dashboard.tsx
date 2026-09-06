@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import type { MestreCardData, StudySessionRecord } from '../types/mestre-card';
 import { db } from '../lib/db';
 
@@ -74,12 +74,31 @@ export const Dashboard: React.FC<DashboardProps> = ({
     }
   });
 
+  // Live History Sync directly from IndexedDB
+  const [liveHistory, setLiveHistory] = useState<StudySessionRecord[]>(allHistory);
+
+  const fetchHistory = useCallback(async () => {
+    try {
+      const records = await db.getAllHistory();
+      setLiveHistory(records);
+    } catch (e) {
+      console.error('Falha ao sincronizar histórico no Dashboard:', e);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchHistory();
+  }, [fetchHistory, allHistory]);
+
   const getErrorHash = (err: { cardId?: string; prompt: string; game: string }) => 
     `${err.cardId || ''}:${err.game}:${err.prompt}`;
 
-  // Extract all historical errors from allHistory
+  // Extract all historical errors from liveHistory or allHistory
   const historicErrors = useMemo(() => {
-    if (!allHistory || isHistoryCleared) return [];
+    if (isHistoryCleared) return [];
+    const sourceHistory = liveHistory.length > 0 ? liveHistory : allHistory;
+    if (!sourceHistory || sourceHistory.length === 0) return [];
+
     const errors: Array<{
       game: 'G1' | 'G3' | 'G5' | 'Lab' | 'Lab-Hardcore' | 'Lab-Boss' | string;
       prompt: string;
@@ -90,7 +109,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       timestamp?: number;
     }> = [];
     
-    for (const session of allHistory) {
+    for (const session of sourceHistory) {
       if (session.details?.sessionErrors && Array.isArray(session.details.sessionErrors)) {
         for (const err of session.details.sessionErrors) {
           errors.push({
@@ -116,11 +135,17 @@ export const Dashboard: React.FC<DashboardProps> = ({
       }
     }
     return deduplicated;
-  }, [allHistory, isHistoryCleared]);
+  }, [liveHistory, allHistory, isHistoryCleared]);
 
   const activeHistoricErrors = useMemo(() => {
     return historicErrors.filter(err => !dismissedHashes.has(getErrorHash(err)));
   }, [historicErrors, dismissedHashes]);
+
+  // Se todos os erros foram marcados como revisados em localStorage, exibe historicErrors para nunca deixar vazio sem motivo
+  const displayErrors = useMemo(() => {
+    if (activeHistoricErrors.length > 0) return activeHistoricErrors;
+    return historicErrors;
+  }, [activeHistoricErrors, historicErrors]);
 
   const handleDismissSingleError = (err: typeof historicErrors[0]) => {
     const hash = getErrorHash(err);
@@ -136,16 +161,27 @@ export const Dashboard: React.FC<DashboardProps> = ({
     });
   };
 
+  const handleRestoreDismissedErrors = () => {
+    setDismissedHashes(new Set());
+    try {
+      localStorage.removeItem('mestre_dismissed_error_hashes');
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const handleClearAllErrors = async () => {
     try {
       await db.clearAllHistoricErrors();
       setIsHistoryCleared(true);
+      setLiveHistory([]);
       setDismissedHashes(new Set());
       try {
         localStorage.removeItem('mestre_dismissed_error_hashes');
       } catch (e) {
         console.error(e);
       }
+      await fetchHistory();
     } catch (err) {
       console.error('Falha ao limpar erros no DB:', err);
     }
@@ -294,13 +330,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
         <div className="flex flex-wrap gap-2 justify-end">
           <button 
             onClick={() => setIsGlobalErrorModalOpen(true)}
-            className={activeHistoricErrors.length > 0 
+            className={historicErrors.length > 0 
               ? "bg-red-500/15 hover:bg-red-500/25 border border-red-500/60 text-red-300 px-3.5 py-2 rounded-lg text-xs font-mono font-bold transition-all uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_15px_rgba(239,68,68,0.25)] animate-pulse hover:animate-none cursor-pointer"
               : "bg-slate-900/80 hover:bg-slate-800 border border-slate-700/60 text-slate-400 hover:text-slate-200 px-3.5 py-2 rounded-lg text-xs font-mono font-bold transition-all uppercase tracking-wider flex items-center gap-1.5 cursor-pointer"
             }
             title="Abrir Caderno de Erros Global de sessões anteriores">
-            <span>{activeHistoricErrors.length > 0 ? '🚨' : '🛡️'}</span>
-            <span>{activeHistoricErrors.length > 0 ? `REPESCAGEM: ${activeHistoricErrors.length} ERROS` : 'CADERNO DE ERROS (0)'}</span>
+            <span>{historicErrors.length > 0 ? '🚨' : '🛡️'}</span>
+            <span>{historicErrors.length > 0 ? `REPESCAGEM: ${historicErrors.length} ${historicErrors.length === 1 ? 'ERRO' : 'ERROS'}` : 'CADERNO DE ERROS (0)'}</span>
           </button>
 
           <button 
@@ -336,7 +372,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       </div>
 
       {/* Banner Tático de Vulnerabilidade Cognitiva / Caderno de Erros Ativo */}
-      {activeHistoricErrors.length > 0 && (
+      {historicErrors.length > 0 && (
         <div className="p-4 rounded-2xl border border-red-500/50 bg-gradient-to-r from-red-950/40 via-slate-900/90 to-amber-950/30 shadow-[0_0_25px_rgba(239,68,68,0.15)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-fade-in">
           <div className="flex items-start sm:items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-red-500/20 border border-red-500/40 flex items-center justify-center text-xl shrink-0 animate-pulse">
@@ -348,7 +384,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   Caderno de Erros Ativo // Fila de Repescagem
                 </h2>
                 <span className="px-2 py-0.5 rounded-full bg-red-500/20 border border-red-500/40 text-red-300 font-mono text-[10px] font-bold">
-                  {activeHistoricErrors.length} {activeHistoricErrors.length === 1 ? 'FALHA' : 'FALHAS'}
+                  {historicErrors.length} {historicErrors.length === 1 ? 'FALHA' : 'FALHAS'}
                 </span>
               </div>
               <p className="text-xs text-slate-300 font-sans mt-0.5 leading-relaxed">
@@ -681,7 +717,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   </h3>
                 </div>
                 <p className="text-xs text-slate-400 font-mono mt-1">
-                  Revisão ativa das {activeHistoricErrors.length} falhas cognitivas registradas em combate.
+                  Revisão ativa das {displayErrors.length} {displayErrors.length === 1 ? 'falha cognitiva registrada' : 'falhas cognitivas registradas'} em combate.
                 </p>
               </div>
               <button
@@ -694,22 +730,32 @@ export const Dashboard: React.FC<DashboardProps> = ({
             </div>
 
             {/* Ações Rápidas do Modal */}
-            <div className="flex items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-800 text-xs font-mono">
+            <div className="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-800 text-xs font-mono">
               <span className="text-slate-400">
-                {activeHistoricErrors.length} falhas disponíveis para retestagem
+                {displayErrors.length} {displayErrors.length === 1 ? 'falha disponível' : 'falhas disponíveis'} para retestagem
               </span>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
+                {dismissedHashes.size > 0 && (
+                  <button
+                    onClick={handleRestoreDismissedErrors}
+                    className="px-2.5 py-1 rounded bg-cyan-950/60 border border-cyan-800/50 hover:bg-cyan-900 text-cyan-300 text-[11px] transition-colors cursor-pointer flex items-center gap-1"
+                    title="Restaurar falhas marcadas como revisadas de volta para a fila ativa"
+                  >
+                    <span>🔄</span>
+                    <span>Restaurar Fila</span>
+                  </button>
+                )}
                 <button
                   onClick={() => {
-                    if (revealedErrorIdxs.size === activeHistoricErrors.length) {
+                    if (revealedErrorIdxs.size === displayErrors.length) {
                       setRevealedErrorIdxs(new Set());
                     } else {
-                      setRevealedErrorIdxs(new Set(activeHistoricErrors.map((_, i) => i)));
+                      setRevealedErrorIdxs(new Set(displayErrors.map((_, i) => i)));
                     }
                   }}
                   className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] transition-colors cursor-pointer"
                 >
-                  {revealedErrorIdxs.size === activeHistoricErrors.length ? '🙈 Ocultar Gabaritos' : '👁️ Revelar Todos'}
+                  {revealedErrorIdxs.size === displayErrors.length ? '🙈 Ocultar Gabaritos' : '👁️ Revelar Todos'}
                 </button>
                 <button
                   onClick={handleClearAllErrors}
@@ -723,14 +769,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
             {/* Lista de Falhas com Auto-teste */}
             <div className="flex-1 overflow-y-auto space-y-4 pr-1 scrollbar-thin">
-              {activeHistoricErrors.length === 0 ? (
+              {displayErrors.length === 0 ? (
                 <div className="py-12 text-center text-emerald-400 font-mono text-sm space-y-2">
                   <div className="text-4xl">🛡️</div>
                   <p className="font-bold">TODAS AS FALHAS FORAM REVISADAS OU NENHUM ERRO REGISTRADO!</p>
                   <p className="text-xs text-slate-500">Mantenha a consistência em combate.</p>
                 </div>
               ) : (
-                activeHistoricErrors.map((err, idx) => {
+                displayErrors.map((err, idx) => {
                   const isRevealed = revealedErrorIdxs.has(idx);
                   return (
                     <div key={idx} className="p-4 rounded-xl bg-slate-950/80 border border-red-900/50 space-y-2.5 text-xs font-mono">

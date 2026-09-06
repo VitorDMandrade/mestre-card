@@ -66,10 +66,13 @@ export const StudyView: FC<StudyViewProps> = ({ card, onBack, queueInfo, onNextQ
     });
   };
 
+  const [isZenMode, setIsZenMode] = useState(false);
+  const [isOledMode, setIsOledMode] = useState(false);
+
   return (
-    <div className="min-h-screen bg-[#050810]">
+    <div className={`min-h-screen transition-colors duration-300 ${isOledMode ? 'oled-mode bg-black' : 'bg-[#050810]'}`}>
       {/* Header Fixo Global de Navegação (Retornar) */}
-      <div className="bg-[#0a0f18] border-b border-slate-800 p-4 flex items-center justify-between z-50 relative">
+      <div className={`border-b border-slate-800 p-4 flex items-center justify-between z-50 relative ${isOledMode ? 'bg-black' : 'bg-[#0a0f18]'}`}>
         <div className="max-w-6xl mx-auto w-full flex items-center justify-between gap-4 px-4">
           <div className="flex items-center gap-4">
             <button 
@@ -114,9 +117,13 @@ export const StudyView: FC<StudyViewProps> = ({ card, onBack, queueInfo, onNextQ
         textSize={textSize}
         onTextSizeChange={setTextSize}
         theoryBlocks={card.sec02_theory?.blocks}
+        isZenMode={isZenMode}
+        onToggleZenMode={() => setIsZenMode(!isZenMode)}
+        isOledMode={isOledMode}
+        onToggleOledMode={() => setIsOledMode(!isOledMode)}
       />
 
-      <div className="max-w-6xl mx-auto px-4 pb-20 space-y-12">
+      <div className={`max-w-6xl mx-auto px-4 pb-20 space-y-12 transition-all duration-300 ${isZenMode ? 'zen-focus-active' : ''}`}>
         <ErrorBoundary fallbackTitle="Erro na Seção de Teoria">
           <TheorySection card={card} textSize={textSize} />
         </ErrorBoundary>

@@ -31,6 +31,10 @@ interface StudyHUDProps {
   textSize?: 'sm' | 'md' | 'lg';
   onTextSizeChange?: (size: 'sm' | 'md' | 'lg') => void;
   theoryBlocks?: TheoryBlock[];
+  isZenMode?: boolean;
+  onToggleZenMode?: () => void;
+  isOledMode?: boolean;
+  onToggleOledMode?: () => void;
 }
 
 export const StudyHUD = ({ 
@@ -44,7 +48,11 @@ export const StudyHUD = ({
   onNextQueueItem,
   textSize = 'md',
   onTextSizeChange,
-  theoryBlocks
+  theoryBlocks,
+  isZenMode = false,
+  onToggleZenMode,
+  isOledMode = false,
+  onToggleOledMode
 }: StudyHUDProps) => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeHash, setActiveHash] = useState('sec-01');
@@ -321,6 +329,39 @@ export const StudyHUD = ({
                   </button>
                 </div>
               )}
+
+              {/* Controles de Conforto Visual: Foco Zen & Modo OLED */}
+              <div className="flex items-center gap-1">
+                {onToggleZenMode && (
+                  <button
+                    onClick={onToggleZenMode}
+                    className={`px-2.5 py-1 rounded text-xs font-mono font-bold transition-all flex items-center gap-1 cursor-pointer ${
+                      isZenMode
+                        ? 'bg-cyan-950 border border-cyan-400 text-cyan-300 shadow-[0_0_8px_rgba(34,211,238,0.3)]'
+                        : 'bg-slate-900 border border-slate-700 hover:border-cyan-500/50 text-slate-400 hover:text-slate-200'
+                    }`}
+                    title="Modo Foco Zen: Dimeriza visualmente seções periféricas ao ler"
+                  >
+                    <span>👁️</span>
+                    <span className="hidden sm:inline">Zen</span>
+                  </button>
+                )}
+
+                {onToggleOledMode && (
+                  <button
+                    onClick={onToggleOledMode}
+                    className={`px-2.5 py-1 rounded text-xs font-mono font-bold transition-all flex items-center gap-1 cursor-pointer ${
+                      isOledMode
+                        ? 'bg-black border border-amber-500 text-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.3)]'
+                        : 'bg-slate-900 border border-slate-700 hover:border-amber-500/50 text-slate-400 hover:text-slate-200'
+                    }`}
+                    title="Modo Noite OLED: Preto puro 100% para ambientes com pouca luz"
+                  >
+                    <span>🌙</span>
+                    <span className="hidden sm:inline">OLED</span>
+                  </button>
+                )}
+              </div>
 
               <button 
                 onClick={() => {

@@ -105,3 +105,31 @@
 .katex { font-size: 1.05em; color: #38bdf8; font-family: 'JetBrains Mono', monospace; }
 .katex-display .katex { color: #f8fafc; text-shadow: 0 0 12px rgba(56, 189, 248, 0.2); }
 
+/* Ergonomia Visual & Conforto Cognitivo */
+.oled-mode {
+  background-color: #000000 !important;
+  background-image: none !important;
+}
+
+.oled-mode .glass-card,
+.oled-mode .bg-slate-900,
+.oled-mode .bg-slate-950 {
+  background-color: #050505 !important;
+  border-color: #222 !important;
+}
+
+/* Modo Foco Zen: Dimeriza seções periféricas para foco absoluto */
+.zen-focus-active section {
+  transition: opacity 0.35s ease, filter 0.35s ease;
+}
+
+.zen-focus-active:hover section:not(:hover) {
+  opacity: 0.35;
+  filter: grayscale(20%);
+}
+
+.zen-focus-active section:hover {
+  opacity: 1;
+  filter: none;
+}
+

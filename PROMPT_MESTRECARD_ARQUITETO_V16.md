@@ -87,7 +87,7 @@ Adapte **OBRIGATORIAMENTE** a natureza desta seção à matéria:
   - `comparisonTable`: Quadro Comparativo Tático de alto contraste confrontando correntes, fases, modelos ou conceitos frequentemente confundidos (ex: *Colonialismo Moderno vs. Neocolonialismo Imperialista* ou *Respiração Aeróbia vs. Fermentação*). Deve conter `header` (ex: `["Critério", "Modelo A", "Modelo B", "Ponto Crítico TRI"]`) e **4 a 6 linhas (`rows`)** de alto contraste analítico.
 
 #### SEC.04 // MACETES, ARMADILHAS & RADAR DE GATILHOS
-- `mnemonics`: Exatamente **3 Mnemônicos Práticos e Operacionais** em cards dedicados, com o acrônimo destrinchado letra por letra (ex: `"C.A.P.E.L."` ou `"N.A.N.Q.U.I.M."`).
+- `mnemonics`: Exatamente **3 Mnemônicos Práticos e Operacionais** em cards dedicados. No campo `rule`, separe os itens da regra com `" // "` (ex: `"M - Matérias-primas... // E - Excedente de capital... // C - Consumidores..."`), permitindo que a interface do MestreCard separe automaticamente cada termo com badges anatômicos estilizados.
 - `blindSpots`: Exatamente **2 a 3 Pontos Cegos Clássicos na TRI** — dissecando profundamente as pegadinhas conceituais refinadas que derrubam mais de 75% dos vestibulandos, explicando a armadilha e como desarmá-la.
 - `triggerWords`: Exatamente **4 a 6 Palavras-Gatilho (Trigger Words)** com:
   - `trigger`: Expressão ou palavra-chave do enunciado.

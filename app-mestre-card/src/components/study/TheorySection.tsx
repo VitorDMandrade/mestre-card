@@ -102,8 +102,15 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
                 <MathRenderer content={block.content} />
               </div>
               {block.highlight && (
-                <div className="mt-4 p-3 bg-blue-950/40 border-l-2 border-blue-500 text-blue-200 text-sm font-mono relative z-10">
-                  <MathRenderer content={block.highlight} />
+                <div className="mt-4 p-3 bg-blue-950/40 border border-blue-500/30 rounded-xl relative z-10 flex flex-wrap gap-2 items-center">
+                  <span className="text-[10px] font-mono uppercase font-black text-cyan-400 tracking-wider">
+                    DESTAQUE:
+                  </span>
+                  {block.highlight.split(/\s*\/\/\s*|\s*\/\s*/).map((tag, tIdx) => (
+                    <span key={tIdx} className="px-2.5 py-0.5 rounded-md bg-blue-900/40 border border-blue-500/30 text-cyan-200 text-xs font-mono font-semibold">
+                      {tag.replace(/\*\*/g, '').trim()}
+                    </span>
+                  ))}
                 </div>
               )}
             </div>

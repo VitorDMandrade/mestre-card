@@ -42,7 +42,26 @@ export const MathRenderer: React.FC<MathRendererProps> = ({ content, className =
                   </ErrorBoundary>
                 );
               }
-              return <span key={pIndex} className="whitespace-pre-wrap">{part}</span>;
+
+              // Parse Markdown Bold (**texto**) e limpeza de barras duplas (//)
+              const cleanPart = part.replace(/\s*\/\/\s*/g, ' • ');
+              const boldSegments = cleanPart.split(/(\*\*[\s\S]*?\*\*)/g);
+
+              return (
+                <span key={pIndex} className="whitespace-pre-wrap">
+                  {boldSegments.map((segment, bIndex) => {
+                    if (segment.startsWith('**') && segment.endsWith('**') && segment.length >= 4) {
+                      const inner = segment.slice(2, -2);
+                      return (
+                        <strong key={bIndex} className="text-cyan-300 font-bold tracking-tight">
+                          {inner}
+                        </strong>
+                      );
+                    }
+                    return <span key={bIndex}>{segment}</span>;
+                  })}
+                </span>
+              );
             })}
           </p>
         );
