@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { db } from './lib/db';
 import type { MestreCardData } from './types/mestre-card';
-import { sanitizeAndParseJSON, validateImportPayload, exportFullBackup, parseBackupFile } from './lib/importer';
+import { sanitizeAndParseJSON, validateImportPayload, exportFullBackup, exportSingleCardJSON, exportFilteredBackup, parseBackupFile } from './lib/importer';
 import type { ParsedImport } from './lib/importer';
 import { Dashboard } from './components/Dashboard';
 import { StudyView } from './components/StudyView';
@@ -126,9 +126,31 @@ function App() {
       const allCards = await db.getAllCards();
       const allHistory = await db.getAllHistory();
       exportFullBackup(allCards, allHistory);
+      showToast('💾 Backup geral baixado com sucesso!', 'success');
     } catch (err) {
       console.error('Falha ao exportar backup', err);
-      alert('Erro ao exportar backup.');
+      showToast('Erro ao exportar backup geral.', 'error');
+    }
+  };
+
+  const handleExportSingleCard = (card: MestreCardData) => {
+    try {
+      exportSingleCardJSON(card);
+      showToast(`📥 Card exportado com sucesso: [${card.title}]`, 'success');
+    } catch (err: any) {
+      console.error('Falha ao exportar card avulso', err);
+      showToast(`FALHA NA EXPORTAÇÃO: ${err.message}`, 'error');
+    }
+  };
+
+  const handleExportFiltered = async (filteredCards: MestreCardData[], categoryLabel: string) => {
+    try {
+      const allHistory = await db.getAllHistory();
+      exportFilteredBackup(filteredCards, allHistory, categoryLabel);
+      showToast(`💾 Backup da categoria [${categoryLabel}] gerado com ${filteredCards.length} cards.`, 'success');
+    } catch (err: any) {
+      console.error('Falha ao exportar backup filtrado', err);
+      showToast(`FALHA NA EXPORTAÇÃO SELETIVA: ${err.message}`, 'error');
     }
   };
 
@@ -188,6 +210,8 @@ function App() {
             onImportCard={handleImportCard}
             onImportFile={handleImportFile}
             onExportBackup={handleExportBackup}
+            onExportSingleCard={handleExportSingleCard}
+            onExportFiltered={handleExportFiltered}
           />
         )}
         

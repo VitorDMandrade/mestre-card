@@ -134,6 +134,18 @@ export function validateImportPayload(rawObj: any): ParsedImport {
   };
 }
 
+function triggerDownload(filename: string, jsonString: string): void {
+  const blob = new Blob([jsonString], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
 export function exportFullBackup(cards: MestreCardData[], history: StudySessionRecord[]): void {
   const payload: UnifiedBackupPayload = {
     schemaVersion: "1.0",
@@ -143,16 +155,47 @@ export function exportFullBackup(cards: MestreCardData[], history: StudySessionR
   };
 
   const dataStr = JSON.stringify(payload, null, 2);
-  const blob = new Blob([dataStr], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `mestre-card-full-backup-${new Date().toISOString().split('T')[0]}.json`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  const dateStr = new Date().toISOString().split('T')[0];
+  triggerDownload(`mestre-card-full-backup-${dateStr}.json`, dataStr);
+}
+
+export function exportSingleCardJSON(card: MestreCardData): void {
+  const slug = (card.title || 'card')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .substring(0, 40) || 'card';
+
+  const dateStr = new Date().toISOString().split('T')[0];
+  const filename = `card-${slug}-${dateStr}.json`;
+  const dataStr = JSON.stringify(card, null, 2);
+  triggerDownload(filename, dataStr);
+}
+
+export function exportFilteredBackup(cards: MestreCardData[], allHistory: StudySessionRecord[], categoryLabel: string): void {
+  const cardIds = new Set(cards.map(c => c.id));
+  const filteredHistory = allHistory.filter(h => cardIds.has(h.cardId));
+
+  const payload: UnifiedBackupPayload = {
+    schemaVersion: "1.0",
+    exportedAt: Date.now(),
+    cards,
+    history: filteredHistory
+  };
+
+  const slug = (categoryLabel || 'selecao')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'selecao';
+
+  const dateStr = new Date().toISOString().split('T')[0];
+  const filename = `mestre-card-${slug}-backup-${dateStr}.json`;
+  const dataStr = JSON.stringify(payload, null, 2);
+  triggerDownload(filename, dataStr);
 }
 
 export function parseBackupFile(file: File): Promise<ParsedImport> {
@@ -184,4 +227,5 @@ export function parseBackupFile(file: File): Promise<ParsedImport> {
     reader.readAsText(file, 'utf-8');
   });
 }
+
 

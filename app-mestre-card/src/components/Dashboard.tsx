@@ -9,6 +9,8 @@ interface DashboardProps {
   onImportCard: (jsonStr: string) => void | Promise<void>;
   onImportFile?: (file: File) => void | Promise<void>;
   onExportBackup: () => void;
+  onExportSingleCard?: (card: MestreCardData) => void;
+  onExportFiltered?: (cards: MestreCardData[], categoryLabel: string) => void;
 }
 
 export type SubjectCategory = 'TODOS' | 'BIOLOGIA' | 'QUÍMICA' | 'FÍSICA' | 'MATEMÁTICA' | 'HUMANAS' | 'LINGUAGENS' | 'OUTROS';
@@ -35,7 +37,17 @@ export function resolveCategory(topic: string = '', title: string = ''): Subject
   return 'OUTROS';
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ cards, historyMap, onSelectCard, onDeleteCard, onImportCard, onImportFile, onExportBackup }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ 
+  cards, 
+  historyMap, 
+  onSelectCard, 
+  onDeleteCard, 
+  onImportCard, 
+  onImportFile, 
+  onExportBackup,
+  onExportSingleCard,
+  onExportFiltered
+}) => {
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
   const [jsonInput, setJsonInput] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<SubjectCategory>('TODOS');
@@ -134,17 +146,36 @@ export const Dashboard: React.FC<DashboardProps> = ({ cards, historyMap, onSelec
           </div>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2 justify-end">
           <button 
             onClick={() => setIsTerminalOpen(!isTerminalOpen)}
             className="bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 px-4 py-2 rounded-lg text-xs font-mono font-bold transition-colors uppercase tracking-widest">
             {isTerminalOpen ? 'FECHAR TERMINAL' : 'INGESTÃO JSON'}
           </button>
-          <button 
-            onClick={onExportBackup}
-            className="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 px-4 py-2 rounded-lg text-xs font-mono font-bold transition-colors uppercase tracking-widest">
-            EXPORTAR BACKUP
-          </button>
+          {selectedCategory !== 'TODOS' ? (
+            <div className="flex gap-2">
+              <button 
+                onClick={() => onExportFiltered ? onExportFiltered(filteredCards, selectedCategory) : onExportBackup()}
+                className="bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/60 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.25)] px-3.5 py-2 rounded-lg text-xs font-mono font-bold transition-all uppercase tracking-wider flex items-center gap-1.5"
+                title={`Exportar backup dos ${filteredCards.length} cards de ${selectedCategory}`}>
+                <span>💾</span>
+                <span>EXPORTAR {selectedCategory} ({filteredCards.length})</span>
+              </button>
+              <button 
+                onClick={onExportBackup}
+                className="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 px-2.5 py-2 rounded-lg text-xs font-mono font-bold transition-colors uppercase"
+                title="Exportar backup completo de todos os cards">
+                GERAL
+              </button>
+            </div>
+          ) : (
+            <button 
+              onClick={onExportBackup}
+              className="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 px-4 py-2 rounded-lg text-xs font-mono font-bold transition-colors uppercase tracking-widest flex items-center gap-1.5">
+              <span>💾</span>
+              <span>EXPORTAR BACKUP GERAL</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -357,12 +388,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ cards, historyMap, onSelec
                   )}
                 </div>
 
-              <div className="mt-auto flex gap-2">
+              <div className="mt-auto flex gap-2 items-center">
                 <button 
                   onClick={() => onSelectCard(card.id)}
                   className="flex-1 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white px-3 py-2 rounded-lg font-bold text-xs font-mono shadow-lg shadow-sky-500/20 transition-all">
                   INICIAR ESTUDO
                 </button>
+                {onExportSingleCard && (
+                  <button 
+                    onClick={() => onExportSingleCard(card)}
+                    title="Exportar este card avulso (.JSON)"
+                    className="p-2 rounded-lg bg-slate-900 border border-slate-700 text-slate-400 hover:text-cyan-300 hover:border-cyan-500/50 hover:bg-slate-800 transition-all font-mono text-xs flex items-center justify-center">
+                    📥
+                  </button>
+                )}
                 <button 
                   onClick={() => onDeleteCard(card.id)}
                   className="bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 px-3 py-2 rounded-lg text-xs font-mono font-bold transition-colors">
