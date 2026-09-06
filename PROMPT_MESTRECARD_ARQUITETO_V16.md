@@ -53,7 +53,10 @@ O JSON gerado deve satisfazer rigorosamente as seguintes especificações quanti
   - `title`: Título técnico e cirúrgico.
   - `content`: Texto encorpado estruturado em **F-Pattern** com alto contraste cognitivo:
     - **Teto Estrito de 4 Linhas**: Proibido blocos com parágrafos de mais de 4 linhas corridas.
-    - **Negritos Táticos Nucleares**: Destaque com `**negrito**` estritamente os 2 a 3 conceitos operacionais mais críticos por bloco (nomes, leis, termos-chave, equações), permitindo leitura dinâmica imediata.
+    - **Sintaxe de Destaque Semântico & F-Pattern**:
+      - `**Conceito Chave**`: Destaque com `**negrito**` estritamente os 2 a 3 conceitos operacionais mais críticos por bloco (nomes, leis, termos nucleares) — renderizados em ciano luminoso de alta retenção.
+      - `==Marcos e Métricas==`: Use `==termo==` para destacar datas críticas, séculos, percentuais e grandezas — renderizados em âmbar/dourado de leitura rápida.
+      - `!!Alerta de Prova!!`: Use `!!alerta!!` para sinalizar armadilhas, falsos cognatos ou distratores recorrentes — renderizados em vermelho coral tático com ícone de alerta.
     - **Tríade de Estruturação Interna de Cada Bloco**:
       1. *Premissa Central* (1 frase sintética com o conceito nuclear em negrito).
       2. *Encadeamento & Evidências* (desenvolvimento denso, com fatos, mecanismos e KaTeX).

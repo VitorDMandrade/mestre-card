@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import type { StudySessionRecord, TheoryBlock } from '../../types/mestre-card';
 import { playClickSound } from '../../lib/audio';
+import { useReading } from '../../context/ReadingContext';
 
 export function sanitizeForSpeech(rawText: string): string {
   if (!rawText) return '';
@@ -58,6 +59,7 @@ export const StudyHUD = ({
   const [activeHash, setActiveHash] = useState('sec-01');
   const [speechState, setSpeechState] = useState<'idle' | 'playing' | 'paused'>('idle');
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const { isBionic, toggleBionic, searchTerm, setSearchTerm, clearSearch } = useReading();
 
   // Strict cleanup of SpeechSynthesis on unmount or card changes
   useEffect(() => {
@@ -330,7 +332,7 @@ export const StudyHUD = ({
                 </div>
               )}
 
-              {/* Controles de Conforto Visual: Foco Zen & Modo OLED */}
+              {/* Controles de Conforto Visual: Foco Zen & Modo OLED & Leitura Biônica */}
               <div className="flex items-center gap-1">
                 {onToggleZenMode && (
                   <button
@@ -359,6 +361,40 @@ export const StudyHUD = ({
                   >
                     <span>🌙</span>
                     <span className="hidden sm:inline">OLED</span>
+                  </button>
+                )}
+
+                <button
+                  onClick={toggleBionic}
+                  className={`px-2.5 py-1 rounded text-xs font-mono font-bold transition-all flex items-center gap-1 cursor-pointer ${
+                    isBionic
+                      ? 'bg-purple-950 border border-purple-400 text-purple-300 shadow-[0_0_8px_rgba(192,132,252,0.4)]'
+                      : 'bg-slate-900 border border-slate-700 hover:border-purple-500/50 text-slate-400 hover:text-slate-200'
+                  }`}
+                  title="Leitura Biônica: Destaca fixação sacádica nas primeiras letras das palavras"
+                >
+                  <span>⚡</span>
+                  <span className="hidden sm:inline">Bionic</span>
+                </button>
+              </div>
+
+              {/* Localizador Tático In-Page */}
+              <div className="relative flex items-center" title="Localizador Tático: Destaque imediato do termo em todo o card">
+                <span className="absolute left-2.5 text-xs text-slate-500 pointer-events-none">🔍</span>
+                <input
+                  type="text"
+                  placeholder="Localizar termo..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="bg-slate-900 border border-slate-700 hover:border-amber-500/50 rounded-full pl-7 pr-7 py-1 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/40 w-28 sm:w-36 transition-all"
+                />
+                {searchTerm && (
+                  <button
+                    onClick={clearSearch}
+                    className="absolute right-2 text-xs text-slate-400 hover:text-white transition-colors cursor-pointer"
+                    title="Limpar busca"
+                  >
+                    ✕
                   </button>
                 )}
               </div>
