@@ -1,0 +1,24 @@
+Puxei exatamente o registro histórico no log do projeto! Você tem 100% de razão — tínhamos definido exatamente a Matriz das 5 Grandes Vias de Gamificação Ativa (Fim da Leitura Zumbi) para transformar o MestreCard em uma central de comando interativa.
+
+Aqui está o mapa exato do plano original de 5 vias e o nosso status atual:
+
+O Plano Mestre das 5 Grandes Vias
+#	Módulo / Frente	O que prevê	Status Atual
+1	🧬 Teoria Descriptografada (Protocolo Decoder) (Seção 02)	Tarjas militares de sigilo [ █ CENSURADO █ ], descramble de caracteres de 300ms, bandeja de fichas e confirmação na Web Audio API para aniquilar a leitura passiva.	✅ Concluído & Homologado
+2	⚡ Simulador Causal Interativo / Reator de Cabos (Seção 03)	Em vez de cards estáticos de causalidade, um circuito tático estilo "Ligue os Fios / Dominó": conectar Causas ➔ Agentes ➔ Mecanismos ➔ Consequências ➔ Desdobramentos. Se errar o polo, o disjuntor desarma com faísca e choque acústico; se acertar, a corrente de alta tensão acende o reator.	🚀 PRÓXIMO PASSO DO PLANO
+3	⚔️ Boss Fight Roguelike em Turnos (Seção 05)	A questão de elite do laboratório vira uma batalha RPG contra a Banca Examinadora: barra gigante de HP da Banca, ataques com pegadinhas a cada turno, menu tático com Ataque de Equação, Escudo Mnemônico (para anular distrator) e Poção de Mana (dica teórica por XP).	⏳ Na Fila
+4	🎙️ Modo Interrogatório por Voz (Voice Battle)	Uso da Web Speech Recognition API nativa do navegador: o sistema dita a pergunta e você responde no microfone por evocação ativa verbal ("Ela diminui!"), validando o gatilho sem tocar no mouse.	⏳ Na Fila
+5	🌌 Constelação Neural 3D (Grafo Interativo Canvas)	Visualização galáctica interativa em Canvas/3D das conexões entre temas (ex: Lei de Hess orbitando e emitindo feixes de luz para Entalpia de Ligação e Termodinâmica).	⏳ Na Fila
+(Além dessas 5 vias de seções, tínhamos implementado no meio a Mesa do Inspetor Papers, Please dentro do Arcade, que já está fechada e rodando).
+
+Onde Estamos e Qual é o Próximo Passo
+Acabamos de homologar a Via 1 (Protocolo Decoder) com louvor.
+Pelo plano original, a próxima parada imediata é a Via 2: O Circuito Causal Interativo da Seção 03 (Estrutura)!
+
+Como funciona a Via 2 (Circuito Causal):
+Na Seção 03 (Motor Estrutural Qualitativo), os 5 nós causais da matéria chegam como terminais de alta tensão desconectados.
+Você clica/arrasta os conectores para fechar o circuito lógico:
+Terminal A (Causas) ➔ Terminal B (Agentes) ➔ Terminal C (Mecanismos) ➔ Terminal D (Consequências) ➔ Terminal E (Desdobramentos).
+Se você tentar ligar um nó na ordem errada ou com premissa invertida: som de curto-circuito procedural e disjuntor caindo.
+Quando o circuito fecha corretamente: pulso luminoso elétrico em ciano percorrendo os cabos e ativação do Reator do Dossiê (+XP).
+Quer que iniciemos o plano de implementação da Via 2 (Circuito Causal da Seção 03)?
