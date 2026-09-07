@@ -1,8 +1,10 @@
 import type { MestreCardData } from '../types/mestre-card';
 
 export interface DecoderSlot {
-  id: string;
-  token: string;       // ex: "{{SLOT_0}}"
+  id: string;          // ex: "b1-slot-0" (único por bloco e por card)
+  blockNumber: number; // ex: 1
+  displayIndex: number;// ex: 1, 2, 3 (índice legível na tarja #1, #2...)
+  token: string;       // ex: "{{SLOT_B1_0}}"
   correctWord: string; // Termo limpo
   isMath: boolean;     // Se é fórmula matemática KaTeX (ex: $...$)
   options: string[];   // Termo correto + 2 a 3 distratores embaralhados
@@ -77,9 +79,13 @@ export function extractDistractorPool(card: MestreCardData, currentBlockNumber?:
 /**
  * Parser de blocos teóricos para o Protocolo Decoder.
  * Identifica termos em **negrito**, protege KaTeX contra descramble destrutivo,
- * e gera slots com distratores de alta relevância contextual.
+ * e gera slots estritamente isolados por bloco com distratores de alta relevância contextual.
  */
-export function parseBlockForDecoder(text: string, poolDistractors: string[] = []): DecodedBlock {
+export function parseBlockForDecoder(
+  text: string, 
+  poolDistractors: string[] = [], 
+  blockNumber: number = 1
+): DecodedBlock {
   if (!text) {
     return { originalText: '', templateText: '', slots: [] };
   }
@@ -98,8 +104,8 @@ export function parseBlockForDecoder(text: string, poolDistractors: string[] = [
 
       const isMath = rawTerm.includes('$');
       const cleanWord = rawTerm;
-      const slotId = `slot-${slotIndex}`;
-      const token = `{{SLOT_${slotIndex}}}`;
+      const slotId = `b${blockNumber}-slot-${slotIndex}`;
+      const token = `{{SLOT_B${blockNumber}_${slotIndex}}}`;
 
       // Seleciona 2 a 3 distratores inteligentes que não sejam idênticos à palavra correta
       const availableDistractors = poolDistractors.filter(d => 
@@ -108,10 +114,10 @@ export function parseBlockForDecoder(text: string, poolDistractors: string[] = [
         !d.toLowerCase().includes(cleanWord.toLowerCase())
       );
 
-      // Embaralhamento determinístico de distratores baseado no slotIndex
+      // Embaralhamento determinístico de distratores baseado no slotIndex e blockNumber
       const shuffledPool = [...availableDistractors].sort((a, b) => {
-        const hashA = (a.charCodeAt(0) * 31 + slotIndex * 7) % 100;
-        const hashB = (b.charCodeAt(0) * 31 + slotIndex * 7) % 100;
+        const hashA = (a.charCodeAt(0) * 31 + slotIndex * 7 + blockNumber * 13) % 100;
+        const hashB = (b.charCodeAt(0) * 31 + slotIndex * 7 + blockNumber * 13) % 100;
         return hashA - hashB;
       });
 
@@ -120,7 +126,7 @@ export function parseBlockForDecoder(text: string, poolDistractors: string[] = [
       // Se tiver poucos distratores disponíveis no pool, complementa com alternativas genéricas elegantes
       const fallbacks = ['Premissa Canônica', 'Distrator TRI', 'Correlação Direta', 'Fundamento Analítico'];
       while (selectedDistractors.length < 2) {
-        const fb = fallbacks[selectedDistractors.length % fallbacks.length];
+        const fb = fallbacks[(selectedDistractors.length + blockNumber) % fallbacks.length];
         if (!selectedDistractors.includes(fb) && fb !== cleanWord) {
           selectedDistractors.push(fb);
         }
@@ -128,13 +134,15 @@ export function parseBlockForDecoder(text: string, poolDistractors: string[] = [
 
       // Embaralha as opções incluindo o termo correto
       const allOptions = [cleanWord, ...selectedDistractors].sort((a, b) => {
-        const valA = (a.length * 13 + slotIndex * 17) % 97;
-        const valB = (b.length * 13 + slotIndex * 17) % 97;
+        const valA = (a.length * 13 + slotIndex * 17 + blockNumber * 11) % 97;
+        const valB = (b.length * 13 + slotIndex * 17 + blockNumber * 11) % 97;
         return valA - valB;
       });
 
       slots.push({
         id: slotId,
+        blockNumber,
+        displayIndex: slotIndex + 1,
         token,
         correctWord: cleanWord,
         isMath,
@@ -188,8 +196,8 @@ export function parseBlockForDecoder(text: string, poolDistractors: string[] = [
     if (match) {
       const cleanWord = match[0];
       const isMath = cleanWord.includes('$');
-      const slotId = `slot-${slotIndex}`;
-      const token = `{{SLOT_${slotIndex}}}`;
+      const slotId = `b${blockNumber}-slot-${slotIndex}`;
+      const token = `{{SLOT_B${blockNumber}_${slotIndex}}}`;
 
       const availableDistractors = poolDistractors.filter(d => 
         d.toLowerCase() !== cleanWord.toLowerCase() && 
@@ -198,28 +206,30 @@ export function parseBlockForDecoder(text: string, poolDistractors: string[] = [
       );
 
       const shuffledPool = [...availableDistractors].sort((a, b) => {
-        const hashA = (a.charCodeAt(0) * 31 + slotIndex * 7) % 100;
-        const hashB = (b.charCodeAt(0) * 31 + slotIndex * 7) % 100;
+        const hashA = (a.charCodeAt(0) * 31 + slotIndex * 7 + blockNumber * 13) % 100;
+        const hashB = (b.charCodeAt(0) * 31 + slotIndex * 7 + blockNumber * 13) % 100;
         return hashA - hashB;
       });
 
       const selectedDistractors = shuffledPool.slice(0, 3);
       const fallbacks = ['Premissa Canônica', 'Distrator TRI', 'Correlação Direta', 'Fundamento Analítico'];
       while (selectedDistractors.length < 2) {
-        const fb = fallbacks[selectedDistractors.length % fallbacks.length];
+        const fb = fallbacks[(selectedDistractors.length + blockNumber) % fallbacks.length];
         if (!selectedDistractors.includes(fb) && fb !== cleanWord) {
           selectedDistractors.push(fb);
         }
       }
 
       const allOptions = [cleanWord, ...selectedDistractors].sort((a, b) => {
-        const valA = (a.length * 13 + slotIndex * 17) % 97;
-        const valB = (b.length * 13 + slotIndex * 17) % 97;
+        const valA = (a.length * 13 + slotIndex * 17 + blockNumber * 11) % 97;
+        const valB = (b.length * 13 + slotIndex * 17 + blockNumber * 11) % 97;
         return valA - valB;
       });
 
       slots.push({
         id: slotId,
+        blockNumber,
+        displayIndex: slotIndex + 1,
         token,
         correctWord: cleanWord,
         isMath,

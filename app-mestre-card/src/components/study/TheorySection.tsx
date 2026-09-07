@@ -68,7 +68,7 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
   const parsedBlocksMap = useMemo(() => {
     const map = new Map<number, DecodedBlock>();
     card.sec02_theory.blocks.forEach(b => {
-      map.set(b.number, parseBlockForDecoder(b.content, distractorPool));
+      map.set(b.number, parseBlockForDecoder(b.content, distractorPool, b.number));
     });
     return map;
   }, [card, distractorPool]);
@@ -264,11 +264,11 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
         className={`censor-bar notranslate ${isSelected ? 'censor-bar-active' : ''} ${isWrong ? '!border-red-500 !text-red-400 animate-shake' : ''}`}
         translate="no"
         style={{ minWidth: `${Math.max(8, slot.correctWord.length * 0.95)}ch` }}
-        title="Clique para desclassificar esta lacuna"
+        title={`Clique para desclassificar esta lacuna (Bloco 0${blockNumber})`}
       >
         <span className="text-[10px] text-amber-400 mr-1.5">🔒</span>
         <span className="tracking-widest font-black text-xs">
-          █ CENSURADO #{slot.id.replace('slot-', '')} █
+          █ CENSURADO #{slot.displayIndex || 1} █
         </span>
       </button>
     );
@@ -292,7 +292,7 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
               <span>⚡</span> BANDEJA DE DESCLASSIFICAÇÃO
             </span>
             <span className="text-[11px] font-mono text-slate-400">
-              Selecione o termo autêntico para liberar a lacuna <strong className="text-amber-300">#{activeSlot.id.replace('slot-', '')}</strong>
+              Selecione o termo autêntico para liberar a lacuna <strong className="text-amber-300">#{activeSlot.displayIndex || 1}</strong> do Bloco 0{blockNumber}
             </span>
           </div>
           <button
