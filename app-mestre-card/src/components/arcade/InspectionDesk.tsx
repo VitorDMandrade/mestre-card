@@ -61,6 +61,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
   // Rádio do Posto & Pareamento de Evidências (Fase 2B)
   const [isRadioOn, setIsRadioOn] = useState(false);
   const [selectedClaim, setSelectedClaim] = useState(false);
+  const [selectedSuspiciousTerm, setSelectedSuspiciousTerm] = useState<string | null>(null);
   const [selectedRuleId, setSelectedRuleId] = useState<string | null>(null);
   const [isEvidenceMatched, setIsEvidenceMatched] = useState(false);
   const [mismatchWarning, setMismatchWarning] = useState<string | null>(null);
@@ -156,28 +157,40 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
     return () => clearTimeout(timer);
   }, [currentIndex, soundEnabled]);
 
-  // Aponta discrepância no documento e abre interrogatório / arma evidência 01
+  // Aponta discrepância no documento (só opera se Modo Investigar estiver ativado)
   const handleInspectDiscrepancy = useCallback(() => {
+    if (!isInvestigationMode) {
+      setMismatchWarning('ℹ️ ATIVE O [🔍 MODO INVESTIGAR] NO CABEÇALHO PARA APONTAR DISCREPÂNCIAS');
+      playTeletypeWarningSound(soundEnabled);
+      setTimeout(() => setMismatchWarning(null), 3000);
+      return;
+    }
+
     setSelectedClaim(prev => !prev);
     playClickSound(soundEnabled);
     setIsRulebookOpen(true); // Abre o manual de imediato para permitir o confronto
+  }, [isInvestigationMode, soundEnabled]);
 
-    if (currentCase.interrogation) {
-      setActiveInterrogation(currentCase.interrogation);
-    } else {
-      setActiveInterrogation({
-        postulantExcuse: "Inspetor, declarei os autos de boa-fé segundo minha compreensão dos conceitos!",
-        inspectorVerdict: currentCase.isFraudulent 
-          ? `Negativo. O documento contraria as diretrizes: ${currentCase.fraudReason || 'Inconsistência formal detectada.'}`
-          : "Conforme. Não há discrepâncias formais detectadas neste parecer."
-      });
+  // Isola um termo ou palavra suspeita específica (Fase 2B Refinada)
+  const handleSelectSuspiciousTerm = useCallback((term: string) => {
+    if (!isInvestigationMode) {
+      setMismatchWarning('ℹ️ ATIVE O [🔍 MODO INVESTIGAR] NO CABEÇALHO PARA APONTAR DISCREPÂNCIAS');
+      playTeletypeWarningSound(soundEnabled);
+      setTimeout(() => setMismatchWarning(null), 3000);
+      return;
     }
-  }, [currentCase, soundEnabled]);
+
+    setSelectedClaim(true);
+    setSelectedSuspiciousTerm(prev => prev === term ? null : term);
+    setIsRulebookOpen(true);
+    playClickSound(soundEnabled);
+    setMismatchWarning(null);
+  }, [isInvestigationMode, soundEnabled]);
 
   // Seleciona uma regra do manual para confrontar a alegação selecionada (Fase 2B)
-  const handleSelectRule = useCallback((ruleId: string, ruleTitle: string) => {
+  const handleSelectRule = useCallback((ruleId: string, ruleTitle: string, ruleContent?: string) => {
     if (!selectedClaim) {
-      setMismatchWarning('⚠️ SELECIONE PRIMEIRO A TESE NO DOSSIÊ PARA CONFRONTAR');
+      setMismatchWarning('⚠️ SELECIONE PRIMEIRO A TESE OU TERMO SUSPEITO NO DOSSIÊ PARA CONFRONTAR');
       playTeletypeWarningSound(soundEnabled);
       setTimeout(() => setMismatchWarning(null), 3000);
       return;
@@ -185,9 +198,22 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
 
     playClickSound(soundEnabled);
 
-    // Confere determinismo estrito da Fase 2B: regra esperada pelo caso
+    // Confere correspondência por ID estrito ou por palavras-chave conceituais
+    const termLower = (selectedSuspiciousTerm || currentCase.contradictionTrigger || '').toLowerCase();
+    const titleLower = (ruleTitle || '').toLowerCase();
+    const contentLower = (ruleContent || '').toLowerCase();
+
+    const hasKeywordMatch = termLower.length >= 3 && (
+      titleLower.includes(termLower) ||
+      contentLower.includes(termLower) ||
+      (termLower.includes('endot') && (contentLower.includes('endot') || titleLower.includes('entalp') || contentLower.includes('exot'))) ||
+      (termLower.includes('exot') && (contentLower.includes('exot') || titleLower.includes('entalp') || contentLower.includes('endot'))) ||
+      (termLower.includes('hess') && (contentLower.includes('hess') || titleLower.includes('hess')))
+    );
+
     const isTargetMatch = currentCase.isFraudulent && (
       ruleId === currentCase.targetRuleId ||
+      hasKeywordMatch ||
       (!currentCase.targetRuleId && (ruleId === 'rule-trap-0' || ruleId === 'rule-theory-0'))
     );
 
@@ -203,15 +229,25 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
       refreshProfile();
       fireParticles(window.innerWidth / 2, window.innerHeight / 2);
 
-      if (currentCase.interrogation) {
-        setActiveInterrogation(currentCase.interrogation);
-      }
+      // Dispara em tempo real a resposta fundamentada do confronto sobre o termo
+      const postulantExcuse = currentCase.interrogation?.postulantExcuse ||
+        `"Inspetor de turno, aleguei '${selectedSuspiciousTerm || currentCase.contradictionTrigger || 'essa premissa'}' com base na interpretação comum dos fatos! Por que isso seria irregular?"`;
+      
+      const inspectorVerdict = currentCase.interrogation?.inspectorVerdict ||
+        (currentCase.isFraudulent 
+          ? `Negativo. O termo '${selectedSuspiciousTerm || currentCase.contradictionTrigger || 'alegado'}' contraria formalmente as diretrizes do Ministério (${ruleTitle}): ${currentCase.fraudReason || 'Inconsistência formal detectada perante o regulamento.'}`
+          : `Conforme. O termo '${selectedSuspiciousTerm || 'alegado'}' está alinhado às diretrizes oficiais homologadas.`);
+
+      setActiveInterrogation({
+        postulantExcuse,
+        inspectorVerdict
+      });
     } else {
       playTeletypeWarningSound(soundEnabled);
       setMismatchWarning(`⚠️ DIRETRIZ INCOMPATÍVEL COM ESTA ALEGAÇÃO (${ruleTitle})`);
       setTimeout(() => setMismatchWarning(null), 3500);
     }
-  }, [selectedClaim, currentCase, soundEnabled, fireXpToast, refreshProfile, fireParticles]);
+  }, [selectedClaim, currentCase, selectedSuspiciousTerm, soundEnabled, fireXpToast, refreshProfile, fireParticles]);
 
   // Executa o veredito (Aprovar ou Denegar)
   const handleVerdict = useCallback((verdict: InspectionVerdict) => {
@@ -294,6 +330,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
     setStampStatus('none');
     setActiveInterrogation(null);
     setSelectedClaim(false);
+    setSelectedSuspiciousTerm(null);
     setSelectedRuleId(null);
     setIsEvidenceMatched(false);
     setMismatchWarning(null);
@@ -666,13 +703,17 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                   </span>
                   {selectedClaim ? (
                     <span className="text-[10px] font-mono text-amber-900 bg-amber-300 px-2 py-0.5 rounded border border-amber-600 font-black animate-pulse flex items-center gap-1 shadow-sm">
-                      <span>📌</span> EVIDÊNCIA 01: ALEGAÇÃO SELECIONADA
+                      <span>📌</span> EVIDÊNCIA 01: {selectedSuspiciousTerm ? `"${selectedSuspiciousTerm}"` : 'ALEGAÇÃO SELECIONADA'}
                     </span>
                   ) : isInvestigationMode ? (
                     <span className="text-[10px] font-mono text-amber-900 bg-amber-200/90 px-2 py-0.5 rounded border border-amber-500 font-bold animate-pulse flex items-center gap-1">
-                      <span>🔍</span> CLIQUE NA TESE PARA CONFRONTAR
+                      <span>🔍</span> MODO INVESTIGAR ATIVO: SELECIONE O TERMO
                     </span>
-                  ) : null}
+                  ) : (
+                    <span className="text-[10px] font-mono text-stone-500 bg-stone-200/80 px-2 py-0.5 rounded border border-stone-300 font-bold flex items-center gap-1">
+                      <span>📄</span> DOSSIÊ EM LEITURA REGULAR
+                    </span>
+                  )}
                 </div>
 
                 {/* ALERTA DE INCOMPATIBILIDADE TEMPORÁRIO */}
@@ -684,18 +725,22 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
 
                 <div 
                   onClick={handleInspectDiscrepancy}
-                  className={`p-4 rounded-md bg-white/95 border-2 transition-all relative cursor-pointer ${
+                  className={`p-4 rounded-md bg-white/95 border-2 transition-all relative ${
+                    isInvestigationMode ? 'cursor-pointer' : 'cursor-default'
+                  } ${
                     selectedClaim 
                       ? 'border-amber-500 bg-amber-50/95 ring-4 ring-amber-400/60 shadow-[0_0_20px_rgba(245,158,11,0.4)]'
                       : isInvestigationMode 
                       ? 'border-amber-600 shadow-[0_0_15px_rgba(217,119,6,0.35)] hover:bg-amber-50/90 ring-2 ring-amber-500/40' 
                       : 'border-[#8c7864] shadow-sm hover:border-stone-500'
                   }`}
-                  title="Clique para selecionar e confrontar esta alegação contra o Manual Oficial"
+                  title={isInvestigationMode ? "Clique para isolar esta alegação contra o Manual Oficial" : "Ative o [Modo Investigar] para apontar discrepâncias"}
                 >
-                  <div className="absolute top-2 right-2 bg-amber-600 text-white text-[9px] font-mono px-1.5 py-0.5 rounded font-bold uppercase tracking-wider flex items-center gap-1 shadow">
-                    <span>⚡</span> {selectedClaim ? 'CONFRONTAR COM MANUAL' : 'APONTAR DISCREPÂNCIA'}
-                  </div>
+                  {isInvestigationMode && (
+                    <div className="absolute top-2 right-2 bg-amber-600 text-white text-[9px] font-mono px-1.5 py-0.5 rounded font-bold uppercase tracking-wider flex items-center gap-1 shadow">
+                      <span>⚡</span> {selectedClaim ? 'CONFRONTAR COM MANUAL' : 'APONTAR DISCREPÂNCIA'}
+                    </div>
+                  )}
 
                   <div className="text-zinc-950 font-mono font-bold text-sm leading-relaxed">
                     <MathRenderer 
@@ -704,12 +749,45 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                     />
                   </div>
 
-                  {currentCase.contradictionTrigger && (
-                    <div className="mt-2.5 pt-2 border-t border-amber-300/80 flex items-center gap-2 text-[11px] font-mono text-amber-950 bg-amber-100/90 p-1.5 rounded">
-                      <span className="font-black text-xs">⚠️ TRECHO SOB SUSPEITA:</span>
-                      <span className="underline decoration-amber-700 decoration-2 font-semibold">
-                        "{currentCase.contradictionTrigger}"
-                      </span>
+                  {/* CHIPS DE TERMOS SUSPEITOS CLICÁVEIS (Fase 2B Refinada) */}
+                  {isInvestigationMode && (
+                    <div className="mt-3 pt-2 border-t border-amber-300/80 space-y-1.5">
+                      <div className="text-[10px] font-mono text-amber-950 font-bold uppercase tracking-wider flex items-center justify-between">
+                        <span className="flex items-center gap-1">
+                          <span>⚠️</span> TERMOS IDENTIFICADOS PARA CONFRONTO:
+                        </span>
+                        {selectedSuspiciousTerm && (
+                          <span className="text-amber-800 text-[9px] font-black">
+                            [ EVIDÊNCIA ISOLADA ]
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {((currentCase.suspiciousTerms && currentCase.suspiciousTerms.length > 0)
+                          ? currentCase.suspiciousTerms 
+                          : [currentCase.contradictionTrigger].filter(Boolean)
+                        ).map((term, tIdx) => {
+                          const isTermSelected = selectedSuspiciousTerm === term;
+                          return (
+                            <button
+                              key={tIdx}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleSelectSuspiciousTerm(term!);
+                              }}
+                              className={`px-2 py-1 rounded text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                                isTermSelected
+                                  ? 'bg-amber-600 text-white shadow-[0_0_12px_rgba(217,119,6,0.6)] ring-2 ring-amber-400 scale-105'
+                                  : 'bg-amber-100 text-amber-950 border border-amber-500/60 hover:bg-amber-200'
+                              }`}
+                              title="Clique para isolar este termo como evidência de confronto"
+                            >
+                              <span>{isTermSelected ? '📌' : '🔍'}</span>
+                              <span>"{term}"</span>
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -723,7 +801,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                     <span className="tracking-wide">CONTRADIÇÃO COMPROVADA // VINCULADA AO MANUAL</span>
                   </div>
                   <span className="text-[10px] bg-amber-900 text-amber-100 px-2 py-0.5 rounded uppercase font-black tracking-widest shadow-sm">
-                    {selectedRuleId || currentCase.targetRuleId || 'DIRETRIZ RECONHECIDA'}
+                    {selectedSuspiciousTerm ? `"${selectedSuspiciousTerm}" ➔ ` : ''}{selectedRuleId || currentCase.targetRuleId || 'DIRETRIZ RECONHECIDA'}
                   </span>
                 </div>
               )}
@@ -960,7 +1038,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                       return (
                         <div
                           key={bIdx}
-                          onClick={() => handleSelectRule(ruleId, block.title || `Artigo ${block.number || bIdx + 1}`)}
+                          onClick={() => handleSelectRule(ruleId, block.title || `Artigo ${block.number || bIdx + 1}`, block.content)}
                           className={`p-3 rounded border transition-all cursor-pointer ${
                             isMatched
                               ? 'bg-emerald-950/40 border-emerald-500 ring-2 ring-emerald-400/50 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
@@ -1011,7 +1089,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                         return (
                           <div
                             key={sIdx}
-                            onClick={() => handleSelectRule(ruleId, spot.title)}
+                            onClick={() => handleSelectRule(ruleId, spot.title, spot.analysis)}
                             className={`p-3 rounded border transition-all cursor-pointer ${
                               isMatched
                                 ? 'bg-emerald-950/40 border-emerald-500 ring-2 ring-emerald-400/50 shadow-[0_0_15px_rgba(16,185,129,0.3)]'

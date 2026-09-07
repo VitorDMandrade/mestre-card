@@ -41,6 +41,22 @@ const APPLICANT_PROFILES = [
  * Gera casos de inspeção documental de altíssima densidade a partir de qualquer MestreCard
  */
 export function generateInspectionCases(card: MestreCardData): InspectionCase[] {
+  // Se o card já contiver casos ricos sob medida gerados pelo Gemini, utiliza-os diretamente
+  if (card.sec07_arcade?.inspectionCases && card.sec07_arcade.inspectionCases.length > 0) {
+    return card.sec07_arcade.inspectionCases.map((c, i) => {
+      const profile = APPLICANT_PROFILES[i % APPLICANT_PROFILES.length];
+      return {
+        ...c,
+        applicantName: c.applicantName || profile.name,
+        applicantTitle: c.applicantTitle || profile.title,
+        applicantPhoto: c.applicantPhoto || profile.photo,
+        department: c.department || profile.dept,
+        fileNumber: c.fileNumber || `MKA-88-${2000 + i * 421}`,
+        suspiciousTerms: c.suspiciousTerms || (c.contradictionTrigger ? [c.contradictionTrigger] : undefined)
+      };
+    });
+  }
+
   const cases: InspectionCase[] = [];
   let caseIdx = 0;
 
@@ -67,6 +83,7 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
         isFraudulent: true,
         fraudReason: `ANOMALIA DETECTADA: O documento defende uma falácia clássica de banca (${spot.title}). ${cleanAnalysis} Não atende ao rigor científico oficial.`,
         contradictionTrigger: mythPart,
+        suspiciousTerms: [spot.title, mythPart.substring(0, 55)].filter(Boolean),
         targetRuleId: `rule-trap-${i}`,
         denialReason: `FALÁCIA DE BANCA: ${(spot.title || 'PONTO CEGO').toUpperCase()}`,
         interrogation: {
@@ -86,7 +103,15 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
       const fileNum = `MKA-${75 + (i * 2) % 20}-${3000 + (i * 513) % 6999}`;
       const cleanStatement = tf.statement.replace(/[*_~`]/g, '').trim();
       const cleanFeedback = (tf.feedback || '').replace(/[*_~`]/g, '').trim();
-      const theoryTargetIdx = i % (card.sec02_theory?.blocks?.length || 1);
+      let theoryTargetIdx = 0;
+      if (card.sec02_theory?.blocks && card.sec02_theory.blocks.length > 0) {
+        const found = card.sec02_theory.blocks.findIndex(b => {
+          const bText = (b.title + ' ' + b.content).toLowerCase();
+          const sWords = cleanStatement.toLowerCase().split(/\s+/).filter(w => w.length > 4);
+          return sWords.some(w => bText.includes(w));
+        });
+        theoryTargetIdx = found >= 0 ? found : (i % card.sec02_theory.blocks.length);
+      }
 
       cases.push({
         id: `case-tf-${i}`,
@@ -102,6 +127,12 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
           ? `FRAUDE CONCEITUAL: A afirmativa contraria os preceitos científicos do Ministério. Motivo: ${cleanFeedback}`
           : undefined,
         contradictionTrigger: !tf.isTrue ? cleanStatement : undefined,
+        suspiciousTerms: !tf.isTrue 
+          ? [
+              cleanStatement.length > 50 ? cleanStatement.substring(0, 50) + '...' : cleanStatement,
+              ...(cleanStatement.match(/(?:endotérmic\w+|exotérmic\w+|inverte\w*|proporcional\w*|positiv\w+|negativ\w+|independ\w+|exclusiva\w+|sempre|nunca|maior|menor|constante|aument\w+|diminui\w+)/gi) || [])
+            ].filter((v, idx, arr) => arr.indexOf(v) === idx).slice(0, 3)
+          : undefined,
         targetRuleId: !tf.isTrue ? `rule-theory-${theoryTargetIdx}` : undefined,
         denialReason: !tf.isTrue ? `VIOLAÇÃO: ARTIGO ${theoryTargetIdx + 1}` : undefined,
         interrogation: {
@@ -161,6 +192,10 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
           isFraudulent: true,
           fraudReason: `DISTRAÇÃO TÁTICA DETECTADA: ${q.resolution?.distractorAnalysis || 'Esta opção contém uma falha sutil de banca e deve ser reprovada.'}`,
           contradictionTrigger: wrongOpt.text,
+          suspiciousTerms: [
+            wrongOpt.text.length > 55 ? wrongOpt.text.substring(0, 55) + '...' : wrongOpt.text,
+            ...(wrongOpt.text.match(/(?:endotérmic\w+|exotérmic\w+|inverte\w*|proporcional\w*|positiv\w+|negativ\w+|independ\w+|exclusiva\w+|sempre|nunca|maior|menor|constante|aument\w+|diminui\w+)/gi) || [])
+          ].filter((v, idx, arr) => arr.indexOf(v) === idx).slice(0, 3),
           targetRuleId: card.sec04_radar?.blindSpots?.length ? 'rule-trap-0' : 'rule-theory-0',
           denialReason: 'DISTRAÇÃO TÁTICA: PREMISSA INCORRETA',
           interrogation: {

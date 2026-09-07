@@ -135,7 +135,7 @@ export const MathRenderer: React.FC<MathRendererProps> = ({ content, className =
         const inlineParts = block.split(/(\$[\s\S]*?\$)/g);
 
         return (
-          <p key={index} className={`${textClassName || 'text-slate-300'} leading-relaxed text-sm`}>
+          <p key={index} className={`${textClassName || 'text-slate-300 text-sm'} leading-relaxed`}>
             {inlineParts.map((part, pIndex) => {
               if (part.startsWith('$') && part.endsWith('$')) {
                 const math = part.slice(1, -1);

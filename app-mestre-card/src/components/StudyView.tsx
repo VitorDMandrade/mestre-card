@@ -134,14 +134,13 @@ export const StudyView: FC<StudyViewProps> = ({ card, onBack, queueInfo, onNextQ
           onNextQueueItem={onNextQueueItem}
           textSize={textSize}
           onTextSizeChange={setTextSize}
-          theoryBlocks={card.sec02_theory?.blocks}
           isZenMode={isZenMode}
           onToggleZenMode={() => setIsZenMode(!isZenMode)}
           isOledMode={isOledMode}
           onToggleOledMode={() => setIsOledMode(!isOledMode)}
         />
 
-        <div className={`max-w-6xl mx-auto px-4 pb-20 space-y-12 transition-all duration-300 ${isZenMode ? 'zen-focus-active' : ''}`}>
+        <div className={`max-w-6xl mx-auto px-4 pb-20 space-y-12 transition-all duration-300 study-font-${textSize} ${isZenMode ? 'zen-focus-active' : ''}`}>
           <ErrorBoundary fallbackTitle="Erro na Seção de Teoria">
             <TheorySection card={card} textSize={textSize} />
           </ErrorBoundary>

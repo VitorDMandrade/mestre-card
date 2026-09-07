@@ -473,4 +473,38 @@
   backdrop-filter: blur(1px);
 }
 
+/* 4. Escala Tipográfica Dinâmica do Estudo (A-, A, A+) */
+.study-font-sm {
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.6;
+}
+.study-font-sm p, .study-font-sm span:not(.font-mono):not(.text-xs):not(.text-\[10px\]) {
+  font-size: 0.875rem;
+}
+.study-font-sm .katex {
+  font-size: 0.95em;
+}
+
+.study-font-md {
+  font-size: 1rem; /* 16px */
+  line-height: 1.7;
+}
+.study-font-md p, .study-font-md span:not(.font-mono):not(.text-xs):not(.text-\[10px\]) {
+  font-size: 1rem;
+}
+.study-font-md .katex {
+  font-size: 1.05em;
+}
+
+.study-font-lg {
+  font-size: 1.1875rem; /* 19px */
+  line-height: 1.8;
+}
+.study-font-lg p, .study-font-lg span:not(.font-mono):not(.text-xs):not(.text-\[10px\]) {
+  font-size: 1.1875rem;
+}
+.study-font-lg .katex {
+  font-size: 1.25em;
+}
+
 

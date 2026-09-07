@@ -196,7 +196,7 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
                   {currentFocusedBlock.title}
                 </h3>
                 <div className={`max-w-prose leading-relaxed text-slate-200 space-y-4 ${textScaleClass}`}>
-                  <MathRenderer content={currentFocusedBlock.content} />
+                  <MathRenderer content={currentFocusedBlock.content} textClassName={textScaleClass} />
                 </div>
               </div>
 
@@ -282,7 +282,7 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
                   </button>
                 </div>
                 <div className={`max-w-prose leading-relaxed text-gray-300 relative z-10 space-y-3 ${textScaleClass}`}>
-                  <MathRenderer content={block.content} />
+                  <MathRenderer content={block.content} textClassName={textScaleClass} />
                 </div>
                 {block.highlight && (
                   <div className="mt-4 p-3 bg-blue-950/40 border border-blue-500/30 rounded-xl relative z-10 flex flex-wrap gap-2 items-center">

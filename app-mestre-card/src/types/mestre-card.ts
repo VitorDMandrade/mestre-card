@@ -128,6 +128,7 @@ export interface MestreCardData {
     tfData: ArcadeTFData[];
     orderData: ArcadeOrderData[];
     oddData: ArcadeOddData[];
+    inspectionCases?: InspectionCase[];
   };
 }
 
@@ -176,6 +177,7 @@ export interface InspectionCase {
   isFraudulent: boolean; // true = contém erro / distrator / falácia; false = 100% rigoroso
   fraudReason?: string; // Por que o documento é fraudulento / distrator
   contradictionTrigger?: string; // Frase ou trecho exato que contém o erro conceitual
+  suspiciousTerms?: string[]; // Palavras ou expressões suspeitas específicas para confronto isolado
   interrogation?: InterrogationDialog; // Diálogo de confronto dialético
   targetRuleId?: string; // ID da diretriz violada no manual para confronto determinístico
   denialReason?: string; // Motivo formal sintético da infração para a tarja do carimbo
