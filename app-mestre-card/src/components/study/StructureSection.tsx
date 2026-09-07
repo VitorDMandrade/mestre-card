@@ -22,7 +22,7 @@ export const StructureSection = ({ card }: StructureSectionProps) => {
   }
 
   return (
-    <section id="sec-03" className="mb-12 scroll-mt-24">
+    <section id="sec-03" className="mb-12 scroll-mt-44">
       <h2 className="text-2xl font-black text-white mb-6 border-b border-slate-800 pb-4 flex items-center gap-3">
         <span className="text-blue-500">03.</span> MOTOR ESTRUTURAL
       </h2>

@@ -11,7 +11,7 @@ export const RecallSection = ({ card }: RecallSectionProps) => {
   if (!flashcards || flashcards.length === 0) return null;
 
   return (
-    <section id="sec-06" className="mb-12 scroll-mt-24">
+    <section id="sec-06" className="mb-12 scroll-mt-44">
       <h2 className="text-2xl font-black text-white mb-6 border-b border-slate-800 pb-4 flex items-center gap-3">
         <span className="text-blue-500">06.</span> RECALL MATRIX
       </h2>

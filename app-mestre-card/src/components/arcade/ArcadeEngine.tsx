@@ -222,7 +222,7 @@ export const ArcadeEngine = ({
   }));
 
   return (
-    <section id="sec-arcade" className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-[0_0_25px_-4px_rgba(56,189,248,0.25)] scroll-mt-20">
+    <section id="sec-arcade" className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-[0_0_25px_-4px_rgba(56,189,248,0.25)] scroll-mt-44">
       {/* Header and Controls */}
       <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
         <h2 className="text-2xl font-black text-white">🕹️ Pentágono Revisional (Arcade)</h2>

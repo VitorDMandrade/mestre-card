@@ -129,7 +129,7 @@ export const LabSection = ({ cardId, cardTitle, questions, hardcoreQuestions, bo
   };
 
   return (
-    <section id="sec-05" className="mb-12 scroll-mt-24">
+    <section id="sec-05" className="mb-12 scroll-mt-44">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-slate-800 pb-4">
         <h2 className="text-2xl font-black text-white flex items-center gap-3">
           <span className="text-blue-500">05.</span> LABORATÓRIO PRÁTICO

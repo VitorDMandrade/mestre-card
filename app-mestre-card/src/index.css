@@ -587,4 +587,39 @@
   animation: stamp-impact 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
+/* Efeito de Destaque / Glow no Comutador do Decoder */
+@keyframes pulse-subtle {
+  0%, 100% {
+    box-shadow: 0 0 18px rgba(245, 158, 11, 0.45), inset 0 0 10px rgba(255, 255, 255, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 32px rgba(245, 158, 11, 0.85), inset 0 0 16px rgba(255, 255, 255, 0.4);
+  }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2.5s infinite ease-in-out;
+}
+
+.btn-decoder-glow {
+  box-shadow: 0 0 22px rgba(245, 158, 11, 0.5), inset 0 0 12px rgba(255, 255, 255, 0.25);
+  transition: all 0.25s ease-in-out;
+}
+
+.btn-decoder-glow:hover {
+  box-shadow: 0 0 38px rgba(245, 158, 11, 0.9), inset 0 0 18px rgba(255, 255, 255, 0.45);
+  transform: translateY(-2px) scale(1.03);
+}
+
+.btn-decoder-active-glow {
+  box-shadow: 0 0 22px rgba(16, 185, 129, 0.5), inset 0 0 12px rgba(255, 255, 255, 0.2);
+  transition: all 0.25s ease-in-out;
+}
+
+.btn-decoder-active-glow:hover {
+  box-shadow: 0 0 35px rgba(16, 185, 129, 0.8);
+  transform: translateY(-1px) scale(1.02);
+}
+
+
 

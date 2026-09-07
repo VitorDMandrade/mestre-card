@@ -358,7 +358,7 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
   return (
     <>
       {/* SEC 01 - Header TRI & Eixos */}
-      <section id="sec-01" className="mb-12 scroll-mt-24">
+      <section id="sec-01" className="mb-12 scroll-mt-44">
         <div className="flex flex-wrap items-center gap-3 mb-6">
           <div className="bg-gradient-to-r from-blue-900 to-indigo-900 border border-blue-500/50 px-4 py-2 rounded-lg flex items-center gap-2 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
             <span className="text-blue-400 font-bold font-mono text-sm">INCIDÊNCIA TRI:</span>
@@ -390,14 +390,14 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
       </section>
 
       {/* SEC 02 - Dossiê & Árvore de Triagem */}
-      <section id="sec-02" className="mb-12 scroll-mt-24">
+      <section id="sec-02" className="mb-12 scroll-mt-44">
         <div className="flex items-center justify-between flex-wrap gap-4 border-b border-slate-800 pb-4 mb-6">
           <div className="flex items-center gap-4 flex-wrap">
             <h2 className="text-2xl font-black text-white flex items-center gap-3">
               <span className="text-blue-500">02.</span> DOSSIÊ TEÓRICO
             </h2>
 
-            {/* Comutador Tático: Leitura Canônica vs. Protocolo Decoder */}
+            {/* Comutador Tático no Cabeçalho */}
             <button
               type="button"
               onClick={() => {
@@ -409,25 +409,32 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
                 setSelectedSlotId(null);
                 setActiveBlockNumForSlot(null);
               }}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-black tracking-wider uppercase transition-all flex items-center gap-2 cursor-pointer border ${
+              className={`px-4 py-2.5 rounded-xl text-xs font-mono font-black tracking-wider uppercase transition-all flex items-center gap-2.5 cursor-pointer border-2 shadow-lg hover:scale-105 active:scale-95 ${
                 isDecoderMode
-                  ? 'bg-emerald-950/90 border-emerald-400 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.35)]'
-                  : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-slate-200 hover:border-slate-500'
+                  ? 'bg-emerald-950 border-emerald-400 text-emerald-200 btn-decoder-active-glow'
+                  : 'bg-gradient-to-r from-amber-400 via-orange-500 to-amber-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 border-amber-300 btn-decoder-glow animate-pulse-subtle'
               }`}
               title="Alternar entre modo convencional de leitura e treino ativo com tarjas de censura"
             >
               {isDecoderMode ? (
                 <>
-                  <span className="text-emerald-400 animate-pulse">🕵️</span>
-                  <span>Protocolo Decoder</span>
-                  <span className="px-1.5 py-0.5 rounded bg-emerald-900/90 text-[10px] text-emerald-200 font-bold border border-emerald-500/40">
+                  <span className="text-emerald-300 text-sm animate-pulse">🕵️</span>
+                  <span>DECODER ATIVO</span>
+                  <span className="px-2 py-0.5 rounded bg-emerald-900 text-[10px] text-emerald-200 font-bold border border-emerald-500/50">
                     {totalDecryptedCount}/{totalSlotsCount}
                   </span>
                 </>
               ) : (
                 <>
-                  <span className="text-blue-400">📖</span>
-                  <span>Leitura Canônica</span>
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-950 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-slate-950"></span>
+                  </span>
+                  <span className="text-base">🕵️</span>
+                  <span>ATIVAR PROTOCOLO DECODER</span>
+                  <span className="px-2 py-0.5 rounded bg-black/60 text-amber-200 text-[10px] font-black border border-amber-300/60 uppercase">
+                    NOVO +XP
+                  </span>
                 </>
               )}
             </button>
@@ -460,6 +467,79 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
               </button>
             ))}
           </div>
+        </div>
+
+        {/* BANNER DE COMANDO TÁTICO: PROTOCOLO DECODER // ALTA VISIBILIDADE */}
+        <div className={`p-5 md:p-6 rounded-2xl border-2 transition-all mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 ${
+          isDecoderMode 
+            ? 'bg-gradient-to-r from-emerald-950/80 via-slate-950 to-emerald-950/80 border-emerald-400 shadow-[0_0_35px_rgba(16,185,129,0.3)]'
+            : 'bg-gradient-to-r from-slate-950 via-amber-950/50 to-slate-950 border-amber-500/80 shadow-[0_0_35px_rgba(245,158,11,0.25)]'
+        }`}>
+          <div className="flex items-center gap-4">
+            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shrink-0 border-2 ${
+              isDecoderMode
+                ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300 shadow-[0_0_20px_rgba(16,185,129,0.6)] animate-pulse'
+                : 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-[0_0_20px_rgba(245,158,11,0.6)]'
+            }`}>
+              {isDecoderMode ? '🕵️' : '⚡'}
+            </div>
+            <div>
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <span className="font-mono text-sm md:text-base font-black tracking-wider uppercase text-white">
+                  {isDecoderMode ? 'PROTOCOLO DECODER EM EXECUÇÃO' : 'MODO DE FIXAÇÃO: PROTOCOLO DECODER'}
+                </span>
+                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono font-black uppercase tracking-widest border ${
+                  isDecoderMode
+                    ? 'bg-emerald-900/90 text-emerald-200 border-emerald-400'
+                    : 'bg-amber-500/30 text-amber-300 border-amber-400 animate-pulse'
+                }`}>
+                  {isDecoderMode ? `${totalDecryptedCount}/${totalSlotsCount} DESCLASSIFICADOS` : 'RECORDAÇÃO ATIVA // NOVO'}
+                </span>
+              </div>
+              <p className="text-xs md:text-sm text-slate-300 mt-1.5 max-w-2xl leading-relaxed font-medium">
+                {isDecoderMode
+                  ? 'Palavras-chave censuradas militarmente. Clique em cada tarja para escolher o conceito autêntico e homologar o bloco (+XP).'
+                  : 'Oculte palavras-chave do texto com tarjas de censura militar para exercitar sua memória ativa e ganhar XP extra.'}
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              setIsDecoderMode(prev => {
+                const next = !prev;
+                if (next) playDecoderChirpSound();
+                return next;
+              });
+              setSelectedSlotId(null);
+              setActiveBlockNumForSlot(null);
+            }}
+            className={`w-full md:w-auto px-7 py-3.5 rounded-xl font-mono text-xs font-black tracking-wider uppercase transition-all flex items-center justify-center gap-3 cursor-pointer shadow-xl border-2 hover:scale-105 active:scale-95 ${
+              isDecoderMode
+                ? 'bg-slate-900 hover:bg-slate-800 text-emerald-300 border-emerald-400 btn-decoder-active-glow'
+                : 'bg-gradient-to-r from-amber-400 via-orange-500 to-amber-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 border-amber-200 btn-decoder-glow animate-pulse-subtle'
+            }`}
+          >
+            {isDecoderMode ? (
+              <>
+                <span className="text-base">📖</span>
+                <span>Voltar para Leitura Normal</span>
+              </>
+            ) : (
+              <>
+                <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-950 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-slate-950"></span>
+                </span>
+                <span className="text-lg">🕵️</span>
+                <span className="text-xs md:text-sm font-black">ATIVAR PROTOCOLO DECODER</span>
+                <span className="px-2 py-0.5 rounded-md bg-black/60 text-amber-200 text-[10px] font-black border border-amber-300/40">
+                  +XP EXTRA
+                </span>
+              </>
+            )}
+          </button>
         </div>
 
         {/* Barra de Conceitos Centrais Clicáveis (Tags de Salto Rápido) */}
@@ -512,13 +592,29 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               {/* Coluna Principal: Largura Áurea com max-w-prose para evitar fadiga ocular */}
               <div className="lg:col-span-8 space-y-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="px-2.5 py-0.5 rounded bg-blue-900/40 border border-blue-500/40 text-cyan-300 font-mono text-xs font-bold uppercase tracking-wider">
-                    Bloco 0{currentFocusedBlock.number}
-                  </span>
-                  <span className="text-xs font-mono text-slate-500">
-                    de 0{card.sec02_theory.blocks.length}
-                  </span>
+                <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-0.5 rounded bg-blue-900/40 border border-blue-500/40 text-cyan-300 font-mono text-xs font-bold uppercase tracking-wider">
+                      Bloco 0{currentFocusedBlock.number}
+                    </span>
+                    <span className="text-xs font-mono text-slate-500">
+                      de 0{card.sec02_theory.blocks.length}
+                    </span>
+                  </div>
+                  {!isDecoderMode && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsDecoderMode(true);
+                        playDecoderChirpSound();
+                      }}
+                      className="px-3 py-1 rounded-lg text-xs font-mono font-bold bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-400/50 hover:border-amber-300 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm hover:scale-105"
+                      title="Ativar tarjas de censura do Protocolo Decoder para treinar este bloco"
+                    >
+                      <span>🕵️</span>
+                      <span>Treinar com Decoder (+XP)</span>
+                    </button>
+                  )}
                 </div>
                 <h3 className="text-xl md:text-2xl font-black text-white tracking-tight">
                   {currentFocusedBlock.title}
@@ -570,6 +666,27 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
                   </div>
                 )}
 
+                {!isDecoderMode && (
+                  <div className="p-3.5 rounded-xl bg-gradient-to-br from-amber-950/40 to-slate-900 border border-amber-500/40 shadow-sm space-y-2">
+                    <div className="flex items-center gap-1.5 text-amber-300 font-mono text-xs font-bold">
+                      <span>⚡</span> <span>TREINO DE FIXAÇÃO</span>
+                    </div>
+                    <p className="text-[11px] text-slate-300 leading-relaxed">
+                      Oculte as palavras-chave deste bloco com o Protocolo Decoder para exercitar a memória ativa.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsDecoderMode(true);
+                        playDecoderChirpSound();
+                      }}
+                      className="w-full py-2 px-3 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-mono text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-md hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
+                    >
+                      <span>🕵️</span> <span>Ativar Protocolo Decoder</span>
+                    </button>
+                  </div>
+                )}
+
                 <div className="p-3 rounded-lg bg-blue-950/20 border border-blue-500/20 text-xs text-slate-400 leading-relaxed">
                   <span className="font-bold text-blue-300 block mb-1">💡 Dica Cognitiva:</span>
                   Palavras em <strong className="text-cyan-300">ciano</strong> indicam conceitos nucleares e <strong className="text-amber-300">âmbar</strong> marcam datas/períodos temporais.
@@ -612,20 +729,36 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
               <div 
                 key={block.number} 
                 id={`block-${block.number}`}
-                className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 relative overflow-hidden group hover:border-slate-600 transition-colors scroll-mt-28"
+                className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 relative overflow-hidden group hover:border-slate-600 transition-colors scroll-mt-44"
               >
                 <div className="absolute top-0 right-0 bg-blue-900/20 text-blue-500/30 font-black text-6xl -mt-4 -mr-2 select-none pointer-events-none group-hover:text-blue-500/40 transition-colors">
                   {String(block.number).padStart(2, '0')}
                 </div>
-                <div className="flex items-center justify-between mb-3 relative z-10">
+                <div className="flex items-center justify-between mb-3 relative z-10 flex-wrap gap-2">
                   <h3 className="text-lg font-bold text-blue-400">{block.title}</h3>
-                  <button
-                    onClick={() => setActiveBlockTab(block.number)}
-                    className="text-[10px] font-mono text-slate-500 hover:text-cyan-400 border border-slate-800 hover:border-cyan-500/40 px-2 py-0.5 rounded transition-colors cursor-pointer"
-                    title="Focar apenas neste bloco"
-                  >
-                    Focar 🔍
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {!isDecoderMode && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsDecoderMode(true);
+                          playDecoderChirpSound();
+                        }}
+                        className="text-[10px] font-mono font-bold text-amber-300 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/50 hover:border-amber-300 px-2.5 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 shadow-sm hover:scale-105"
+                        title="Ativar tarjas de censura do Protocolo Decoder para treinar este bloco"
+                      >
+                        <span>🕵️</span>
+                        <span>Treinar (+XP)</span>
+                      </button>
+                    )}
+                    <button
+                      onClick={() => setActiveBlockTab(block.number)}
+                      className="text-[10px] font-mono text-slate-500 hover:text-cyan-400 border border-slate-800 hover:border-cyan-500/40 px-2 py-0.5 rounded transition-colors cursor-pointer"
+                      title="Focar apenas neste bloco"
+                    >
+                      Focar 🔍
+                    </button>
+                  </div>
                 </div>
                 <div className={`max-w-prose leading-relaxed text-gray-300 relative z-10 space-y-3 ${textScaleClass}`}>
                   {isDecoderMode ? (

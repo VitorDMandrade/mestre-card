@@ -153,7 +153,7 @@ export const RadarSection = ({ card, soundEnabled }: RadarSectionProps) => {
   const triggerWordsCount = radar.triggerWords?.length || 0;
 
   return (
-    <section id="sec-04" className="mb-12 scroll-mt-24">
+    <section id="sec-04" className="mb-12 scroll-mt-44">
       {/* Cabeçalho da Seção com Ações Rápidas */}
       <div className="border-b border-slate-800 pb-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <h2 className="text-2xl font-black text-white flex items-center gap-3">
