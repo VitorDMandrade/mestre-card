@@ -838,3 +838,43 @@ export function playReactorOverdriveSound(enabled = true): void {
   }
 }
 
+/**
+ * 13. Rearme mecânico de disjuntor industrial de alta voltagem (Trava de mola pesada)
+ */
+export function playBreakerResetSound(enabled = true): void {
+  if (!enabled) return;
+  try {
+    const ctx = getAudioContext();
+    if (ctx.state === 'suspended') ctx.resume();
+
+    const t = ctx.currentTime;
+
+    // Estalo agudo de trava mecânica metálica
+    const clickOsc = ctx.createOscillator();
+    const clickGain = ctx.createGain();
+    clickOsc.type = 'square';
+    clickOsc.frequency.setValueAtTime(1400, t);
+    clickOsc.frequency.exponentialRampToValueAtTime(300, t + 0.04);
+    clickGain.gain.setValueAtTime(0.18, t);
+    clickGain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+    clickOsc.connect(clickGain);
+    clickGain.connect(ctx.destination);
+    clickOsc.start(t);
+    clickOsc.stop(t + 0.04);
+
+    // Baque grave de mola e fechamento de contato de cobre pesado
+    const thudOsc = ctx.createOscillator();
+    const thudGain = ctx.createGain();
+    thudOsc.type = 'triangle';
+    thudOsc.frequency.setValueAtTime(180, t + 0.03);
+    thudOsc.frequency.exponentialRampToValueAtTime(45, t + 0.18);
+    thudGain.gain.setValueAtTime(0.3, t + 0.03);
+    thudGain.gain.exponentialRampToValueAtTime(0.001, t + 0.20);
+    thudOsc.connect(thudGain);
+    thudGain.connect(ctx.destination);
+    thudOsc.start(t + 0.03);
+    thudOsc.stop(t + 0.20);
+  } catch (e) {
+    console.warn('AudioContext breakerReset falhou:', e);
+  }
+}

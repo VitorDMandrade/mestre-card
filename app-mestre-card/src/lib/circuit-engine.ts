@@ -62,8 +62,8 @@ export function buildCircuitNodes(card: any): CircuitNode[] {
   const structure = card?.sec03_structure || {};
   const causalChain = structure?.causalChain;
 
-  // 1. Caso Qualitativo (Cadeia Causal clássica)
-  if (causalChain) {
+  // 1. Caso Qualitativo (Cadeia Causal clássica de 5 etapas)
+  if (causalChain && (causalChain.causes || causalChain.agents || causalChain.mechanisms)) {
     const qualitativeDefs = [
       {
         label: 'TERMINAL 01: POLO GERADOR',
@@ -121,61 +121,91 @@ export function buildCircuitNodes(card: any): CircuitNode[] {
     });
   }
 
-  // 2. Caso Quantitativo (Proporcionalidade de Fórmulas e Grandezas)
-  if (Array.isArray(structure?.proportionality) && structure.proportionality.length > 0) {
-    const props = structure.proportionality.slice(0, 5);
-    return props.map((prop: any, idx: number) => {
-      const propText = typeof prop === 'string' ? prop : (prop.rule || prop.statement || JSON.stringify(prop));
-      const correct = truncateForOption(propText);
-      const distractor1 = `Relação inversa: grandezas variam em razões assintóticas desbalanceadas.`;
-      const distractor2 = `Invariância estática: o parâmetro não responde à variação dos fatores de contorno.`;
+  // 2. Caso Quantitativo / Híbrido: constrói SEMPRE 5 terminais interligados
+  const candidateNodes: { label: string; name: string; icon: string; badge: string; correct: string }[] = [];
 
-      const badges = [
-        'bg-amber-950/70 border-amber-500/50 text-amber-300',
-        'bg-blue-950/70 border-blue-500/50 text-blue-300',
-        'bg-emerald-950/70 border-emerald-500/50 text-emerald-300',
-        'bg-red-950/70 border-red-500/50 text-red-300',
-        'bg-purple-950/70 border-purple-500/50 text-purple-300'
-      ];
-      const icons = ['📐', '⚡', '🔄', '⚖️', '🎯'];
-
-      return {
-        id: `prop-node-${idx + 1}`,
-        stageIndex: idx,
-        terminalLabel: `TERMINAL 0${idx + 1}: CALIBRAÇÃO S.I.`,
-        stageName: `Relação Proporcional 0${idx + 1}`,
-        badgeClass: badges[idx % badges.length],
-        icon: icons[idx % icons.length],
-        correctAnswer: correct,
-        options: shuffleArray([correct, distractor1, distractor2])
-      };
+  // Terminal 01: Função de Estado Primária (FormulaChamber)
+  if (Array.isArray(structure?.formulaChamber) && structure.formulaChamber.length > 0) {
+    const f0 = structure.formulaChamber[0];
+    candidateNodes.push({
+      label: 'TERMINAL 01: POLO GERADOR',
+      name: f0.title || 'Função de Estado Primária',
+      icon: '🏛️',
+      badge: 'bg-amber-950/70 border-amber-500/50 text-amber-300',
+      correct: truncateForOption(f0.notes || `${f0.title}: Lei fundamental que rege o balanço do sistema.`)
     });
   }
 
-  // 3. Fallback genérico a partir dos eixos temáticos se o card não possuir sec03 estruturada
-  const fallbackAxes = card?.sec01_header?.thematicAxes || [
-    'Fundamentos Conceituais',
-    'Agentes & Dinâmica',
-    'Mecanismos de Operação',
-    'Impactos Imediatos',
-    'Desdobramentos na TRI'
+  // Terminal 02: Dissecação Anatômica S.I. (Variables)
+  if (Array.isArray(structure?.variables) && structure.variables.length > 0) {
+    const v0 = structure.variables[0];
+    candidateNodes.push({
+      label: 'TERMINAL 02: CONDUTOR ATIVO',
+      name: `Dissecação S.I. (${v0.symbol || 'Grandeza'})`,
+      icon: '📐',
+      badge: 'bg-blue-950/70 border-blue-500/50 text-blue-300',
+      correct: truncateForOption(`${v0.meaning || 'Grandeza'}: expressa em ${v0.siUnit || 'S.I.'}${v0.conversions ? ` (${v0.conversions})` : ''}`)
+    });
+  }
+
+  // Terminais de Proporcionalidade
+  if (Array.isArray(structure?.proportionality) && structure.proportionality.length > 0) {
+    structure.proportionality.forEach((prop: any, pIdx: number) => {
+      const propText = typeof prop === 'string' ? prop : (prop.rule || prop.statement || JSON.stringify(prop));
+      candidateNodes.push({
+        label: `TERMINAL 0${candidateNodes.length + 1}: CALIBRAÇÃO DINÂMICA`,
+        name: `Proporcionalidade 0${pIdx + 1}`,
+        icon: '🔄',
+        badge: 'bg-emerald-950/70 border-emerald-500/50 text-emerald-300',
+        correct: truncateForOption(propText)
+      });
+    });
+  }
+
+  // Terminal de Mecanismo Secundário se houver 2ª fórmula
+  if (Array.isArray(structure?.formulaChamber) && structure.formulaChamber.length > 1 && candidateNodes.length < 5) {
+    const f1 = structure.formulaChamber[1];
+    candidateNodes.push({
+      label: `TERMINAL 0${candidateNodes.length + 1}: SAÍDA DE CARGA`,
+      name: f1.title || 'Mecanismo Secundário',
+      icon: '⚙️',
+      badge: 'bg-red-950/70 border-red-500/50 text-red-300',
+      correct: truncateForOption(f1.notes || `${f1.title}: Rege a conversão e quebra/formação das ligações.`)
+    });
+  }
+
+  // Preenche até 5 com eixos temáticos se necessário
+  const thematicAxes = card?.sec01_header?.thematicAxes || [
+    'Conservação de Carga & Balanço Energético',
+    'Convergência Estequiométrica na TRI',
+    'Estabilidade do Produto Reacional'
   ];
 
-  return fallbackAxes.slice(0, 5).map((axis: string, idx: number) => {
-    const correct = truncateForOption(axis);
+  let axIdx = 0;
+  while (candidateNodes.length < 5) {
+    const axis = thematicAxes[axIdx % thematicAxes.length];
+    candidateNodes.push({
+      label: `TERMINAL 0${candidateNodes.length + 1}: REDE DISTRIBUÍDA`,
+      name: `Acoplamento TRI 0${candidateNodes.length + 1}`,
+      icon: '🌐',
+      badge: 'bg-purple-950/70 border-purple-500/50 text-purple-300',
+      correct: truncateForOption(`Princípio de nexo causal: ${axis}`)
+    });
+    axIdx++;
+  }
+
+  return candidateNodes.slice(0, 5).map((node, idx) => {
+    const distractor1 = DISTRACTOR_TEMPLATES[idx % DISTRACTOR_TEMPLATES.length];
+    const distractor2 = `Inversão de grandezas: gradiente de fluxo opera em sentido oposto às leis do equilíbrio.`;
     return {
-      id: `fallback-node-${idx + 1}`,
+      id: `prop-node-${idx + 1}`,
       stageIndex: idx,
-      terminalLabel: `TERMINAL 0${idx + 1}: EIXO ESTRUTURAL`,
-      stageName: `Eixo ${idx + 1}`,
-      badgeClass: 'bg-cyan-950/70 border-cyan-500/50 text-cyan-300',
-      icon: '⚙️',
-      correctAnswer: correct,
-      options: shuffleArray([
-        correct,
-        DISTRACTOR_TEMPLATES[idx % DISTRACTOR_TEMPLATES.length],
-        `Dispersão inercial: o conceito é desacoplado da matriz de competência.`
-      ])
+      terminalLabel: node.label,
+      stageName: node.name,
+      badgeClass: node.badge,
+      icon: node.icon,
+      correctAnswer: node.correct,
+      options: shuffleArray([node.correct, distractor1, distractor2])
     };
   });
 }

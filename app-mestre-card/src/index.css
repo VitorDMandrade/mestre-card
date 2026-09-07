@@ -655,3 +655,86 @@
 .short-circuit-active {
   animation: breakerSpark 0.25s ease-in-out infinite alternate;
 }
+
+/* Faixas Industriais de Advertência (Hazard Stripes) */
+.hazard-stripes-amber {
+  background: repeating-linear-gradient(
+    -45deg,
+    #ffb800,
+    #ffb800 10px,
+    #0f172a 10px,
+    #0f172a 20px
+  );
+}
+
+.hazard-stripes-danger {
+  background: repeating-linear-gradient(
+    -45deg,
+    #ff2a55,
+    #ff2a55 10px,
+    #1e0a12 10px,
+    #1e0a12 20px
+  );
+}
+
+/* Alavanca de Disjuntor Industrial Bipolar 3D */
+.breaker-housing-3d {
+  background: linear-gradient(145deg, #1e293b, #090d16);
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.1), inset 0 -3px 6px rgba(0, 0, 0, 0.8), 0 8px 20px rgba(0, 0, 0, 0.6);
+  border: 2px solid #334155;
+  position: relative;
+}
+
+.breaker-lever-arm {
+  transform-origin: center bottom;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.breaker-lever-arm.tripped {
+  transform: rotate(38deg) translateY(6px);
+  filter: drop-shadow(0 0 12px rgba(255, 42, 85, 0.8));
+}
+
+.breaker-lever-arm.armed {
+  transform: rotate(-3deg) translateY(0);
+  filter: drop-shadow(0 0 8px rgba(0, 245, 255, 0.4));
+}
+
+/* Pulso de plasma nos cabos de alta tensão */
+@keyframes plasmaFlow {
+  0% { stroke-dashoffset: 100; opacity: 0.6; }
+  50% { opacity: 1; filter: drop-shadow(0 0 10px #00f5ff); }
+  100% { stroke-dashoffset: 0; opacity: 0.6; }
+}
+
+.plasma-cable-active {
+  stroke-dasharray: 12 8;
+  animation: plasmaFlow 0.8s linear infinite;
+}
+
+/* Conectores / Plugs Táticos */
+.plug-card-tactile {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(9, 13, 22, 0.95));
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: all 0.2s ease-out;
+}
+
+.plug-card-tactile:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 8px 25px rgba(0, 245, 255, 0.2), inset 0 0 15px rgba(0, 245, 255, 0.1);
+  border-color: rgba(0, 245, 255, 0.6);
+}
+
+/* Tremor de tela por curto-circuito */
+@keyframes screenGlitchShake {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-3px, 2px); }
+  40% { transform: translate(3px, -2px); }
+  60% { transform: translate(-2px, -1px); }
+  80% { transform: translate(2px, 2px); }
+  100% { transform: translate(0, 0); }
+}
+
+.screen-shake-short {
+  animation: screenGlitchShake 0.3s ease-in-out;
+}
