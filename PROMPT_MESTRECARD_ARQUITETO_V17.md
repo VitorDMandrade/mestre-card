@@ -86,7 +86,7 @@ O usuário possui acesso estendido ao Gemini e exige **esgotamento conceitual ab
      - `applicantPhoto`: Caminho da imagem atribuída (`"./inspection/postulant-1.png"` até `"./inspection/postulant-8.png"`).
      - `allegedThesis`: Texto longo e formal do parecer ou petição defendida pelo postulante (1 a 2 parágrafos técnicos).
      - `claimedConcepts`: Array de **3 a 5 termos técnicos** presentes no parecer.
-     - `suspiciousTerms`: Array com **2 a 4 palavras ou expressões suspeitas extraídas literalmente do parecer**, que o inspetor pode isolar na bancada (ex: `["ocupação puramente declaratória", "reciprocidade tarifária irrestrita", "soberania compartilhada"]`).
+     - `suspiciousTerms`: Array com **2 a 4 palavras ou expressões-chave extraídas literalmente do parecer**, que o inspetor pode isolar na bancada para confrontar com o manual. (OBRIGATÓRIO para todos os casos, sejam legítimos ou fraudulentos, garantindo que o estudante sempre precise investigar e não adivinhe a resposta apenas pela presença de termos).
      - `isFraudulent`: `boolean` (distribua balanceadamente: metade casos legítimos/conformes, metade fraudulentos/inconsistentes).
      - `contradictionTrigger`: Expressão central que deflagra a contradição teórica (ex: `"Ocupação meramente simbólica em desacordo com a Conferência de Berlim"`).
      - `targetRuleId`: ID da regra do manual ministerial com a qual o caso deve ser confrontado (ex: `"rule-theory-0"`, `"rule-trap-0"`, `"rule-theory-1"`, `"rule-trap-1"`).

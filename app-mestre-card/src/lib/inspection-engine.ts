@@ -38,6 +38,79 @@ const APPLICANT_PROFILES = [
 ];
 
 /**
+ * Helper resiliente para extrair termos e premissas candidatos para investigação/confronto.
+ * Garante que TODO e qualquer caso (seja legítimo ou fraudulento) possua de 2 a 4 termos investigáveis.
+ */
+export function extractCandidateTerms(statement: string, fallbackConcepts: string[] = []): string[] {
+  if (!statement) return ['Premissa Geral', 'Diretriz Oficial'];
+
+  const clean = statement.replace(/[*_~`"“”]/g, ' ').trim();
+  const candidates: string[] = [];
+
+  // 1. Extrair expressões entre aspas originais
+  const quoteMatches = statement.match(/["“]([^"”]{4,45})["”]/g);
+  if (quoteMatches) {
+    quoteMatches.forEach(q => {
+      const trimmed = q.replace(/["“”]/g, '').trim();
+      if (trimmed.length >= 4 && !candidates.includes(trimmed)) {
+        candidates.push(trimmed);
+      }
+    });
+  }
+
+  // 2. Extrair termos técnicos/conceituais com regex de palavras-chave clássicas
+  const keywordMatches = clean.match(/\b(?:capitalismo\s+\w+|revolução\s+\w+|darwinismo\s+\w+|conferência\s+de\s+\w+|fardo\s+do\s+\w+|missão\s+\w+|entalpia\s+\w*|endot[ée]rmic\w+|exot[ée]rmic\w+|princípio\s+de\s+\w+|lei\s+de\s+\w+|reação\s+\w+|termodinâmica|eletrodinâmica|cinética|equilíbrio|velocidade|aceleração|gravidade|transformação|oxirredução|citologia|genética|fisiologia|reagente|soluto|solvente|pressão|temperatura|volume|concentração|proporcional\w*|inversamente\s+\w+|diretamente\s+\w+|superprodução|subconsumo|monopolista|financeiro|ocupação\s+\w+|imperialism\w+|colonial\w+|hegemonia)\b/gi);
+  if (keywordMatches) {
+    keywordMatches.forEach(k => {
+      const norm = k.trim();
+      if (norm.length >= 4 && !candidates.some(c => c.toLowerCase() === norm.toLowerCase())) {
+        candidates.push(norm);
+      }
+    });
+  }
+
+  // 3. Extrair expressões nominais capitalizadas (ex: "Segunda Revolução Industrial", "Herbert Spencer", "Tratado de Berlim")
+  const capitalizedMatches = clean.match(/\b[A-ZÁÉÍÓÚÂÊÔÃÕ][a-záéíóúâêôãõç]+(?:\s+(?:de|da|do|dos|das|e)?\s+[A-ZÁÉÍÓÚÂÊÔÃÕ][a-záéíóúâêôãõç]+){1,3}\b/g);
+  if (capitalizedMatches) {
+    capitalizedMatches.forEach(cap => {
+      const norm = cap.trim();
+      if (norm.length >= 5 && !['Para Fins', 'Em Resposta', 'Ministério Do', 'Solicito Deferimento', 'Dossiê De', 'Atesto A', 'Requeiro A'].some(stop => norm.startsWith(stop))) {
+        if (!candidates.some(c => c.toLowerCase() === norm.toLowerCase())) {
+          candidates.push(norm);
+        }
+      }
+    });
+  }
+
+  // 4. Incluir conceitos de fallback se disponíveis
+  if (fallbackConcepts && fallbackConcepts.length > 0) {
+    fallbackConcepts.forEach(fc => {
+      if (fc && fc.length >= 3 && !candidates.some(c => c.toLowerCase() === fc.toLowerCase())) {
+        candidates.push(fc);
+      }
+    });
+  }
+
+  // 5. Se ainda tiver menos de 2 candidatos, extrair orações substantivas
+  if (candidates.length < 2) {
+    const clauses = clean.split(/[,;–—\.]/).map(s => s.trim()).filter(s => s.length >= 10 && s.length <= 45);
+    clauses.forEach(cl => {
+      if (!candidates.some(c => c.toLowerCase() === cl.toLowerCase())) {
+        candidates.push(cl);
+      }
+    });
+  }
+
+  // Garante de 2 a 4 termos limpos e sem redundância
+  const result = candidates
+    .map(c => c.replace(/^["'\s]+|["'\s]+$/g, ''))
+    .filter(c => c.length >= 3 && c.length <= 50)
+    .slice(0, 4);
+
+  return result.length >= 2 ? result : [...result, 'Premissa Teórica', 'Diretriz Oficial'].slice(0, 3);
+}
+
+/**
  * Gera casos de inspeção documental de altíssima densidade a partir de qualquer MestreCard
  */
 export function generateInspectionCases(card: MestreCardData): InspectionCase[] {
@@ -45,14 +118,21 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
   if (card.sec07_arcade?.inspectionCases && card.sec07_arcade.inspectionCases.length > 0) {
     return card.sec07_arcade.inspectionCases.map((c, i) => {
       const profile = APPLICANT_PROFILES[i % APPLICANT_PROFILES.length];
+      const rawThesis = c.thesisStatement || (c as any).allegedThesis || '';
+      const candidateTerms = (c.suspiciousTerms && c.suspiciousTerms.length > 0)
+        ? c.suspiciousTerms
+        : extractCandidateTerms(rawThesis, c.claimedConcepts);
+
       return {
         ...c,
+        thesisStatement: rawThesis || `\"Parecer técnico sob análise para fins de homologação perante o Ministério.\"`,
         applicantName: c.applicantName || profile.name,
         applicantTitle: c.applicantTitle || profile.title,
         applicantPhoto: c.applicantPhoto || profile.photo,
         department: c.department || profile.dept,
         fileNumber: c.fileNumber || `MKA-88-${2000 + i * 421}`,
-        suspiciousTerms: c.suspiciousTerms || (c.contradictionTrigger ? [c.contradictionTrigger] : undefined)
+        suspiciousTerms: candidateTerms,
+        targetRuleId: c.targetRuleId || (c.isFraudulent ? 'rule-trap-0' : 'rule-theory-0')
       };
     });
   }
@@ -70,6 +150,7 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
       const cleanAnalysis = spot.analysis.replace(/[*_~`]/g, '').trim();
       const parts = cleanAnalysis.split(/\s*\/\/\s*/);
       const mythPart = parts[0] || cleanAnalysis;
+      const candidateTerms = extractCandidateTerms(cleanAnalysis, [spot.title, card.topic]);
 
       cases.push({
         id: `case-fraud-bs-${i}`,
@@ -83,7 +164,7 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
         isFraudulent: true,
         fraudReason: `ANOMALIA DETECTADA: O documento defende uma falácia clássica de banca (${spot.title}). ${cleanAnalysis} Não atende ao rigor científico oficial.`,
         contradictionTrigger: mythPart,
-        suspiciousTerms: [spot.title, mythPart.substring(0, 55)].filter(Boolean),
+        suspiciousTerms: candidateTerms,
         targetRuleId: `rule-trap-${i}`,
         denialReason: `FALÁCIA DE BANCA: ${(spot.title || 'PONTO CEGO').toUpperCase()}`,
         interrogation: {
@@ -113,6 +194,8 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
         theoryTargetIdx = found >= 0 ? found : (i % card.sec02_theory.blocks.length);
       }
 
+      const candidateTerms = extractCandidateTerms(cleanStatement, [card.topic]);
+
       cases.push({
         id: `case-tf-${i}`,
         applicantName: profile.name,
@@ -127,13 +210,8 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
           ? `FRAUDE CONCEITUAL: A afirmativa contraria os preceitos científicos do Ministério. Motivo: ${cleanFeedback}`
           : undefined,
         contradictionTrigger: !tf.isTrue ? cleanStatement : undefined,
-        suspiciousTerms: !tf.isTrue 
-          ? [
-              cleanStatement.length > 50 ? cleanStatement.substring(0, 50) + '...' : cleanStatement,
-              ...(cleanStatement.match(/(?:endotérmic\w+|exotérmic\w+|inverte\w*|proporcional\w*|positiv\w+|negativ\w+|independ\w+|exclusiva\w+|sempre|nunca|maior|menor|constante|aument\w+|diminui\w+)/gi) || [])
-            ].filter((v, idx, arr) => arr.indexOf(v) === idx).slice(0, 3)
-          : undefined,
-        targetRuleId: !tf.isTrue ? `rule-theory-${theoryTargetIdx}` : undefined,
+        suspiciousTerms: candidateTerms,
+        targetRuleId: `rule-theory-${theoryTargetIdx}`,
         denialReason: !tf.isTrue ? `VIOLAÇÃO: ARTIGO ${theoryTargetIdx + 1}` : undefined,
         interrogation: {
           postulantExcuse: !tf.isTrue
@@ -154,10 +232,12 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
     card.sec05_lab.questions.slice(0, 3).forEach((q, i) => {
       const correctOpt = q.options.find(o => o.isCorrect);
       const wrongOpt = q.options.find(o => !o.isCorrect);
+      const theoryTargetIdx = i % (card.sec02_theory?.blocks?.length || 1);
 
       // Gera um caso legítimo com a resposta correta
       if (correctOpt) {
         const profile = APPLICANT_PROFILES[(caseIdx++) % APPLICANT_PROFILES.length];
+        const candidateTerms = extractCandidateTerms(correctOpt.text, [card.topic, 'Resolução Homologada']);
         cases.push({
           id: `case-lab-valid-${i}`,
           applicantName: profile.name,
@@ -168,6 +248,8 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
           thesisStatement: `\"Em resposta à demanda de triagem de ${card.title} (${q.enunciado.substring(0, 100)}...), certifico a validade da seguinte conclusão: ${correctOpt.text}\"`,
           claimedConcepts: [card.topic, 'Resolução Homologada'],
           isFraudulent: false,
+          suspiciousTerms: candidateTerms,
+          targetRuleId: `rule-theory-${theoryTargetIdx}`,
           interrogation: {
             postulantExcuse: `\"Inspetor, o cálculo e a justificativa foram demonstrados na íntegra de acordo com o padrão de prova.\"`,
             inspectorVerdict: `\"Conforme. Resolução validada pela banca examinadora do Ministério.\"`
@@ -180,6 +262,7 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
       // Gera um caso fraudulento com um distrator atraente
       if (wrongOpt) {
         const profile = APPLICANT_PROFILES[(caseIdx++) % APPLICANT_PROFILES.length];
+        const candidateTerms = extractCandidateTerms(wrongOpt.text, [card.topic, 'Distrator Incorreto']);
         cases.push({
           id: `case-lab-fraud-${i}`,
           applicantName: profile.name,
@@ -192,10 +275,7 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
           isFraudulent: true,
           fraudReason: `DISTRAÇÃO TÁTICA DETECTADA: ${q.resolution?.distractorAnalysis || 'Esta opção contém uma falha sutil de banca e deve ser reprovada.'}`,
           contradictionTrigger: wrongOpt.text,
-          suspiciousTerms: [
-            wrongOpt.text.length > 55 ? wrongOpt.text.substring(0, 55) + '...' : wrongOpt.text,
-            ...(wrongOpt.text.match(/(?:endotérmic\w+|exotérmic\w+|inverte\w*|proporcional\w*|positiv\w+|negativ\w+|independ\w+|exclusiva\w+|sempre|nunca|maior|menor|constante|aument\w+|diminui\w+)/gi) || [])
-          ].filter((v, idx, arr) => arr.indexOf(v) === idx).slice(0, 3),
+          suspiciousTerms: candidateTerms,
           targetRuleId: card.sec04_radar?.blindSpots?.length ? 'rule-trap-0' : 'rule-theory-0',
           denialReason: 'DISTRAÇÃO TÁTICA: PREMISSA INCORRETA',
           interrogation: {
@@ -214,6 +294,7 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
     card.sec02_theory.blocks.forEach((block, i) => {
       const profile = APPLICANT_PROFILES[(caseIdx++) % APPLICANT_PROFILES.length];
       const cleanContent = block.content.replace(/[*_~`$]/g, '').substring(0, 160);
+      const candidateTerms = extractCandidateTerms(cleanContent, [block.title, card.topic]);
       cases.push({
         id: `case-theory-${i}`,
         applicantName: profile.name,
@@ -224,6 +305,8 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
         thesisStatement: `\"Dossiê de Fundamentação [${block.title}]: Atesto a rigorosa aplicação das leis de ${card.title}. Constata-se que: ${cleanContent}...\"`,
         claimedConcepts: [card.topic, block.title],
         isFraudulent: false,
+        suspiciousTerms: candidateTerms,
+        targetRuleId: `rule-theory-${i}`,
         interrogation: {
           postulantExcuse: `\"Inspetor, transcrevo fielmente o Artigo Oficial ${block.number || i + 1} para registro do protocolo.\"`,
           inspectorVerdict: `\"Homologado. Conteúdo canônico conferido perante a Lei Geral.\"`
