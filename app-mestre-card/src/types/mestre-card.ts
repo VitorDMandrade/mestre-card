@@ -159,6 +159,11 @@ export interface StudySessionRecord {
   };
 }
 
+export interface InterrogationDialog {
+  postulantExcuse: string;
+  inspectorVerdict: string;
+}
+
 export interface InspectionCase {
   id: string;
   applicantName: string;
@@ -170,6 +175,8 @@ export interface InspectionCase {
   claimedConcepts: string[]; // Conceitos alegados
   isFraudulent: boolean; // true = contém erro / distrator / falácia; false = 100% rigoroso
   fraudReason?: string; // Por que o documento é fraudulento / distrator
+  contradictionTrigger?: string; // Frase ou trecho exato que contém o erro conceitual
+  interrogation?: InterrogationDialog; // Diálogo de confronto dialético
   relevantRuleSnippet?: string; // Norma oficial / trecho do manual para confronto
   difficulty: 'Normal' | 'Crítico' | 'Armadilha TRI';
 }

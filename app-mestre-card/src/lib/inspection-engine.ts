@@ -52,6 +52,8 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
 
       // Extrai a tese distorcida ou a afirmação que parece convincente mas é armadilha
       const cleanAnalysis = spot.analysis.replace(/[*_~`]/g, '').trim();
+      const parts = cleanAnalysis.split(/\s*\/\/\s*/);
+      const mythPart = parts[0] || cleanAnalysis;
 
       cases.push({
         id: `case-fraud-bs-${i}`,
@@ -64,6 +66,11 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
         claimedConcepts: [card.topic, spot.title || 'Distrator Clássico'],
         isFraudulent: true,
         fraudReason: `ANOMALIA DETECTADA: O documento defende uma falácia clássica de banca (${spot.title}). ${cleanAnalysis} Não atende ao rigor científico oficial.`,
+        contradictionTrigger: mythPart,
+        interrogation: {
+          postulantExcuse: `\"Mas senhor Inspetor, no cotidiano e em muitas provas costuma-se aceitar que ${spot.title}! Por que essa premissa seria uma anomalia documental?\"`,
+          inspectorVerdict: `\"Negativo. O Ministério veda expressamente essa falácia: ${cleanAnalysis}. A prova pune quem restringe o conceito a essa armadilha.\"`
+        },
         relevantRuleSnippet: `Manual MKA - Eixo de Blindagem: Falsas correlações sobre ${card.topic} devem ser sumariamente denegadas.`,
         difficulty: 'Armadilha TRI'
       });
@@ -91,6 +98,15 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
         fraudReason: !tf.isTrue 
           ? `FRAUDE CONCEITUAL: A afirmativa contraria os preceitos científicos do Ministério. Motivo: ${cleanFeedback}`
           : undefined,
+        contradictionTrigger: !tf.isTrue ? cleanStatement : undefined,
+        interrogation: {
+          postulantExcuse: !tf.isTrue
+            ? `\"Inspetor de turno, peço deferimento! Essa afirmação parece perfeitamente lógica e consistente à primeira vista!\"`
+            : `\"Inspetor, os autos foram revisados e conferem 100% com o regulamento oficial de ${card.title}.\"`,
+          inspectorVerdict: !tf.isTrue
+            ? `\"Indeferido. A premissa incorre em contradição direta: ${cleanFeedback || 'Violação dos cânones científicos oficiais.'}\"`
+            : `\"Conforme. A tese observa rigorosamente a verdade teórica homologada.\"`
+        },
         relevantRuleSnippet: cleanFeedback || `Conforme os cânones oficiais de ${card.title}, todas as premissas devem observar a correlação formal.`,
         difficulty: tf.isTrue ? 'Normal' : 'Crítico'
       });
@@ -116,6 +132,10 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
           thesisStatement: `\"Em resposta à demanda de triagem de ${card.title} (${q.enunciado.substring(0, 100)}...), certifico a validade da seguinte conclusão: ${correctOpt.text}\"`,
           claimedConcepts: [card.topic, 'Resolução Homologada'],
           isFraudulent: false,
+          interrogation: {
+            postulantExcuse: `\"Inspetor, o cálculo e a justificativa foram demonstrados na íntegra de acordo com o padrão de prova.\"`,
+            inspectorVerdict: `\"Conforme. Resolução validada pela banca examinadora do Ministério.\"`
+          },
           relevantRuleSnippet: q.resolution?.technicalVerdict || `Atestado pelo comitê técnico do Ministério.`,
           difficulty: 'Normal'
         });
@@ -135,6 +155,11 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
           claimedConcepts: [card.topic, 'Distrator Incorreto'],
           isFraudulent: true,
           fraudReason: `DISTRAÇÃO TÁTICA DETECTADA: ${q.resolution?.distractorAnalysis || 'Esta opção contém uma falha sutil de banca e deve ser reprovada.'}`,
+          contradictionTrigger: wrongOpt.text,
+          interrogation: {
+            postulantExcuse: `\"Auditor, essa conclusão foi obtida aplicando o enunciado diretamente. Por que apontar como distrator inválido?\"`,
+            inspectorVerdict: `\"Denegação mandatória. ${q.resolution?.distractorAnalysis || 'Esta alternativa é uma armadilha calculada e viola as leis canônicas da matéria.'}\"`
+          },
           relevantRuleSnippet: q.resolution?.technicalVerdict || `O Ministério exige conformidade com as leis de ${card.topic}.`,
           difficulty: 'Armadilha TRI'
         });
@@ -157,6 +182,10 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
         thesisStatement: `\"Dossiê de Fundamentação [${block.title}]: Atesto a rigorosa aplicação das leis de ${card.title}. Constata-se que: ${cleanContent}...\"`,
         claimedConcepts: [card.topic, block.title],
         isFraudulent: false,
+        interrogation: {
+          postulantExcuse: `\"Inspetor, transcrevo fielmente o Artigo Oficial ${block.number || i + 1} para registro do protocolo.\"`,
+          inspectorVerdict: `\"Homologado. Conteúdo canônico conferido perante a Lei Geral.\"`
+        },
         relevantRuleSnippet: `Artigo ${block.number}: ${block.title}. Todas as conclusões correlatas são válidas.`,
         difficulty: 'Normal'
       });

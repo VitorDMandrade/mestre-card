@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import type { MestreCardData, InspectionCase, InspectionVerdict } from '../../types/mestre-card';
+import type { MestreCardData, InspectionCase, InspectionVerdict, InterrogationDialog } from '../../types/mestre-card';
 import { generateInspectionCases } from '../../lib/inspection-engine';
 import { MathRenderer } from '../MathRenderer';
+import { DailyShiftModal } from './DailyShiftModal';
 import { useGame } from '../../context/GameContext';
 import { addXP } from '../../lib/xp-engine';
 import { 
@@ -49,6 +50,11 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
   // Estado de clique físico mecânico sincronizado ao teclado
   const [isAPressed, setIsAPressed] = useState(false);
   const [isDPressed, setIsDPressed] = useState(false);
+
+  // Modo de Investigação & Confronto Dialético (Fase 2A)
+  const [isInvestigationMode, setIsInvestigationMode] = useState(false);
+  const [activeInterrogation, setActiveInterrogation] = useState<InterrogationDialog | null>(null);
+  const [isDailyShiftModalOpen, setIsDailyShiftModalOpen] = useState(false);
 
   // Helper para limpar e estruturar mnemônicos sem asteriscos crus (**) ou barras (//)
   const renderRulebookMnemonic = (rule: string) => {
@@ -112,6 +118,8 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
   const [shiftStats, setShiftStats] = useState({
     totalProcessed: 0,
     correctVerdicts: 0,
+    correctApprovals: 0,
+    correctDenials: 0,
     fraudsIntercepted: 0,
     citationsReceived: 0,
     xpEarned: 0,
@@ -130,6 +138,21 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
     }, 250);
     return () => clearTimeout(timer);
   }, [currentIndex, soundEnabled]);
+
+  // Aponta discrepância no documento e abre interrogatório
+  const handleInspectDiscrepancy = useCallback(() => {
+    playTeletypeWarningSound(soundEnabled);
+    if (currentCase.interrogation) {
+      setActiveInterrogation(currentCase.interrogation);
+    } else {
+      setActiveInterrogation({
+        postulantExcuse: "Inspetor, declarei os autos de boa-fé segundo minha compreensão dos conceitos!",
+        inspectorVerdict: currentCase.isFraudulent 
+          ? `Negativo. O documento contraria as diretrizes: ${currentCase.fraudReason || 'Inconsistência formal detectada.'}`
+          : "Conforme. Não há discrepâncias formais detectadas neste parecer."
+      });
+    }
+  }, [currentCase, soundEnabled]);
 
   // Executa o veredito (Aprovar ou Denegar)
   const handleVerdict = useCallback((verdict: InspectionVerdict) => {
@@ -166,6 +189,8 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
         ...prev,
         totalProcessed: prev.totalProcessed + 1,
         correctVerdicts: prev.correctVerdicts + 1,
+        correctApprovals: !isFraud ? prev.correctApprovals + 1 : prev.correctApprovals,
+        correctDenials: isFraud ? prev.correctDenials + 1 : prev.correctDenials,
         fraudsIntercepted: isFraud ? prev.fraudsIntercepted + 1 : prev.fraudsIntercepted,
         xpEarned: prev.xpEarned + xpGained
       }));
@@ -207,10 +232,12 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
   const advanceToNextCase = () => {
     setCitation({ isOpen: false, title: '', message: '' });
     setStampStatus('none');
+    setActiveInterrogation(null);
 
     if (currentIndex + 1 >= cases.length) {
       // Turno concluído
       setShiftStats(prev => ({ ...prev, isShiftComplete: true }));
+      setIsDailyShiftModalOpen(true);
       playShutterSound(soundEnabled);
     } else {
       setIsTransitioning(true);
@@ -267,10 +294,14 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
   const handleRestartShift = () => {
     setCurrentIndex(0);
     setStampStatus('none');
+    setActiveInterrogation(null);
+    setIsDailyShiftModalOpen(false);
     setCitation({ isOpen: false, title: '', message: '' });
     setShiftStats({
       totalProcessed: 0,
       correctVerdicts: 0,
+      correctApprovals: 0,
+      correctDenials: 0,
       fraudsIntercepted: 0,
       citationsReceived: 0,
       xpEarned: 0,
@@ -327,6 +358,28 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
               </span>
             )}
           </div>
+
+          {/* BOTÃO MODO INVESTIGAR (Fase 2A - Apontamento de Discrepância) */}
+          <button
+            onClick={() => {
+              setIsInvestigationMode(prev => !prev);
+              playClickSound(soundEnabled);
+            }}
+            className={`px-3 py-1.5 rounded font-mono text-xs font-bold border transition-all flex items-center gap-1.5 cursor-pointer ${
+              isInvestigationMode 
+                ? 'bg-amber-900/80 border-amber-500 text-amber-200 shadow-[0_0_15px_rgba(245,158,11,0.5)] ring-2 ring-amber-500/50'
+                : 'bg-[#241c16] border-[#4a3525] text-stone-300 hover:border-amber-600 hover:text-white'
+            }`}
+            title="Ativar Modo de Investigação de Discrepâncias e Interrogatório"
+          >
+            <span>🔍</span>
+            <span>MODO INVESTIGAR</span>
+            {isInvestigationMode && (
+              <span className="px-1.5 py-0.2 bg-amber-500 text-black text-[9px] rounded font-black uppercase">
+                ATIVO
+              </span>
+            )}
+          </button>
 
           <button
             onClick={() => {
@@ -516,18 +569,123 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
 
               {/* TESE SUBMETIDA PARA AUDITORIA (Alto Contraste Estilo Dossiê Oficial Datilografado) */}
               <div className="space-y-3 my-4">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-[#5c4a3b] font-bold block border-b border-[#5c4a3b]/20 pb-1">
-                  ▶ TESE SUBMETIDA PELO POSTULANTE (AUDITAR CONTRADIÇÕES):
-                </span>
-                <div className="p-4 rounded-md bg-white/95 border-2 border-[#8c7864] shadow-sm">
+                <div className="flex items-center justify-between border-b border-[#5c4a3b]/20 pb-1">
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-[#5c4a3b] font-bold flex items-center gap-1.5">
+                    <span>▶</span>
+                    <span>TESE SUBMETIDA PELO POSTULANTE:</span>
+                  </span>
+                  {isInvestigationMode && (
+                    <span className="text-[10px] font-mono text-amber-900 bg-amber-200/90 px-2 py-0.5 rounded border border-amber-500 font-bold animate-pulse flex items-center gap-1">
+                      <span>🔍</span> CLIQUE NA TESE PARA CONFRONTAR
+                    </span>
+                  )}
+                </div>
+
+                <div 
+                  onClick={isInvestigationMode ? handleInspectDiscrepancy : undefined}
+                  className={`p-4 rounded-md bg-white/95 border-2 transition-all relative ${
+                    isInvestigationMode 
+                      ? 'border-amber-600 shadow-[0_0_15px_rgba(217,119,6,0.35)] cursor-pointer hover:bg-amber-50/90 ring-2 ring-amber-500/40' 
+                      : 'border-[#8c7864] shadow-sm'
+                  }`}
+                  title={isInvestigationMode ? "Clique para confrontar as alegações no interrogatório" : undefined}
+                >
+                  {isInvestigationMode && (
+                    <div className="absolute top-2 right-2 bg-amber-600 text-white text-[9px] font-mono px-1.5 py-0.5 rounded font-bold uppercase tracking-wider flex items-center gap-1 shadow">
+                      <span>⚡</span> APONTAR DISCREPÂNCIA
+                    </div>
+                  )}
+
                   <div className="text-zinc-950 font-mono font-bold text-sm leading-relaxed">
                     <MathRenderer 
                       content={currentCase.thesisStatement} 
                       textClassName="text-zinc-950 font-bold font-mono text-sm leading-relaxed" 
                     />
                   </div>
+
+                  {isInvestigationMode && currentCase.contradictionTrigger && (
+                    <div className="mt-2.5 pt-2 border-t border-amber-300/80 flex items-center gap-2 text-[11px] font-mono text-amber-950 bg-amber-100/90 p-1.5 rounded">
+                      <span className="font-black text-xs">⚠️ TRECHO SOB SUSPEITA:</span>
+                      <span className="underline decoration-amber-700 decoration-2 font-semibold">
+                        "{currentCase.contradictionTrigger}"
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
+
+              {/* FITA DE INTERROGATÓRIO E CONFRONTO DIALÉTICO (Fase 2A) */}
+              {activeInterrogation && (
+                <div className="my-3 p-3.5 rounded-lg bg-[#140f0c] border-2 border-amber-600/80 shadow-[0_0_20px_rgba(245,158,11,0.25)] font-mono space-y-3 animate-fade-in relative z-20">
+                  {/* Cabeçalho da fita */}
+                  <div className="flex items-center justify-between border-b border-[#3d2b1f] pb-1.5 text-[10px]">
+                    <div className="flex items-center gap-2 text-amber-400 font-bold tracking-wider">
+                      <span className="animate-pulse">🔴</span>
+                      <span>TELE-TIPO MKA // CONFRONTO DE EVIDÊNCIA EM TEMPO REAL</span>
+                    </div>
+                    <button
+                      onClick={() => setActiveInterrogation(null)}
+                      className="text-stone-400 hover:text-white px-1.5 py-0.5 rounded bg-[#241c16] border border-[#4a3525] text-[9px] cursor-pointer"
+                    >
+                      ✕ DISPENSAR
+                    </button>
+                  </div>
+
+                  {/* Diálogo em dois tempos */}
+                  <div className="space-y-2.5 text-xs">
+                    {/* Postulante */}
+                    <div className="flex items-start gap-2.5 bg-[#1e1712] p-2 rounded border border-[#423122]">
+                      <div className="w-8 h-8 rounded border border-stone-600 overflow-hidden flex-shrink-0 bg-black">
+                        <img 
+                          src={currentCase.applicantPhoto} 
+                          alt="Postulante" 
+                          className="w-full h-full object-cover grayscale"
+                        />
+                      </div>
+                      <div className="space-y-0.5 flex-1">
+                        <span className="text-[10px] text-stone-400 font-bold block">
+                          POSTULANTE ({currentCase.applicantName}):
+                        </span>
+                        <p className="text-amber-100 italic leading-relaxed">
+                          "{activeInterrogation.postulantExcuse}"
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Inspetor / Auditor */}
+                    <div className="flex items-start gap-2.5 bg-[#17120e] p-2 rounded border border-amber-900/50">
+                      <div className="w-8 h-8 rounded border border-amber-600/60 overflow-hidden flex-shrink-0 bg-black flex items-center justify-center">
+                        <img 
+                          src="./inspection/ministry-seal.jpg" 
+                          alt="MKA Seal" 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="space-y-0.5 flex-1">
+                        <span className="text-[10px] text-amber-400 font-bold block flex items-center gap-1.5">
+                          <span>INSPEÇÃO MKA // PARECER TÉCNICO:</span>
+                          <span className={`px-1 rounded text-[9px] font-bold ${currentCase.isFraudulent ? 'bg-red-900/80 text-red-200' : 'bg-emerald-900/80 text-emerald-200'}`}>
+                            {currentCase.isFraudulent ? 'INCONSISTÊNCIA CONFIRMADA' : 'CONFORME'}
+                          </span>
+                        </span>
+                        <div className="text-stone-200 font-sans leading-relaxed">
+                          <MathRenderer content={activeInterrogation.inspectorVerdict} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Orientação tática da mesa */}
+                  <div className="text-[10px] text-stone-400 border-t border-[#3d2b1f] pt-1.5 flex items-center justify-between">
+                    <span className="text-amber-500 font-bold">
+                      {currentCase.isFraudulent 
+                        ? '🚨 RECOMENDAÇÃO: APLIQUE CARIMBO DENEGADO (FRAUDE)'
+                        : '✅ RECOMENDAÇÃO: APLIQUE CARIMBO HOMÓLOGO'}
+                    </span>
+                    <span className="text-[9px] text-stone-500">PROCESSO Nº {currentCase.fileNumber}</span>
+                  </div>
+                </div>
+              )}
 
               {/* Chips de Conceitos Declarados */}
               <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-[#5c4a3b]/30 text-[10px] font-mono">
@@ -580,7 +738,11 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                 <button
                   onClick={() => handleVerdict('APPROVED')}
                   disabled={stampStatus !== 'none' || citation.isOpen}
-                  className={`btn-inspector-hybrid btn-hybrid-homologo group ${isAPressed ? 'pressed' : ''} disabled:opacity-40 disabled:cursor-not-allowed`}
+                  className={`btn-inspector-hybrid btn-hybrid-homologo group ${isAPressed ? 'pressed' : ''} ${
+                    activeInterrogation && !currentCase.isFraudulent 
+                      ? 'ring-4 ring-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.8)] animate-pulse' 
+                      : ''
+                  } disabled:opacity-40 disabled:cursor-not-allowed`}
                   title="Aprovar documento em conformidade (Tecla A / 1)"
                 >
                   <div className="pilot-lamp-housing">
@@ -600,7 +762,11 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                 <button
                   onClick={() => handleVerdict('DENIED')}
                   disabled={stampStatus !== 'none' || citation.isOpen}
-                  className={`btn-inspector-hybrid btn-hybrid-denegar group ${isDPressed ? 'pressed' : ''} disabled:opacity-40 disabled:cursor-not-allowed`}
+                  className={`btn-inspector-hybrid btn-hybrid-denegar group ${isDPressed ? 'pressed' : ''} ${
+                    activeInterrogation && currentCase.isFraudulent 
+                      ? 'ring-4 ring-red-500 shadow-[0_0_25px_rgba(239,68,68,0.9)] animate-pulse' 
+                      : ''
+                  } disabled:opacity-40 disabled:cursor-not-allowed`}
                   title="Denegar documento fraudulento (Tecla D / 2)"
                 >
                   <div className="pilot-lamp-housing">
@@ -727,6 +893,16 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
           </div>
         </div>
       )}
+
+      {/* BOLETIM DIÁRIO DE FECHAMENTO DE TURNO (Fase 2A - DailyShiftModal) */}
+      <DailyShiftModal
+        isOpen={isDailyShiftModalOpen}
+        onClose={() => setIsDailyShiftModalOpen(false)}
+        onRestartShift={handleRestartShift}
+        onExitToArcade={onClose || (() => {})}
+        topic={card.topic || card.title}
+        stats={shiftStats}
+      />
     </div>
   );
 };
