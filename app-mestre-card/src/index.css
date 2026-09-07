@@ -621,5 +621,37 @@
   transform: translateY(-1px) scale(1.02);
 }
 
+/* ==========================================================================
+   CIRCUITO CAUSAL INTERATIVO // REATOR DE ALTA TENSÃO (VIA 2)
+   ========================================================================== */
+:root {
+  --reactor-cyan: #00f5ff;
+  --reactor-cyan-glow: rgba(0, 245, 255, 0.45);
+  --reactor-amber: #ffb800;
+  --reactor-amber-glow: rgba(255, 184, 0, 0.4);
+  --reactor-breaker-red: #ff2a55;
+  --reactor-breaker-glow: rgba(255, 42, 85, 0.5);
+  --reactor-mesh-bg: #090d14;
+  --reactor-plate: rgba(15, 23, 42, 0.85);
+}
 
+@keyframes circuitPulse {
+  0% { stroke-dashoffset: 60; filter: drop-shadow(0 0 2px #00f5ff); }
+  50% { stroke-dashoffset: 0; filter: drop-shadow(0 0 8px #00f5ff); }
+  100% { stroke-dashoffset: -60; filter: drop-shadow(0 0 2px #00f5ff); }
+}
 
+@keyframes breakerSpark {
+  0% { opacity: 1; transform: scale(1); filter: drop-shadow(0 0 12px #ff2a55); }
+  50% { opacity: 0.4; transform: scale(1.02); filter: drop-shadow(0 0 24px #ff2a55); }
+  100% { opacity: 1; transform: scale(1); filter: drop-shadow(0 0 12px #ff2a55); }
+}
+
+.cable-energized {
+  stroke-dasharray: 8 6;
+  animation: circuitPulse 1.2s linear infinite;
+}
+
+.short-circuit-active {
+  animation: breakerSpark 0.25s ease-in-out infinite alternate;
+}

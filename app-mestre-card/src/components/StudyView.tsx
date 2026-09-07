@@ -146,7 +146,7 @@ export const StudyView: FC<StudyViewProps> = ({ card, onBack, queueInfo, onNextQ
           </ErrorBoundary>
           
           <ErrorBoundary fallbackTitle="Erro na Seção de Estrutura">
-            <StructureSection card={card} />
+            <StructureSection card={card} soundEnabled={soundEnabled} />
           </ErrorBoundary>
           
           <ErrorBoundary fallbackTitle="Erro na Seção de Radar">
