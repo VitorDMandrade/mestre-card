@@ -800,8 +800,9 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                     <span className="text-base">⚡</span>
                     <span className="tracking-wide">CONTRADIÇÃO COMPROVADA // VINCULADA AO MANUAL</span>
                   </div>
-                  <span className="text-[10px] bg-amber-900 text-amber-100 px-2 py-0.5 rounded uppercase font-black tracking-widest shadow-sm">
-                    {selectedSuspiciousTerm ? `"${selectedSuspiciousTerm}" ➔ ` : ''}{selectedRuleId || currentCase.targetRuleId || 'DIRETRIZ RECONHECIDA'}
+                  <span className="text-[10px] bg-amber-900 text-amber-100 px-2 py-0.5 rounded uppercase font-black tracking-widest shadow-sm flex items-center gap-1">
+                    {selectedSuspiciousTerm && <span>"{selectedSuspiciousTerm}" ➔</span>}
+                    <span>{selectedRuleId || currentCase.targetRuleId || 'DIRETRIZ RECONHECIDA'}</span>
                   </span>
                 </div>
               )}
