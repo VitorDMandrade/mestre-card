@@ -257,3 +257,38 @@
   filter: none;
 }
 
+/* Efeito de Impacto Mecânico do Carimbo (Papers, Please) */
+@keyframes stampImpact {
+  0% {
+    transform: scale(2.8);
+    opacity: 0;
+    filter: blur(4px);
+  }
+  50% {
+    transform: scale(0.92);
+    opacity: 0.95;
+    filter: blur(0px);
+  }
+  75% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-stamp-impact {
+  animation: stampImpact 0.22s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+}
+
+@keyframes bounceShort {
+  0%, 100% { transform: translate(-50%, 0); }
+  30% { transform: translate(-50%, -6px); }
+  60% { transform: translate(-50%, -2px); }
+}
+
+.animate-bounce-short {
+  animation: bounceShort 0.4s ease-out;
+}
+

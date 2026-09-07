@@ -158,3 +158,27 @@ export interface StudySessionRecord {
     [key: string]: any;
   };
 }
+
+export interface InspectionCase {
+  id: string;
+  applicantName: string;
+  applicantTitle: string;
+  applicantPhoto: string;
+  fileNumber: string;
+  department: string;
+  thesisStatement: string; // Parecer / afirmação submetida para homologação
+  claimedConcepts: string[]; // Conceitos alegados
+  isFraudulent: boolean; // true = contém erro / distrator / falácia; false = 100% rigoroso
+  fraudReason?: string; // Por que o documento é fraudulento / distrator
+  relevantRuleSnippet?: string; // Norma oficial / trecho do manual para confronto
+  difficulty: 'Normal' | 'Crítico' | 'Armadilha TRI';
+}
+
+export type InspectionVerdict = 'APPROVED' | 'DENIED';
+
+export interface InspectionResultRecord {
+  caseId: string;
+  verdict: InspectionVerdict;
+  isCorrect: boolean;
+  timestamp: number;
+}

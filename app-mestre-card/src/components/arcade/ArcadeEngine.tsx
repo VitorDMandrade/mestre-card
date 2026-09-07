@@ -5,6 +5,7 @@ import { GameMatch } from './GameMatch';
 import { GameTrueFalse } from './GameTrueFalse';
 import { GameOrder } from './GameOrder';
 import { GameOdd } from './GameOdd';
+import { InspectionDesk } from './InspectionDesk';
 import { ScoreScreen } from './ScoreScreen';
 import { calculateTRIScore } from '../../lib/tri-engine';
 import type { TRICalculationInput, TRIScoreResult } from '../../lib/tri-engine';
@@ -27,7 +28,7 @@ interface ArcadeEngineProps {
 }
 
 export interface SessionErrorLog {
-  game: 'G1' | 'G3' | 'G5';
+  game: 'G1' | 'G3' | 'G5' | 'Inspection';
   prompt: string;
   userWrongAnswer: string;
   explanation: string;
@@ -43,7 +44,7 @@ export const ArcadeEngine = ({
   onToggleHardcore,
   onApplyDamage
 }: ArcadeEngineProps) => {
-  const [activeTab, setActiveTab] = useState<'g1' | 'g2' | 'g3' | 'g4' | 'g5'>('g1');
+  const [activeTab, setActiveTab] = useState<'g1' | 'g2' | 'g3' | 'g4' | 'g5' | 'inspection'>('g1');
   
   // Game state tracking
   const [g1Results, setG1Results] = useState<{ hit: boolean; difficulty: string }[]>([]);
@@ -90,7 +91,7 @@ export const ArcadeEngine = ({
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
 
       if (e.key === ',' || e.key === '.') {
-        const tabs = ['g1', 'g2', 'g3', 'g4', 'g5'] as const;
+        const tabs = ['g1', 'g2', 'g3', 'g4', 'g5', 'inspection'] as const;
         const currentIdx = tabs.indexOf(activeTab);
         let nextIdx = e.key === '.' ? currentIdx + 1 : currentIdx - 1;
         if (nextIdx >= tabs.length) nextIdx = 0;
@@ -272,6 +273,34 @@ export const ArcadeEngine = ({
         </div>
       </div>
 
+      {/* Banner Tático de Destaque: Guichê Papers, Please */}
+      <div className="mb-6 p-4 rounded-xl border-2 border-amber-600/60 bg-gradient-to-r from-amber-950/40 via-stone-900/60 to-amber-950/40 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-[0_0_20px_rgba(245,158,11,0.2)]">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-full border border-amber-500/50 overflow-hidden bg-black/60 p-0.5 flex-shrink-0">
+            <img src="./inspection/ministry-seal.jpg" alt="MKA Seal" className="w-full h-full object-cover rounded-full" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="px-1.5 py-0.2 bg-amber-500/20 text-amber-300 font-mono text-[9px] rounded font-bold uppercase border border-amber-500/40">NOVA ENGINE</span>
+              <span className="text-xs font-mono font-bold text-amber-400">MINISTÉRIO DA VALIDAÇÃO ACADÊMICA</span>
+            </div>
+            <h3 className="text-sm font-bold text-white font-mono tracking-wide">
+              OPERAÇÃO PAPERS, PLEASE: AUDITORIA DE DOSSIÊS
+            </h3>
+            <p className="text-[11px] text-stone-400 font-serif">
+              Examine requerimentos e teses de prova com carimbos mecânicos, manuais oficiais e citações de infração.
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={() => setActiveTab('inspection')}
+          className="px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-black font-mono font-bold text-xs uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(245,158,11,0.4)] flex items-center gap-2 whitespace-nowrap cursor-pointer hover:scale-105"
+        >
+          <span>🛂 ASSUMIR O GUICHÊ</span>
+          <span>➔</span>
+        </button>
+      </div>
+
       {/* Tabs */}
       <div className="flex flex-wrap gap-2 mb-6 border-b border-slate-800 pb-4">
         {[
@@ -280,6 +309,7 @@ export const ArcadeEngine = ({
           { id: 'g3', label: '3. Pressão TRI', color: 'red' },
           { id: 'g4', label: '4. Ordenação Tática', color: 'amber' },
           { id: 'g5', label: '5. O Infiltrado', color: 'purple' },
+          { id: 'inspection', label: '🛂 6. Auditoria (Papers, Please)', color: 'amber' },
         ].map(t => {
           const isActive = activeTab === t.id;
           const isDone = gamesStatus[t.id as keyof typeof gamesStatus];
@@ -289,7 +319,9 @@ export const ArcadeEngine = ({
               onClick={() => setActiveTab(t.id as any)}
               className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-all border inline-flex items-center gap-1.5 ${
                 isActive 
-                  ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.5)] transform -translate-y-px' 
+                  ? t.id === 'inspection'
+                    ? 'bg-gradient-to-br from-amber-600 to-amber-700 text-black font-extrabold border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.5)] transform -translate-y-px'
+                    : 'bg-gradient-to-br from-blue-600 to-blue-700 text-white border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.5)] transform -translate-y-px' 
                   : 'bg-slate-800 text-gray-400 border-slate-700 hover:bg-slate-700'
               }`}
             >
@@ -303,6 +335,14 @@ export const ArcadeEngine = ({
       {/* Viewport protegido por ErrorBoundary */}
       <ErrorBoundary fallbackTitle="Interrupção no Motor do Arcade">
         <div>
+          {activeTab === 'inspection' && (
+            <InspectionDesk 
+              card={card}
+              soundEnabled={soundEnabled}
+              onApplyDamage={onApplyDamage}
+              onClose={() => setActiveTab('g1')}
+            />
+          )}
           {activeTab === 'g1' && (
             <GameTimeline 
               questions={questionsData || []} 
