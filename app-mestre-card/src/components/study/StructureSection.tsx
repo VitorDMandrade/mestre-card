@@ -40,8 +40,9 @@ export const StructureSection: React.FC<StructureSectionProps> = ({
   const [lastError, setLastError] = useState<string | null>(null);
   const [xpAwarded, setXpAwarded] = useState<boolean>(false);
   const [shakeScreen, setShakeScreen] = useState<boolean>(false);
+  const [roundKey, setRoundKey] = useState<number>(0);
 
-  const nodes = useMemo(() => buildCircuitNodes(card), [card]);
+  const nodes = useMemo(() => buildCircuitNodes(card, roundKey), [card, roundKey]);
   const totalNodes = nodes.length || 5;
   const conductionPercent = Math.min(100, Math.round((currentNodeIndex / totalNodes) * 100));
 
@@ -114,6 +115,7 @@ export const StructureSection: React.FC<StructureSectionProps> = ({
     setIsShortCircuited(false);
     setCompleted(false);
     setLastError(null);
+    setRoundKey(k => k + 1);
     playBreakerResetSound(soundEnabled);
   };
 
@@ -150,7 +152,12 @@ export const StructureSection: React.FC<StructureSectionProps> = ({
           </button>
           <button
             type="button"
-            onClick={() => setActiveMode('reactor')}
+            onClick={() => {
+              setActiveMode('reactor');
+              if (completed) {
+                setRoundKey(k => k + 1);
+              }
+            }}
             className={`px-4 py-2 rounded-xl text-xs font-bold tracking-wide transition-all flex items-center gap-2 ${
               activeMode === 'reactor'
                 ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/60 shadow-[0_0_18px_rgba(0,245,255,0.35)]'

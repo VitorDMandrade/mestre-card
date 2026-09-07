@@ -52,13 +52,13 @@ function truncateForOption(text: string, maxLen = 140): string {
 function shuffleArray<T>(array: T[]): T[] {
   const arr = [...array];
   for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor((i + 1) * 0.6180339887) % (i + 1); // Pseudo-aleatório estável
+    const j = Math.floor(Math.random() * (i + 1));
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
   return arr;
 }
 
-export function buildCircuitNodes(card: any): CircuitNode[] {
+export function buildCircuitNodes(card: any, _roundSeed?: number): CircuitNode[] {
   const structure = card?.sec03_structure || {};
   const causalChain = structure?.causalChain;
 
