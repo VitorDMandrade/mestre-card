@@ -878,3 +878,251 @@ export function playBreakerResetSound(enabled = true): void {
     console.warn('AudioContext breakerReset falhou:', e);
   }
 }
+
+// ─── VIA 3: BOSS FIGHT ROGUELIKE (SEÇÃO 05 - LAB) ───────────────────────────
+
+let bossBattleAudio: HTMLAudioElement | null = null;
+let bossVictoryAudio: HTMLAudioElement | null = null;
+
+/**
+ * Inicia a trilha sonora orquestrada de batalha em loop contínuo
+ */
+export function startBossBattleMusic(enabled = true): void {
+  if (!enabled) return;
+  try {
+    if (!bossBattleAudio) {
+      bossBattleAudio = new Audio('/audio/boss_battle_theme.mp3');
+      bossBattleAudio.loop = true;
+      bossBattleAudio.volume = 0.18;
+    }
+    bossBattleAudio.currentTime = 0;
+    const playPromise = bossBattleAudio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch((err) => {
+        console.warn('Autoplay da trilha do boss bloqueado pelo navegador:', err);
+      });
+    }
+  } catch (e) {
+    console.warn('Erro ao inicializar trilha do boss:', e);
+  }
+}
+
+/**
+ * Interrompe a trilha sonora de batalha e reinicia o ponteiro
+ */
+export function stopBossBattleMusic(): void {
+  try {
+    if (bossBattleAudio) {
+      bossBattleAudio.pause();
+      bossBattleAudio.currentTime = 0;
+    }
+  } catch (e) {
+    console.warn('Erro ao parar trilha do boss:', e);
+  }
+}
+
+/**
+ * Toca a fanfarra orquestrada de vitória épica sobre o Examinador
+ */
+export function playBossVictoryFanfareAudio(enabled = true): void {
+  if (!enabled) return;
+  try {
+    stopBossBattleMusic();
+    if (!bossVictoryAudio) {
+      bossVictoryAudio = new Audio('/audio/boss_victory_fanfare.mp3');
+      bossVictoryAudio.volume = 0.35;
+    }
+    bossVictoryAudio.currentTime = 0;
+    const playPromise = bossVictoryAudio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        // Fallback procedural se o arquivo mp3 for bloqueado
+        playBossDefeatedFanfare(enabled);
+      });
+    }
+  } catch (e) {
+    playBossDefeatedFanfare(enabled);
+  }
+}
+
+/**
+ * 14. Golpe de corte de lâmina / tese axiomática (Web Audio API procedural)
+ */
+export function playSwordSlashSound(enabled = true): void {
+  if (!enabled) return;
+  try {
+    const ctx = getAudioContext();
+    if (ctx.state === 'suspended') ctx.resume();
+    const now = ctx.currentTime;
+
+    const bufferSize = Math.floor(ctx.sampleRate * 0.12);
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(800, now);
+    filter.frequency.exponentialRampToValueAtTime(3200, now + 0.04);
+    filter.frequency.exponentialRampToValueAtTime(400, now + 0.12);
+    filter.Q.setValueAtTime(3.5, now);
+
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.01, now);
+    gain.gain.linearRampToValueAtTime(0.28, now + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+
+    noise.start(now);
+    noise.stop(now + 0.12);
+  } catch (e) {
+    console.warn('AudioContext swordSlash falhou:', e);
+  }
+}
+
+/**
+ * 15. Bloqueio e deflexão metálica do Escudo Mnemônico
+ */
+export function playShieldBlockSound(enabled = true): void {
+  if (!enabled) return;
+  try {
+    const ctx = getAudioContext();
+    if (ctx.state === 'suspended') ctx.resume();
+    const now = ctx.currentTime;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(520, now);
+    osc.frequency.exponentialRampToValueAtTime(140, now + 0.22);
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(1200, now);
+    filter.Q.setValueAtTime(6.0, now);
+
+    gain.gain.setValueAtTime(0.3, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.22);
+  } catch (e) {
+    console.warn('AudioContext shieldBlock falhou:', e);
+  }
+}
+
+/**
+ * 16. Arpeggio cristalino do Oráculo de Foco (Revelação de fraqueza)
+ */
+export function playFocusOracleSound(enabled = true): void {
+  if (!enabled) return;
+  try {
+    const ctx = getAudioContext();
+    if (ctx.state === 'suspended') ctx.resume();
+    const now = ctx.currentTime;
+
+    const freqs = [587.33, 739.99, 880.0, 1174.66]; // D5, F#5, A5, D6
+    freqs.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const startTime = now + idx * 0.06;
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, startTime);
+
+      gain.gain.setValueAtTime(0.001, startTime);
+      gain.gain.linearRampToValueAtTime(0.15, startTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.45);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + 0.5);
+    });
+  } catch (e) {
+    console.warn('AudioContext focusOracle falhou:', e);
+  }
+}
+
+/**
+ * 17. Rugido grave sub-harmônico do Boss ao sofrer golpe de tese
+ */
+export function playBossHitRoarSound(enabled = true): void {
+  if (!enabled) return;
+  try {
+    const ctx = getAudioContext();
+    if (ctx.state === 'suspended') ctx.resume();
+    const now = ctx.currentTime;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(90, now);
+    osc.frequency.linearRampToValueAtTime(30, now + 0.35);
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(450, now);
+    filter.frequency.exponentialRampToValueAtTime(80, now + 0.35);
+
+    gain.gain.setValueAtTime(0.4, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.35);
+  } catch (e) {
+    console.warn('AudioContext bossHitRoar falhou:', e);
+  }
+}
+
+/**
+ * 18. Fanfarra heróica procedural de vitória épica (F4 -> Ab4 -> Bb4 -> C5)
+ */
+export function playBossDefeatedFanfare(enabled = true): void {
+  if (!enabled) return;
+  try {
+    const ctx = getAudioContext();
+    if (ctx.state === 'suspended') ctx.resume();
+    const now = ctx.currentTime;
+
+    const chords = [349.23, 415.30, 466.16, 523.25]; // F4, Ab4, Bb4, C5
+    chords.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const startTime = now + idx * 0.12;
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, startTime);
+
+      gain.gain.setValueAtTime(0.001, startTime);
+      gain.gain.linearRampToValueAtTime(0.24, startTime + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.6);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + 0.65);
+    });
+  } catch (e) {
+    console.warn('AudioContext bossDefeatedFanfare falhou:', e);
+  }
+}
+

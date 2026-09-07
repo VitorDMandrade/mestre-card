@@ -738,3 +738,61 @@
 .screen-shake-short {
   animation: screenGlitchShake 0.3s ease-in-out;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   VIA 3: ARENA BOSS FIGHT ROGUELIKE (SEÇÃO 05 - LAB)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Tremor sísmico ao sofrer dano da banca */
+@keyframes bossDamageShake {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  20% { transform: translate(-6px, 4px) rotate(-1.5deg); filter: brightness(2) contrast(1.5); }
+  40% { transform: translate(6px, -4px) rotate(1.5deg); filter: hue-rotate(-40deg); }
+  60% { transform: translate(-5px, -2px) rotate(0deg); }
+  80% { transform: translate(4px, 3px) rotate(1deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+/* Feixe cortante de luz ao desferir o golpe crítico de tese */
+@keyframes slashSweep {
+  0% {
+    transform: scaleX(0) rotate(-15deg);
+    opacity: 0;
+    box-shadow: 0 0 0 rgba(6, 182, 212, 0);
+  }
+  50% {
+    transform: scaleX(1.4) rotate(-15deg);
+    opacity: 1;
+    box-shadow: 0 0 50px rgba(6, 182, 212, 1), 0 0 100px rgba(255, 255, 255, 0.95);
+  }
+  100% {
+    transform: scaleX(2.2) rotate(-15deg);
+    opacity: 0;
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0);
+  }
+}
+
+/* Pulso carmesim de fúria escalada da banca */
+@keyframes ragePulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.35);
+    border-color: rgba(239, 68, 68, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 45px rgba(239, 68, 68, 0.85);
+    border-color: rgba(255, 100, 100, 1);
+  }
+}
+
+.boss-damaged {
+  animation: bossDamageShake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+.slash-effect {
+  animation: slashSweep 0.38s ease-out forwards;
+}
+
+.boss-rage-active {
+  animation: ragePulse 1.2s infinite ease-in-out;
+}
+
