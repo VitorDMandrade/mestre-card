@@ -11,7 +11,9 @@ import {
   playPaperSlideSound, 
   playTeletypeWarningSound, 
   playShutterSound,
-  playClickSound 
+  playClickSound,
+  toggleAmbientRadio,
+  playEvidenceLockSound
 } from '../../lib/audio';
 
 interface InspectionDeskProps {
@@ -55,6 +57,21 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
   const [isInvestigationMode, setIsInvestigationMode] = useState(false);
   const [activeInterrogation, setActiveInterrogation] = useState<InterrogationDialog | null>(null);
   const [isDailyShiftModalOpen, setIsDailyShiftModalOpen] = useState(false);
+
+  // Rádio do Posto & Pareamento de Evidências (Fase 2B)
+  const [isRadioOn, setIsRadioOn] = useState(false);
+  const [selectedClaim, setSelectedClaim] = useState(false);
+  const [selectedRuleId, setSelectedRuleId] = useState<string | null>(null);
+  const [isEvidenceMatched, setIsEvidenceMatched] = useState(false);
+  const [mismatchWarning, setMismatchWarning] = useState<string | null>(null);
+  const [appliedDenialReason, setAppliedDenialReason] = useState<string | null>(null);
+
+  // Desliga o rádio analógico automaticamente ao fechar o componente
+  useEffect(() => {
+    return () => {
+      toggleAmbientRadio(false);
+    };
+  }, []);
 
   // Helper para limpar e estruturar mnemônicos sem asteriscos crus (**) ou barras (//)
   const renderRulebookMnemonic = (rule: string) => {
@@ -139,9 +156,12 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
     return () => clearTimeout(timer);
   }, [currentIndex, soundEnabled]);
 
-  // Aponta discrepância no documento e abre interrogatório
+  // Aponta discrepância no documento e abre interrogatório / arma evidência 01
   const handleInspectDiscrepancy = useCallback(() => {
-    playTeletypeWarningSound(soundEnabled);
+    setSelectedClaim(prev => !prev);
+    playClickSound(soundEnabled);
+    setIsRulebookOpen(true); // Abre o manual de imediato para permitir o confronto
+
     if (currentCase.interrogation) {
       setActiveInterrogation(currentCase.interrogation);
     } else {
@@ -153,6 +173,45 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
       });
     }
   }, [currentCase, soundEnabled]);
+
+  // Seleciona uma regra do manual para confrontar a alegação selecionada (Fase 2B)
+  const handleSelectRule = useCallback((ruleId: string, ruleTitle: string) => {
+    if (!selectedClaim) {
+      setMismatchWarning('⚠️ SELECIONE PRIMEIRO A TESE NO DOSSIÊ PARA CONFRONTAR');
+      playTeletypeWarningSound(soundEnabled);
+      setTimeout(() => setMismatchWarning(null), 3000);
+      return;
+    }
+
+    playClickSound(soundEnabled);
+
+    // Confere determinismo estrito da Fase 2B: regra esperada pelo caso
+    const isTargetMatch = currentCase.isFraudulent && (
+      ruleId === currentCase.targetRuleId ||
+      (!currentCase.targetRuleId && (ruleId === 'rule-trap-0' || ruleId === 'rule-theory-0'))
+    );
+
+    if (isTargetMatch) {
+      playEvidenceLockSound(soundEnabled);
+      setIsEvidenceMatched(true);
+      setSelectedRuleId(ruleId);
+      setMismatchWarning(null);
+
+      // Bônus de 100 XP por evidência fundamentada
+      addXP(100);
+      fireXpToast(100, "AUDITORIA FUNDAMENTADA");
+      refreshProfile();
+      fireParticles(window.innerWidth / 2, window.innerHeight / 2);
+
+      if (currentCase.interrogation) {
+        setActiveInterrogation(currentCase.interrogation);
+      }
+    } else {
+      playTeletypeWarningSound(soundEnabled);
+      setMismatchWarning(`⚠️ DIRETRIZ INCOMPATÍVEL COM ESTA ALEGAÇÃO (${ruleTitle})`);
+      setTimeout(() => setMismatchWarning(null), 3500);
+    }
+  }, [selectedClaim, currentCase, soundEnabled, fireXpToast, refreshProfile, fireParticles]);
 
   // Executa o veredito (Aprovar ou Denegar)
   const handleVerdict = useCallback((verdict: InspectionVerdict) => {
@@ -172,6 +231,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
     } else {
       setStampStatus('stamped_denied');
       playStampDeniedSound(soundEnabled);
+      setAppliedDenialReason(currentCase.denialReason || 'VIOLAÇÃO CONCEITUAL FORMAL');
     }
 
     if (isCorrect) {
@@ -233,6 +293,11 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
     setCitation({ isOpen: false, title: '', message: '' });
     setStampStatus('none');
     setActiveInterrogation(null);
+    setSelectedClaim(false);
+    setSelectedRuleId(null);
+    setIsEvidenceMatched(false);
+    setMismatchWarning(null);
+    setAppliedDenialReason(null);
 
     if (currentIndex + 1 >= cases.length) {
       // Turno concluído
@@ -296,6 +361,11 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
     setStampStatus('none');
     setActiveInterrogation(null);
     setIsDailyShiftModalOpen(false);
+    setSelectedClaim(false);
+    setSelectedRuleId(null);
+    setIsEvidenceMatched(false);
+    setMismatchWarning(null);
+    setAppliedDenialReason(null);
     setCitation({ isOpen: false, title: '', message: '' });
     setShiftStats({
       totalProcessed: 0,
@@ -311,7 +381,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
   };
 
   return (
-    <div className="relative w-full rounded-2xl overflow-hidden border-2 border-[#3d2b1f]/80 bg-[#120f0d] text-[#d6c7b2] shadow-2xl font-serif select-none">
+    <div className="desk-surface relative w-full rounded-2xl overflow-hidden border-2 border-[#3d2b1f]/80 text-[#d6c7b2] shadow-2xl font-serif select-none">
       
       {/* Luz ambiente de mesa vintage / luminária de gabinete */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-[radial-gradient(ellipse_at_top,_rgba(245,158,11,0.12)_0%,_transparent_70%)] pointer-events-none z-0"></div>
@@ -358,6 +428,25 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
               </span>
             )}
           </div>
+
+          {/* BOTÃO RÁDIO DO POSTO (Fase 2B) */}
+          <button
+            onClick={() => {
+              const next = !isRadioOn;
+              setIsRadioOn(next);
+              toggleAmbientRadio(next);
+              playClickSound(soundEnabled);
+            }}
+            className={`px-2.5 py-1.5 rounded font-mono text-xs font-bold border transition-all flex items-center gap-1.5 cursor-pointer ${
+              isRadioOn 
+                ? 'bg-emerald-950/80 border-emerald-500 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.4)]'
+                : 'bg-[#241c16] border-[#4a3525] text-stone-400 hover:text-stone-200'
+            }`}
+            title="Alternar Rádio Ambiente Analógico do Posto (Web Audio + Streaming)"
+          >
+            <span className={`w-2 h-2 rounded-full ${isRadioOn ? 'bg-emerald-400 animate-pulse' : 'bg-stone-600'}`} />
+            <span>📻 RÁDIO: {isRadioOn ? 'ON' : 'OFF'}</span>
+          </button>
 
           {/* BOTÃO MODO INVESTIGAR (Fase 2A - Apontamento de Discrepância) */}
           <button
@@ -568,33 +657,45 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
               </div>
 
               {/* TESE SUBMETIDA PARA AUDITORIA (Alto Contraste Estilo Dossiê Oficial Datilografado) */}
+              {/* TESE SUBMETIDA PARA AUDITORIA (Alto Contraste Estilo Dossiê Oficial Datilografado) */}
               <div className="space-y-3 my-4">
                 <div className="flex items-center justify-between border-b border-[#5c4a3b]/20 pb-1">
                   <span className="text-[10px] font-mono uppercase tracking-widest text-[#5c4a3b] font-bold flex items-center gap-1.5">
                     <span>▶</span>
                     <span>TESE SUBMETIDA PELO POSTULANTE:</span>
                   </span>
-                  {isInvestigationMode && (
+                  {selectedClaim ? (
+                    <span className="text-[10px] font-mono text-amber-900 bg-amber-300 px-2 py-0.5 rounded border border-amber-600 font-black animate-pulse flex items-center gap-1 shadow-sm">
+                      <span>📌</span> EVIDÊNCIA 01: ALEGAÇÃO SELECIONADA
+                    </span>
+                  ) : isInvestigationMode ? (
                     <span className="text-[10px] font-mono text-amber-900 bg-amber-200/90 px-2 py-0.5 rounded border border-amber-500 font-bold animate-pulse flex items-center gap-1">
                       <span>🔍</span> CLIQUE NA TESE PARA CONFRONTAR
                     </span>
-                  )}
+                  ) : null}
                 </div>
 
+                {/* ALERTA DE INCOMPATIBILIDADE TEMPORÁRIO */}
+                {mismatchWarning && (
+                  <div className="p-2 rounded bg-red-950/90 border-2 border-red-500 text-red-200 text-xs font-mono font-bold animate-bounce-short text-center shadow-[0_0_15px_rgba(239,68,68,0.5)]">
+                    {mismatchWarning}
+                  </div>
+                )}
+
                 <div 
-                  onClick={isInvestigationMode ? handleInspectDiscrepancy : undefined}
-                  className={`p-4 rounded-md bg-white/95 border-2 transition-all relative ${
-                    isInvestigationMode 
-                      ? 'border-amber-600 shadow-[0_0_15px_rgba(217,119,6,0.35)] cursor-pointer hover:bg-amber-50/90 ring-2 ring-amber-500/40' 
-                      : 'border-[#8c7864] shadow-sm'
+                  onClick={handleInspectDiscrepancy}
+                  className={`p-4 rounded-md bg-white/95 border-2 transition-all relative cursor-pointer ${
+                    selectedClaim 
+                      ? 'border-amber-500 bg-amber-50/95 ring-4 ring-amber-400/60 shadow-[0_0_20px_rgba(245,158,11,0.4)]'
+                      : isInvestigationMode 
+                      ? 'border-amber-600 shadow-[0_0_15px_rgba(217,119,6,0.35)] hover:bg-amber-50/90 ring-2 ring-amber-500/40' 
+                      : 'border-[#8c7864] shadow-sm hover:border-stone-500'
                   }`}
-                  title={isInvestigationMode ? "Clique para confrontar as alegações no interrogatório" : undefined}
+                  title="Clique para selecionar e confrontar esta alegação contra o Manual Oficial"
                 >
-                  {isInvestigationMode && (
-                    <div className="absolute top-2 right-2 bg-amber-600 text-white text-[9px] font-mono px-1.5 py-0.5 rounded font-bold uppercase tracking-wider flex items-center gap-1 shadow">
-                      <span>⚡</span> APONTAR DISCREPÂNCIA
-                    </div>
-                  )}
+                  <div className="absolute top-2 right-2 bg-amber-600 text-white text-[9px] font-mono px-1.5 py-0.5 rounded font-bold uppercase tracking-wider flex items-center gap-1 shadow">
+                    <span>⚡</span> {selectedClaim ? 'CONFRONTAR COM MANUAL' : 'APONTAR DISCREPÂNCIA'}
+                  </div>
 
                   <div className="text-zinc-950 font-mono font-bold text-sm leading-relaxed">
                     <MathRenderer 
@@ -603,7 +704,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                     />
                   </div>
 
-                  {isInvestigationMode && currentCase.contradictionTrigger && (
+                  {currentCase.contradictionTrigger && (
                     <div className="mt-2.5 pt-2 border-t border-amber-300/80 flex items-center gap-2 text-[11px] font-mono text-amber-950 bg-amber-100/90 p-1.5 rounded">
                       <span className="font-black text-xs">⚠️ TRECHO SOB SUSPEITA:</span>
                       <span className="underline decoration-amber-700 decoration-2 font-semibold">
@@ -613,6 +714,19 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                   )}
                 </div>
               </div>
+
+              {/* FITA DE EVIDÊNCIA VINCULADA AO MANUAL (Fase 2B) */}
+              {isEvidenceMatched && (
+                <div className="evidence-matched-strip p-3 rounded-lg my-2.5 flex items-center justify-between text-xs font-bold font-mono animate-fade-in shadow-md">
+                  <div className="flex items-center gap-2 text-amber-900">
+                    <span className="text-base">⚡</span>
+                    <span className="tracking-wide">CONTRADIÇÃO COMPROVADA // VINCULADA AO MANUAL</span>
+                  </div>
+                  <span className="text-[10px] bg-amber-900 text-amber-100 px-2 py-0.5 rounded uppercase font-black tracking-widest shadow-sm">
+                    {selectedRuleId || currentCase.targetRuleId || 'DIRETRIZ RECONHECIDA'}
+                  </span>
+                </div>
+              )}
 
               {/* FITA DE INTERROGATÓRIO E CONFRONTO DIALÉTICO (Fase 2A) */}
               {activeInterrogation && (
@@ -714,12 +828,17 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
 
               {stampStatus.includes('stamped_denied') && (
                 <div 
-                  className="absolute inset-0 flex items-center justify-center pointer-events-none z-30"
+                  className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-30"
                   style={{ transform: `rotate(${stampAngle}deg)` }}
                 >
                   <div className="border-4 border-red-700 text-red-800 font-mono font-black text-2xl sm:text-3xl px-6 py-2 tracking-widest uppercase rounded shadow-[0_0_15px_rgba(239,68,68,0.3)] bg-red-500/10 backdrop-blur-[1px] animate-stamp-impact">
                     ⛔ DENEGADO // ANOMALIA DETECTADA ⛔
                   </div>
+                  {appliedDenialReason && (
+                    <div className="stamp-reason px-5 py-2 mt-3 rounded font-mono font-black text-xs sm:text-sm tracking-widest text-center shadow-lg animate-stamp-impact">
+                      ★ MOTIVO: {appliedDenialReason} ★
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -827,37 +946,99 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
               <div className="flex-1 p-4 overflow-y-auto space-y-3 font-serif text-xs leading-relaxed max-h-[500px] scrollbar-thin">
                 {rulebookTab === 'theory' && (
                   <div className="space-y-4">
-                    <div className="text-[10px] font-mono text-amber-500 font-bold uppercase tracking-wider pb-1 border-b border-[#423122]">
-                      REGULAMENTO OFICIAL // {card.title}
+                    <div className="text-[10px] font-mono text-amber-500 font-bold uppercase tracking-wider pb-1 border-b border-[#423122] flex items-center justify-between">
+                      <span>REGULAMENTO OFICIAL // {card.title}</span>
+                      {selectedClaim && (
+                        <span className="text-[9px] text-amber-400 font-normal animate-pulse">
+                          Clique em um artigo para confrontar
+                        </span>
+                      )}
                     </div>
-                    {card.sec02_theory?.blocks?.map((block, bIdx) => (
-                      <div key={bIdx} className="p-3 rounded bg-[#100d0a] border border-[#382b1f] space-y-1">
-                        <div className="flex items-center justify-between text-[10px] font-mono text-amber-400 font-bold">
-                          <span>ARTIGO {block.number || bIdx + 1}</span>
-                          <span>{block.title}</span>
+                    {card.sec02_theory?.blocks?.map((block, bIdx) => {
+                      const ruleId = `rule-theory-${bIdx}`;
+                      const isMatched = isEvidenceMatched && (selectedRuleId === ruleId || currentCase.targetRuleId === ruleId);
+                      return (
+                        <div
+                          key={bIdx}
+                          onClick={() => handleSelectRule(ruleId, block.title || `Artigo ${block.number || bIdx + 1}`)}
+                          className={`p-3 rounded border transition-all cursor-pointer ${
+                            isMatched
+                              ? 'bg-emerald-950/40 border-emerald-500 ring-2 ring-emerald-400/50 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
+                              : selectedClaim
+                              ? 'bg-[#100d0a] border-amber-600/70 hover:border-amber-400 hover:bg-amber-950/30 hover:scale-[1.01]'
+                              : 'bg-[#100d0a] border-[#382b1f] hover:border-[#604934]'
+                          } space-y-1`}
+                          title={selectedClaim ? "Confrontar este artigo contra a alegação" : undefined}
+                        >
+                          <div className="flex items-center justify-between text-[10px] font-mono text-amber-400 font-bold">
+                            <span>ARTIGO {block.number || bIdx + 1}</span>
+                            <div className="flex items-center gap-2">
+                              <span>{block.title}</span>
+                              {isMatched ? (
+                                <span className="bg-emerald-600 text-white text-[9px] px-1.5 py-0.5 rounded font-black tracking-widest shadow">
+                                  ⚡ VINCULADO
+                                </span>
+                              ) : selectedClaim ? (
+                                <span className="bg-amber-800/80 text-amber-200 text-[8px] px-1.5 py-0.5 rounded font-bold border border-amber-600/50">
+                                  [ CONFRONTAR ]
+                                </span>
+                              ) : null}
+                            </div>
+                          </div>
+                          <div className="text-stone-300 text-xs font-sans">
+                            <MathRenderer content={block.content} />
+                          </div>
                         </div>
-                        <div className="text-stone-300 text-xs font-sans">
-                          <MathRenderer content={block.content} />
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
 
                 {rulebookTab === 'traps' && (
                   <div className="space-y-3">
-                    <div className="text-[10px] font-mono text-red-400 font-bold uppercase tracking-wider pb-1 border-b border-[#423122]">
-                      BOLETIM DE ANOMALIAS E FALÁCIAS CONHECIDAS (BLIND SPOTS)
+                    <div className="text-[10px] font-mono text-red-400 font-bold uppercase tracking-wider pb-1 border-b border-[#423122] flex items-center justify-between">
+                      <span>BOLETIM DE ANOMALIAS E FALÁCIAS (BLIND SPOTS)</span>
+                      {selectedClaim && (
+                        <span className="text-[9px] text-red-300 font-normal animate-pulse">
+                          Clique em uma armadilha para confrontar
+                        </span>
+                      )}
                     </div>
                     {card.sec04_radar?.blindSpots?.length ? (
-                      card.sec04_radar.blindSpots.map((spot, sIdx) => (
-                        <div key={sIdx} className="p-3 rounded bg-red-950/20 border border-red-900/40 space-y-1 font-sans">
-                          <span className="text-[11px] font-mono font-bold text-red-300 block">
-                            ⛔ {spot.title}
-                          </span>
-                          {renderRulebookBlindSpot(spot.analysis)}
-                        </div>
-                      ))
+                      card.sec04_radar.blindSpots.map((spot, sIdx) => {
+                        const ruleId = `rule-trap-${sIdx}`;
+                        const isMatched = isEvidenceMatched && (selectedRuleId === ruleId || currentCase.targetRuleId === ruleId);
+                        return (
+                          <div
+                            key={sIdx}
+                            onClick={() => handleSelectRule(ruleId, spot.title)}
+                            className={`p-3 rounded border transition-all cursor-pointer ${
+                              isMatched
+                                ? 'bg-emerald-950/40 border-emerald-500 ring-2 ring-emerald-400/50 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
+                                : selectedClaim
+                                ? 'bg-red-950/30 border-red-600/70 hover:border-red-400 hover:bg-red-900/30 hover:scale-[1.01]'
+                                : 'bg-red-950/20 border-red-900/40 hover:border-red-700/60'
+                            } space-y-1 font-sans`}
+                            title={selectedClaim ? "Confrontar este distrator contra a alegação" : undefined}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-mono font-bold text-red-300 block">
+                                ⛔ {spot.title}
+                              </span>
+                              {isMatched ? (
+                                <span className="bg-emerald-600 text-white text-[9px] font-mono px-1.5 py-0.5 rounded font-black tracking-widest shadow">
+                                  ⚡ VINCULADO
+                                </span>
+                              ) : selectedClaim ? (
+                                <span className="bg-amber-800/80 text-amber-200 text-[8px] font-mono px-1.5 py-0.5 rounded font-bold border border-amber-600/50">
+                                  [ CONFRONTAR ]
+                                </span>
+                              ) : null}
+                            </div>
+                            {renderRulebookBlindSpot(spot.analysis)}
+                          </div>
+                        );
+                      })
                     ) : (
                       <p className="text-stone-500 font-mono text-xs">Nenhum ponto cego registrado no boletim.</p>
                     )}
@@ -866,18 +1047,49 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
 
                 {rulebookTab === 'mnemonics' && (
                   <div className="space-y-3">
-                    <div className="text-[10px] font-mono text-cyan-400 font-bold uppercase tracking-wider pb-1 border-b border-[#423122]">
-                      CÓDIGOS MNEMÔNICOS OFICIAIS
+                    <div className="text-[10px] font-mono text-cyan-400 font-bold uppercase tracking-wider pb-1 border-b border-[#423122] flex items-center justify-between">
+                      <span>CÓDIGOS MNEMÔNICOS OFICIAIS</span>
+                      {selectedClaim && (
+                        <span className="text-[9px] text-cyan-300 font-normal animate-pulse">
+                          Clique em um mnemônico para confrontar
+                        </span>
+                      )}
                     </div>
                     {card.sec04_radar?.mnemonics?.length ? (
-                      card.sec04_radar.mnemonics.map((mnem, mIdx) => (
-                        <div key={mIdx} className="p-3 rounded bg-cyan-950/20 border border-cyan-900/40 space-y-1 font-mono text-xs">
-                          <span className="font-bold text-cyan-300 block">
-                            ⚡ {mnem.title || mnem.trigger}
-                          </span>
-                          {renderRulebookMnemonic(mnem.rule)}
-                        </div>
-                      ))
+                      card.sec04_radar.mnemonics.map((mnem, mIdx) => {
+                        const ruleId = `rule-mnem-${mIdx}`;
+                        const isMatched = isEvidenceMatched && (selectedRuleId === ruleId || currentCase.targetRuleId === ruleId);
+                        return (
+                          <div
+                            key={mIdx}
+                            onClick={() => handleSelectRule(ruleId, mnem.title || mnem.trigger)}
+                            className={`p-3 rounded border transition-all cursor-pointer ${
+                              isMatched
+                                ? 'bg-emerald-950/40 border-emerald-500 ring-2 ring-emerald-400/50 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
+                                : selectedClaim
+                                ? 'bg-cyan-950/30 border-cyan-600/70 hover:border-cyan-400 hover:bg-cyan-900/30 hover:scale-[1.01]'
+                                : 'bg-cyan-950/20 border-cyan-900/40 hover:border-cyan-700/60'
+                            } space-y-1 font-mono text-xs`}
+                            title={selectedClaim ? "Confrontar este código contra a alegação" : undefined}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-bold text-cyan-300 block">
+                                ⚡ {mnem.title || mnem.trigger}
+                              </span>
+                              {isMatched ? (
+                                <span className="bg-emerald-600 text-white text-[9px] font-mono px-1.5 py-0.5 rounded font-black tracking-widest shadow">
+                                  ⚡ VINCULADO
+                                </span>
+                              ) : selectedClaim ? (
+                                <span className="bg-amber-800/80 text-amber-200 text-[8px] font-mono px-1.5 py-0.5 rounded font-bold border border-amber-600/50">
+                                  [ CONFRONTAR ]
+                                </span>
+                              ) : null}
+                            </div>
+                            {renderRulebookMnemonic(mnem.rule)}
+                          </div>
+                        );
+                      })
                     ) : (
                       <p className="text-stone-500 font-mono text-xs">Nenhum mnemônico canônico catalogado.</p>
                     )}

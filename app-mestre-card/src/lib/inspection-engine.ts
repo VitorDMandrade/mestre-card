@@ -67,6 +67,8 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
         isFraudulent: true,
         fraudReason: `ANOMALIA DETECTADA: O documento defende uma falácia clássica de banca (${spot.title}). ${cleanAnalysis} Não atende ao rigor científico oficial.`,
         contradictionTrigger: mythPart,
+        targetRuleId: `rule-trap-${i}`,
+        denialReason: `FALÁCIA DE BANCA: ${(spot.title || 'PONTO CEGO').toUpperCase()}`,
         interrogation: {
           postulantExcuse: `\"Mas senhor Inspetor, no cotidiano e em muitas provas costuma-se aceitar que ${spot.title}! Por que essa premissa seria uma anomalia documental?\"`,
           inspectorVerdict: `\"Negativo. O Ministério veda expressamente essa falácia: ${cleanAnalysis}. A prova pune quem restringe o conceito a essa armadilha.\"`
@@ -84,6 +86,7 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
       const fileNum = `MKA-${75 + (i * 2) % 20}-${3000 + (i * 513) % 6999}`;
       const cleanStatement = tf.statement.replace(/[*_~`]/g, '').trim();
       const cleanFeedback = (tf.feedback || '').replace(/[*_~`]/g, '').trim();
+      const theoryTargetIdx = i % (card.sec02_theory?.blocks?.length || 1);
 
       cases.push({
         id: `case-tf-${i}`,
@@ -99,6 +102,8 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
           ? `FRAUDE CONCEITUAL: A afirmativa contraria os preceitos científicos do Ministério. Motivo: ${cleanFeedback}`
           : undefined,
         contradictionTrigger: !tf.isTrue ? cleanStatement : undefined,
+        targetRuleId: !tf.isTrue ? `rule-theory-${theoryTargetIdx}` : undefined,
+        denialReason: !tf.isTrue ? `VIOLAÇÃO: ARTIGO ${theoryTargetIdx + 1}` : undefined,
         interrogation: {
           postulantExcuse: !tf.isTrue
             ? `\"Inspetor de turno, peço deferimento! Essa afirmação parece perfeitamente lógica e consistente à primeira vista!\"`
@@ -108,7 +113,7 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
             : `\"Conforme. A tese observa rigorosamente a verdade teórica homologada.\"`
         },
         relevantRuleSnippet: cleanFeedback || `Conforme os cânones oficiais de ${card.title}, todas as premissas devem observar a correlação formal.`,
-        difficulty: tf.isTrue ? 'Normal' : 'Crítico'
+        difficulty: tf.isTrue ? 'Rotina' : 'Crítico'
       });
     });
   }
@@ -137,7 +142,7 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
             inspectorVerdict: `\"Conforme. Resolução validada pela banca examinadora do Ministério.\"`
           },
           relevantRuleSnippet: q.resolution?.technicalVerdict || `Atestado pelo comitê técnico do Ministério.`,
-          difficulty: 'Normal'
+          difficulty: 'Rotina'
         });
       }
 
@@ -156,6 +161,8 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
           isFraudulent: true,
           fraudReason: `DISTRAÇÃO TÁTICA DETECTADA: ${q.resolution?.distractorAnalysis || 'Esta opção contém uma falha sutil de banca e deve ser reprovada.'}`,
           contradictionTrigger: wrongOpt.text,
+          targetRuleId: card.sec04_radar?.blindSpots?.length ? 'rule-trap-0' : 'rule-theory-0',
+          denialReason: 'DISTRAÇÃO TÁTICA: PREMISSA INCORRETA',
           interrogation: {
             postulantExcuse: `\"Auditor, essa conclusão foi obtida aplicando o enunciado diretamente. Por que apontar como distrator inválido?\"`,
             inspectorVerdict: `\"Denegação mandatória. ${q.resolution?.distractorAnalysis || 'Esta alternativa é uma armadilha calculada e viola as leis canônicas da matéria.'}\"`
@@ -187,7 +194,7 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
           inspectorVerdict: `\"Homologado. Conteúdo canônico conferido perante a Lei Geral.\"`
         },
         relevantRuleSnippet: `Artigo ${block.number}: ${block.title}. Todas as conclusões correlatas são válidas.`,
-        difficulty: 'Normal'
+        difficulty: 'Rotina'
       });
     });
   }

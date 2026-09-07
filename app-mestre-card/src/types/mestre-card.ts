@@ -177,8 +177,10 @@ export interface InspectionCase {
   fraudReason?: string; // Por que o documento é fraudulento / distrator
   contradictionTrigger?: string; // Frase ou trecho exato que contém o erro conceitual
   interrogation?: InterrogationDialog; // Diálogo de confronto dialético
+  targetRuleId?: string; // ID da diretriz violada no manual para confronto determinístico
+  denialReason?: string; // Motivo formal sintético da infração para a tarja do carimbo
   relevantRuleSnippet?: string; // Norma oficial / trecho do manual para confronto
-  difficulty: 'Normal' | 'Crítico' | 'Armadilha TRI';
+  difficulty: 'Rotina' | 'Atenção' | 'Crítico' | 'Armadilha TRI';
 }
 
 export type InspectionVerdict = 'APPROVED' | 'DENIED';

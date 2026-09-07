@@ -380,3 +380,233 @@ export function playShutterSound(soundEnabled: boolean = true): void {
   }
 }
 
+// ============================================================================
+// MOTOR ACÚSTICO HÍBRIDO: RÁDIO DO POSTO DE FRONTEIRA & TRAVA DE EVIDÊNCIA (Fase 2B)
+// ============================================================================
+
+let radioAudioElement: HTMLAudioElement | null = null;
+let radioSourceNode: MediaElementAudioSourceNode | null = null;
+let radioFilterNode: BiquadFilterNode | null = null;
+let radioGainNode: GainNode | null = null;
+
+// Nós de áudio do gerador procedural de contingência (fail-safe)
+let proceduralOsc1: OscillatorNode | null = null;
+let proceduralOsc2: OscillatorNode | null = null;
+let proceduralNoiseNode: AudioBufferSourceNode | null = null;
+let proceduralGainNode: GainNode | null = null;
+let isRadioPlaying = false;
+
+export function isAmbientRadioActive(): boolean {
+  return isRadioPlaying;
+}
+
+function stopProceduralRadio(): void {
+  try {
+    if (proceduralOsc1) {
+      proceduralOsc1.stop();
+      proceduralOsc1.disconnect();
+      proceduralOsc1 = null;
+    }
+    if (proceduralOsc2) {
+      proceduralOsc2.stop();
+      proceduralOsc2.disconnect();
+      proceduralOsc2 = null;
+    }
+    if (proceduralNoiseNode) {
+      proceduralNoiseNode.stop();
+      proceduralNoiseNode.disconnect();
+      proceduralNoiseNode = null;
+    }
+    if (proceduralGainNode) {
+      proceduralGainNode.disconnect();
+      proceduralGainNode = null;
+    }
+  } catch (e) {
+    console.warn('Erro ao parar rádio procedural:', e);
+  }
+}
+
+function startProceduralRadio(ctx: AudioContext): void {
+  try {
+    stopProceduralRadio();
+
+    const t = ctx.currentTime;
+    const masterGain = ctx.createGain();
+    masterGain.gain.setValueAtTime(0.015, t);
+    masterGain.connect(ctx.destination);
+    proceduralGainNode = masterGain;
+
+    // 1. Zumbido elétrico de 60Hz + 120Hz (hum analógico vintage)
+    const osc1 = ctx.createOscillator();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(60, t);
+    const osc1Gain = ctx.createGain();
+    osc1Gain.gain.setValueAtTime(0.008, t);
+    osc1.connect(osc1Gain);
+    osc1Gain.connect(masterGain);
+    osc1.start(t);
+    proceduralOsc1 = osc1;
+
+    const osc2 = ctx.createOscillator();
+    osc2.type = 'triangle';
+    osc2.frequency.setValueAtTime(120, t);
+    const osc2Gain = ctx.createGain();
+    osc2Gain.gain.setValueAtTime(0.004, t);
+    osc2.connect(osc2Gain);
+    osc2Gain.connect(masterGain);
+    osc2.start(t);
+    proceduralOsc2 = osc2;
+
+    // 2. Ruído estático contínuo com filtro passa-faixa em 1200Hz
+    const bufferSize = ctx.sampleRate * 2;
+    const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+    for (let i = 0; i < bufferSize; i++) {
+      const white = Math.random() * 2 - 1;
+      b0 = 0.99886 * b0 + white * 0.0555179;
+      b1 = 0.99332 * b1 + white * 0.0750759;
+      b2 = 0.96900 * b2 + white * 0.1538520;
+      b3 = 0.86650 * b3 + white * 0.3104856;
+      b4 = 0.55000 * b4 + white * 0.5329522;
+      b5 = -0.7616 * b5 - white * 0.0168980;
+      output[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.04;
+      b6 = white * 0.115926;
+    }
+
+    const noise = ctx.createBufferSource();
+    noise.buffer = noiseBuffer;
+    noise.loop = true;
+
+    const noiseFilter = ctx.createBiquadFilter();
+    noiseFilter.type = 'bandpass';
+    noiseFilter.frequency.setValueAtTime(1200, t);
+    noiseFilter.Q.setValueAtTime(1.0, t);
+
+    noise.connect(noiseFilter);
+    noiseFilter.connect(masterGain);
+    noise.start(t);
+    proceduralNoiseNode = noise;
+  } catch (e) {
+    console.warn('Procedural radio start failed:', e);
+  }
+}
+
+/**
+ * Ativa ou desativa o Rádio Ambiente do Posto de Fronteira.
+ * Reproduz streaming roteado com filtro passa-faixa 1800Hz e atenuação 0.15,
+ * com fail-safe imediato para o gerador procedural analógico.
+ */
+export function toggleAmbientRadio(play: boolean): void {
+  if (!play) {
+    isRadioPlaying = false;
+    if (radioAudioElement) {
+      try {
+        radioAudioElement.pause();
+        radioAudioElement.currentTime = 0;
+      } catch (e) {}
+    }
+    if (radioGainNode) {
+      try {
+        radioGainNode.disconnect();
+      } catch (e) {}
+      radioGainNode = null;
+    }
+    if (radioFilterNode) {
+      try {
+        radioFilterNode.disconnect();
+      } catch (e) {}
+      radioFilterNode = null;
+    }
+    if (radioSourceNode) {
+      try {
+        radioSourceNode.disconnect();
+      } catch (e) {}
+      radioSourceNode = null;
+    }
+    radioAudioElement = null;
+    stopProceduralRadio();
+    return;
+  }
+
+  isRadioPlaying = true;
+  const ctx = getAudioContext();
+  if (ctx.state === 'suspended') {
+    ctx.resume();
+  }
+
+  try {
+    if (!radioAudioElement) {
+      const audio = new Audio();
+      audio.crossOrigin = 'anonymous';
+      audio.loop = true;
+      audio.src = './assets/audio/radio_checkpoint_80s.mp3';
+      radioAudioElement = audio;
+
+      try {
+        const source = ctx.createMediaElementSource(audio);
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(1800, ctx.currentTime);
+        filter.Q.setValueAtTime(0.8, ctx.currentTime);
+
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+
+        source.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+
+        radioSourceNode = source;
+        radioFilterNode = filter;
+        radioGainNode = gain;
+      } catch (nodeErr) {
+        console.warn('Roteamento Web Audio falhou, tocando direto no elemento:', nodeErr);
+      }
+    }
+
+    const playPromise = radioAudioElement.play();
+    if (playPromise !== undefined) {
+      playPromise.catch((err) => {
+        console.warn('Streaming de áudio falhou, ativando fallback procedural Web Audio:', err);
+        startProceduralRadio(ctx);
+      });
+    }
+  } catch (err) {
+    console.warn('Falha ao instanciar áudio, usando procedural:', err);
+    startProceduralRadio(ctx);
+  }
+}
+
+/**
+ * 6. Som de Trava de Evidência (Engrenagem Metálica Pesada)
+ * Onda triangle descendo de 340Hz para 140Hz em 70ms com decaimento exponencial rápido.
+ */
+export function playEvidenceLockSound(enabled: boolean = true): void {
+  if (!enabled) return;
+
+  try {
+    const ctx = getAudioContext();
+    if (ctx.state === 'suspended') ctx.resume();
+
+    const t = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(340, t);
+    osc.frequency.exponentialRampToValueAtTime(140, t + 0.07);
+
+    gain.gain.setValueAtTime(0.18, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(t);
+    osc.stop(t + 0.07);
+  } catch (e) {
+    console.warn('AudioContext evidenceLock falhou:', e);
+  }
+}
+

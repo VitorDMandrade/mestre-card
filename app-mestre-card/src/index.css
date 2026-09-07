@@ -425,3 +425,52 @@
   box-shadow: 0 0 10px rgba(244, 63, 94, 0.85), inset 0 1px 2px rgba(255,255,255,0.8);
 }
 
+/* ==========================================================================
+   FASE 2B: SUPERFÍCIE DE MESA, EVIDÊNCIA PAREADA & CARIMBO DE RAZÃO
+   ========================================================================== */
+
+/* 1. Bancada Vintage de Fórmica Burocrática */
+.desk-surface {
+  background-color: #120f0d;
+  background-image: 
+    radial-gradient(ellipse at top, rgba(245, 158, 11, 0.14) 0%, transparent 70%),
+    radial-gradient(circle at 50% 100%, rgba(0, 0, 0, 0.75) 0%, transparent 80%),
+    url('./assets/inspector/desk_surface_texture.png'),
+    url('./inspection/desk_surface_texture.png');
+  background-size: auto, auto, cover, cover;
+  background-repeat: no-repeat;
+  background-blend-mode: screen, normal, multiply, multiply;
+}
+
+/* 2. Fita Contínua de Telex / Papel Térmico Perfurado de Evidência Pareada */
+.evidence-matched-strip {
+  background-color: #f5eedb;
+  background-image: 
+    repeating-linear-gradient(0deg, transparent 0px, transparent 15px, rgba(120, 90, 60, 0.08) 16px),
+    url('./assets/inspector/teletype_ribbon_paper.png'),
+    url('./inspection/teletype_ribbon_paper.png');
+  background-size: auto, cover, cover;
+  color: #1a140d;
+  border: 2px dashed #b45309;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* 3. Tarja Retangular de Carimbo de Razão da Infração */
+.stamp-reason {
+  background-color: rgba(220, 38, 38, 0.14);
+  background-image: url('./assets/inspector/stamp_reason_box.png'), url('./inspection/stamp_reason_box.png');
+  background-size: cover;
+  background-blend-mode: multiply;
+  border: 2.5px solid #dc2626;
+  border-style: double;
+  color: #b91c1c;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  transform: rotate(-2deg);
+  box-shadow: 0 0 15px rgba(220, 38, 38, 0.35);
+  backdrop-filter: blur(1px);
+}
+
+
