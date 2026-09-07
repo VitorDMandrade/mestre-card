@@ -162,13 +162,13 @@ export const RadarSection = ({ card, soundEnabled }: RadarSectionProps) => {
         <div className="flex items-center gap-2 text-xs font-mono">
           <button
             onClick={expandAll}
-            className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer border border-slate-700"
+            className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 hover:border-slate-500 text-slate-200 hover:text-white transition-all cursor-pointer font-bold shadow-sm"
           >
             Expandir Todos
           </button>
           <button
             onClick={collapseAll}
-            className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer border border-slate-700"
+            className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 hover:border-slate-500 text-slate-200 hover:text-white transition-all cursor-pointer font-bold shadow-sm"
           >
             Recolher Todos
           </button>
@@ -361,7 +361,7 @@ export const RadarSection = ({ card, soundEnabled }: RadarSectionProps) => {
           {/* Gaveta de Conteúdo */}
           {expandedSections.triggerWords && (
             <div className="border-t border-blue-500/20 bg-slate-950/50">
-              <div className="bg-slate-950/80 px-4 py-2.5 border-b border-slate-800 flex justify-between items-center text-xs font-mono text-stone-400">
+              <div className="bg-slate-950/80 px-4 py-2.5 border-b border-slate-800 flex justify-between items-center text-xs font-mono text-slate-300 font-medium">
                 <span>Clique em qualquer linha para decodificar o contexto e a pegadinha</span>
                 <span className="text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-500/30">
                   {revealedTriggers.size} / {radar.triggerWords.length} Revelados
@@ -387,17 +387,17 @@ export const RadarSection = ({ card, soundEnabled }: RadarSectionProps) => {
                       </div>
                       <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                          <div className="text-[10px] text-slate-500 font-mono font-bold uppercase mb-1">Se aparecer no enunciado...</div>
+                          <div className="text-[10px] text-slate-400 font-mono font-bold uppercase mb-1">Se aparecer no enunciado...</div>
                           <div className="text-blue-400 font-bold font-mono text-sm">"{tw.trigger}"</div>
                         </div>
                         <div>
-                          <div className="text-[10px] text-slate-500 font-mono font-bold uppercase mb-1">O contexto exige...</div>
+                          <div className="text-[10px] text-slate-400 font-mono font-bold uppercase mb-1">O contexto exige...</div>
                           <div className={`text-slate-200 text-xs sm:text-sm leading-relaxed transition-all duration-500 font-sans ${!isRevealed ? 'blur-sm select-none opacity-40' : ''}`}>
                             {tw.context}
                           </div>
                         </div>
                         <div>
-                          <div className="text-[10px] text-slate-500 font-mono font-bold uppercase mb-1">A armadilha da banca será...</div>
+                          <div className="text-[10px] text-slate-400 font-mono font-bold uppercase mb-1">A armadilha da banca será...</div>
                           <div className={`text-red-300 text-xs sm:text-sm leading-relaxed transition-all duration-500 font-sans font-medium ${!isRevealed ? 'blur-sm select-none opacity-40' : ''}`}>
                             {tw.trap}
                           </div>

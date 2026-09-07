@@ -95,8 +95,8 @@ export const StudyView: FC<StudyViewProps> = ({ card, onBack, queueInfo, onNextQ
             <div className="flex items-center gap-4">
               <button 
                 onClick={onBack}
-                className="text-slate-400 hover:text-white font-mono text-sm tracking-widest transition-colors flex items-center gap-2 cursor-pointer">
-                <span className="text-xl">←</span> RETORNAR AO QG
+                className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 hover:border-slate-500 text-slate-200 hover:text-white font-mono text-xs font-bold tracking-wider transition-all flex items-center gap-2 cursor-pointer shadow-sm">
+                <span className="text-base text-cyan-400">←</span> RETORNAR AO QG
               </button>
               <div className="h-6 w-px bg-slate-800"></div>
               <span className="px-2 py-1 rounded bg-slate-800 text-slate-300 font-mono text-[10px] uppercase font-bold tracking-wider">

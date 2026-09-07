@@ -139,20 +139,20 @@ export const LabSection = ({ cardId, cardTitle, questions, hardcoreQuestions, bo
           <div className="flex items-center gap-2">
             <button
               onClick={() => setSelectedTab('standard')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all border ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all border cursor-pointer ${
                 !isViewingHardcore
-                  ? 'bg-blue-600/20 text-blue-300 border-blue-500/50'
-                  : 'bg-slate-800/60 text-slate-400 border-slate-700 hover:text-slate-200'
+                  ? 'bg-blue-600/20 text-blue-300 border-blue-500/50 shadow-sm'
+                  : 'bg-slate-900 border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white'
               }`}
             >
               Padrão ({questions.length})
             </button>
             <button
               onClick={() => setSelectedTab('hardcore')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all border flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all border flex items-center gap-1.5 cursor-pointer ${
                 isViewingHardcore
                   ? 'bg-red-600/20 text-red-300 border-red-500/50 shadow-[0_0_12px_rgba(239,68,68,0.25)]'
-                  : 'bg-slate-800/60 text-slate-400 border-slate-700 hover:text-slate-200'
+                  : 'bg-slate-900 border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white'
               }`}
             >
               <span>⚡</span>
@@ -260,11 +260,11 @@ export const LabSection = ({ cardId, cardTitle, questions, hardcoreQuestions, bo
               </div>
 
               <details open={isAnswered} className="group bg-slate-950 rounded-xl border border-slate-800 overflow-hidden [&_summary::-webkit-details-marker]:hidden">
-                <summary className="p-4 cursor-pointer font-bold text-slate-400 flex items-center justify-between select-none hover:text-white transition-colors">
+                <summary className="p-4 cursor-pointer font-bold text-slate-200 flex items-center justify-between select-none hover:text-cyan-300 transition-colors font-mono text-xs sm:text-sm">
                   <span className="flex items-center gap-2">
-                    <span className="text-blue-500">🔬</span> PARECER TÉCNICO & ANÁLISE DE ALTERNATIVAS
+                    <span className="text-blue-400">🔬</span> PARECER TÉCNICO & ANÁLISE DE ALTERNATIVAS
                   </span>
-                  <span className="text-slate-600 transition-transform group-open:rotate-180">▼</span>
+                  <span className="text-slate-400 group-open:text-cyan-400 transition-transform group-open:rotate-180">▼</span>
                 </summary>
                 <div className="p-5 border-t border-slate-800 bg-slate-900/50 space-y-4">
                   {/* Card do Gabarito Oficial // Veredito */}

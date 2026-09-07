@@ -155,7 +155,7 @@ export const StructureSection = ({ card }: StructureSectionProps) => {
                                   NÓ {step.num}
                                 </span>
                               </div>
-                              <span className="text-[10px] font-mono text-slate-500">
+                              <span className="text-[10px] font-mono text-slate-400 font-semibold">
                                 ETAPA {idx + 1}/5
                               </span>
                             </div>
@@ -173,7 +173,7 @@ export const StructureSection = ({ card }: StructureSectionProps) => {
                           </div>
 
                           {/* Rodapé Tático de Conexão Causal */}
-                          <div className="mt-4 pt-3 border-t border-slate-800/60 flex items-center justify-between text-[11px] font-mono text-slate-500">
+                          <div className="mt-4 pt-3 border-t border-slate-800/60 flex items-center justify-between text-[11px] font-mono text-slate-400">
                             <span>Fluxo de Causa:</span>
                             <span className="text-cyan-400/80 font-bold flex items-center gap-1">
                               <span>➔</span>
@@ -273,7 +273,7 @@ export const StructureSection = ({ card }: StructureSectionProps) => {
                       </td>
                       <td className="p-4 text-sm text-gray-300 font-medium">{v.meaning}</td>
                       <td className="p-4 text-sm text-emerald-400 font-mono font-bold"><MathRenderer content={`$${v.siUnit}$`} /></td>
-                      <td className="p-4 text-sm text-gray-500 hidden md:table-cell"><MathRenderer content={v.conversions} /></td>
+                      <td className="p-4 text-sm text-slate-300 hidden md:table-cell"><MathRenderer content={v.conversions} /></td>
                     </tr>
                   ))}
                 </tbody>

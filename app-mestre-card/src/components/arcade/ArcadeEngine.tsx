@@ -228,23 +228,23 @@ export const ArcadeEngine = ({
         <h2 className="text-2xl font-black text-white">🕹️ Pentágono Revisional (Arcade)</h2>
         
         <div className="flex items-center gap-3 flex-wrap">
-          <span className="hidden sm:inline-block text-xs font-mono text-gray-500">
+          <span className="hidden sm:inline-block text-xs font-mono text-slate-400 font-medium">
             Teclas: [,] e [.] abas, [1-5] opções, [V/F], [Espaço] Avançar
           </span>
           
           <button 
             onClick={onToggleSound}
-            className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-colors ${soundEnabled ? 'bg-emerald-600 text-white' : 'bg-slate-700 text-slate-400'}`}
+            className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-colors cursor-pointer ${soundEnabled ? 'bg-emerald-600 text-white shadow-sm' : 'bg-slate-900 border border-slate-700 text-slate-300 hover:text-white hover:border-slate-500 shadow-sm'}`}
           >
             {soundEnabled ? '🔊 Som Ativado' : '🔇 Som Desativado'}
           </button>
 
           <button 
             onClick={onToggleHardcore}
-            className={`px-3 py-1.5 rounded-full border text-xs font-mono transition-all flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-full border text-xs font-mono transition-all flex items-center gap-1.5 cursor-pointer ${
               isHardcore 
                 ? 'bg-red-950/80 border-red-500 text-red-300 shadow-[0_0_15px_rgba(239,68,68,0.2)]' 
-                : 'bg-slate-900/90 border-slate-700 text-slate-400 hover:border-red-500/50 hover:text-red-300'
+                : 'bg-slate-900/90 border-slate-700 text-slate-300 font-bold hover:border-red-500/50 hover:text-red-300 shadow-sm'
             }`}
           >
             <span>{isHardcore ? '🔥' : '🛡️'}</span>
@@ -322,7 +322,7 @@ export const ArcadeEngine = ({
                   ? t.id === 'inspection'
                     ? 'bg-gradient-to-br from-amber-600 to-amber-700 text-black font-extrabold border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.5)] transform -translate-y-px'
                     : 'bg-gradient-to-br from-blue-600 to-blue-700 text-white border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.5)] transform -translate-y-px' 
-                  : 'bg-slate-800 text-gray-400 border-slate-700 hover:bg-slate-700'
+                  : 'bg-slate-900 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800 hover:border-slate-500 shadow-sm'
               }`}
             >
               <span className={isDone ? 'inline' : 'hidden'} aria-hidden="true">✅</span>

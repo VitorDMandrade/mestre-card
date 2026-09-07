@@ -252,10 +252,10 @@ export const StudyHUD = ({
                 {onToggleZenMode && (
                   <button
                     onClick={onToggleZenMode}
-                    className={`px-2.5 py-1 rounded text-xs font-mono font-bold transition-all flex items-center gap-1 cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer border ${
                       isZenMode
-                        ? 'bg-cyan-950 border border-cyan-400 text-cyan-300 shadow-[0_0_8px_rgba(34,211,238,0.3)]'
-                        : 'bg-slate-900 border border-slate-700 hover:border-cyan-500/50 text-slate-400 hover:text-slate-200'
+                        ? 'bg-cyan-950 border-cyan-400 text-cyan-300 shadow-[0_0_8px_rgba(34,211,238,0.3)]'
+                        : 'bg-slate-900 border-slate-700 hover:border-cyan-400 text-slate-300 hover:text-white'
                     }`}
                     title="Modo Foco Zen: Dimeriza visualmente seções periféricas ao ler"
                   >
@@ -267,10 +267,10 @@ export const StudyHUD = ({
                 {onToggleOledMode && (
                   <button
                     onClick={onToggleOledMode}
-                    className={`px-2.5 py-1 rounded text-xs font-mono font-bold transition-all flex items-center gap-1 cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer border ${
                       isOledMode
-                        ? 'bg-black border border-amber-500 text-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.3)]'
-                        : 'bg-slate-900 border border-slate-700 hover:border-amber-500/50 text-slate-400 hover:text-slate-200'
+                        ? 'bg-black border-amber-500 text-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.3)]'
+                        : 'bg-slate-900 border-slate-700 hover:border-amber-400 text-slate-300 hover:text-white'
                     }`}
                     title="Modo Noite OLED: Preto puro 100% para ambientes com pouca luz"
                   >
@@ -282,13 +282,13 @@ export const StudyHUD = ({
 
               {/* Localizador Tático In-Page */}
               <div className="relative flex items-center" title="Localizador Tático: Destaque imediato do termo em todo o card">
-                <span className="absolute left-2.5 text-xs text-slate-500 pointer-events-none">🔍</span>
+                <span className="absolute left-2.5 text-xs text-slate-400 pointer-events-none">🔍</span>
                 <input
                   type="text"
                   placeholder="Localizar termo..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="bg-slate-900 border border-slate-700 hover:border-amber-500/50 rounded-full pl-7 pr-7 py-1 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/40 w-28 sm:w-36 transition-all"
+                  className="bg-slate-900 border border-slate-700 hover:border-slate-500 rounded-full pl-7 pr-7 py-1 text-xs text-slate-100 placeholder-slate-400 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/40 w-28 sm:w-36 transition-all"
                 />
                 {searchTerm && (
                   <button
@@ -306,7 +306,7 @@ export const StudyHUD = ({
                   playClickSound(soundEnabled);
                   onToggleSound();
                 }}
-                className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-colors ${soundEnabled ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-500 border border-slate-700'}`}
+                className={`px-3 py-1.5 rounded-lg font-mono font-bold text-xs transition-colors border cursor-pointer ${soundEnabled ? 'bg-emerald-600/20 text-emerald-400 border-emerald-500/40 shadow-sm' : 'bg-slate-900 text-slate-300 border-slate-700 hover:border-slate-500 hover:text-white'}`}
               >
                 {soundEnabled ? '🔊 Som Ativo' : '🔇 Mudo'}
               </button>
@@ -316,10 +316,10 @@ export const StudyHUD = ({
                   playClickSound(soundEnabled);
                   onToggleHardcore();
                 }}
-                className={`px-3 py-1.5 rounded-full border text-xs font-mono transition-all flex items-center gap-2 ${
+                className={`px-3 py-1.5 rounded-full border text-xs font-mono font-bold transition-all flex items-center gap-2 cursor-pointer ${
                   isHardcore 
                     ? 'bg-red-950/80 border-red-500 text-red-300 shadow-[0_0_15px_rgba(239,68,68,0.2)]' 
-                    : 'bg-slate-900/90 border-slate-700 text-slate-400 hover:border-red-500/50 hover:text-red-300'
+                    : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-slate-500 hover:text-white'
                 }`}
               >
                 <span>{isHardcore ? '🔥' : '🛡️'}</span>
@@ -354,10 +354,10 @@ export const StudyHUD = ({
               <button
                 key={anchor.id}
                 onClick={() => scrollTo(anchor.id)}
-                className={`whitespace-nowrap px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-200 rounded-t-lg border-b-2 ${
+                className={`whitespace-nowrap px-4 py-2 text-xs font-mono font-bold uppercase tracking-wider transition-all duration-200 rounded-t-lg border-b-2 cursor-pointer ${
                   activeHash === anchor.id
                     ? 'border-cyan-400 text-cyan-300 bg-cyan-950/40 shadow-[0_2px_10px_rgba(34,211,238,0.15)]'
-                    : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                    : 'border-transparent text-slate-300 hover:text-white hover:bg-slate-850 hover:border-slate-600'
                 }`}
               >
                 {anchor.label}

@@ -24,7 +24,7 @@ export const RecallSection = ({ card }: RecallSectionProps) => {
           >
             <summary className="p-5 cursor-pointer relative list-none flex flex-col gap-3 min-h-[120px]">
               <div className="flex justify-between items-start gap-2">
-                <span className="bg-slate-800 text-xs font-bold text-gray-400 px-2 py-1 rounded border border-slate-700">
+                <span className="bg-slate-800 text-xs font-bold text-slate-200 px-2.5 py-1 rounded-md border border-slate-600 shadow-sm">
                   {fc.tag || 'GERAL'}
                 </span>
                 <span className="text-blue-500 transition-transform duration-300 group-open:rotate-180">

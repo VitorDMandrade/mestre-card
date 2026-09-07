@@ -282,11 +282,11 @@ function App() {
         <button
           onClick={() => setIsShortcutsOpen(true)}
           aria-label="Atalhos do Teclado"
-          className="fixed bottom-6 left-6 z-40 px-3 py-2 rounded-full bg-slate-900/90 hover:bg-slate-800 border border-slate-700 hover:border-cyan-500/50 text-slate-400 hover:text-cyan-300 shadow-lg backdrop-blur-md transition-all text-xs font-mono flex items-center gap-2 group"
+          className="fixed bottom-6 left-6 z-40 px-3.5 py-2 rounded-full bg-slate-900/95 hover:bg-slate-800 border border-slate-600 hover:border-cyan-400 text-slate-200 hover:text-cyan-300 shadow-xl backdrop-blur-md transition-all text-xs font-mono font-bold flex items-center gap-2 group cursor-pointer"
         >
           <span>⌨️</span>
           <span className="hidden sm:inline">Atalhos</span>
-          <kbd className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-[10px] text-cyan-400 font-bold">?</kbd>
+          <kbd className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-600 text-[10px] text-cyan-300 font-bold shadow-inner">?</kbd>
         </button>
 
         <KeyboardShortcutsModal 

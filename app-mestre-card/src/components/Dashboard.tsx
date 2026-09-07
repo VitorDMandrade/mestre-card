@@ -318,11 +318,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
         <div className="flex gap-4">
           <div className="bg-slate-900/80 border border-slate-800 rounded-lg p-3 text-center min-w-[100px]">
-            <p className="text-xs text-slate-500 font-mono mb-1">TOTAL CARDS</p>
+            <p className="text-xs text-slate-400 font-mono font-bold mb-1">TOTAL CARDS</p>
             <p className="text-xl font-bold text-cyan-400 glow-cyan">{cards.length}</p>
           </div>
           <div className="bg-slate-900/80 border border-slate-800 rounded-lg p-3 text-center min-w-[100px]">
-            <p className="text-xs text-slate-500 font-mono mb-1">TÓPICOS</p>
+            <p className="text-xs text-slate-400 font-mono font-bold mb-1">TÓPICOS</p>
             <p className="text-xl font-bold text-amber-400 glow-amber">{uniqueTopics}</p>
           </div>
         </div>
@@ -332,7 +332,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
             onClick={() => setIsGlobalErrorModalOpen(true)}
             className={historicErrors.length > 0 
               ? "bg-red-500/15 hover:bg-red-500/25 border border-red-500/60 text-red-300 px-3.5 py-2 rounded-lg text-xs font-mono font-bold transition-all uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_15px_rgba(239,68,68,0.25)] animate-pulse hover:animate-none cursor-pointer"
-              : "bg-slate-900/80 hover:bg-slate-800 border border-slate-700/60 text-slate-400 hover:text-slate-200 px-3.5 py-2 rounded-lg text-xs font-mono font-bold transition-all uppercase tracking-wider flex items-center gap-1.5 cursor-pointer"
+              : "bg-slate-900 hover:bg-slate-850 border border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white px-3.5 py-2 rounded-lg text-xs font-mono font-bold transition-all uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-sm"
             }
             title="Abrir Caderno de Erros Global de sessões anteriores">
             <span>{historicErrors.length > 0 ? '🚨' : '🛡️'}</span>
@@ -524,18 +524,18 @@ export const Dashboard: React.FC<DashboardProps> = ({
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-mono font-bold whitespace-nowrap transition-all border ${
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-mono font-bold whitespace-nowrap transition-all border cursor-pointer ${
                   isSelected
                     ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/60 shadow-[0_0_12px_rgba(6,182,212,0.25)]'
-                    : 'bg-slate-900/60 text-slate-400 border-slate-800 hover:border-slate-700 hover:text-slate-200'
+                    : 'bg-slate-900 border-slate-700/80 hover:border-slate-500 text-slate-300 hover:text-white'
                 }`}
               >
                 <span>{cat.icon}</span>
                 <span>{cat.label}</span>
-                <span className={`px-1.5 py-0.2 rounded text-[10px] ${
+                <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold ${
                   isSelected 
                     ? 'bg-cyan-500/30 text-cyan-200' 
-                    : 'bg-slate-800 text-slate-500'
+                    : 'bg-slate-800 text-slate-300 border border-slate-700/80'
                 }`}>
                   {count}
                 </span>
@@ -546,7 +546,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
         {/* TRI Vulnerability & Status Micro-chips Bar */}
         <div className="flex items-center gap-2 overflow-x-auto pt-2 border-t border-slate-800/80 scrollbar-thin">
-          <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider pl-1 hidden sm:inline">
+          <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider pl-1 hidden sm:inline font-bold">
             STATUS TRI:
           </span>
           {[
@@ -562,29 +562,29 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
             if (chip.color === 'red') {
               activeStyle = 'bg-red-950/70 text-red-300 border-red-500 shadow-[0_0_12px_rgba(239,68,68,0.25)]';
-              inactiveStyle = 'text-red-400 border-slate-800 hover:border-red-500/60 hover:text-red-300';
+              inactiveStyle = 'text-red-300 border-red-900/60 hover:border-red-500/60 hover:text-red-200';
             } else if (chip.color === 'amber') {
               activeStyle = 'bg-amber-950/70 text-amber-300 border-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.25)]';
-              inactiveStyle = 'text-amber-400 border-slate-800 hover:border-amber-500/60 hover:text-amber-300';
+              inactiveStyle = 'text-amber-300 border-amber-900/60 hover:border-amber-500/60 hover:text-amber-200';
             } else if (chip.color === 'emerald') {
               activeStyle = 'bg-emerald-950/70 text-emerald-300 border-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.25)]';
-              inactiveStyle = 'text-emerald-400 border-slate-800 hover:border-emerald-500/60 hover:text-emerald-300';
+              inactiveStyle = 'text-emerald-300 border-emerald-900/60 hover:border-emerald-500/60 hover:text-emerald-200';
             } else {
               activeStyle = 'bg-slate-800 text-slate-200 border-slate-600 shadow-sm';
-              inactiveStyle = 'text-slate-400 border-slate-800 hover:border-slate-700 hover:text-slate-300';
+              inactiveStyle = 'text-slate-300 border-slate-700 hover:border-slate-500 hover:text-white';
             }
 
             return (
               <button
                 key={chip.id}
                 onClick={() => setTriFilter(chip.id as any)}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-mono font-bold whitespace-nowrap transition-all border ${
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-mono font-bold whitespace-nowrap transition-all border cursor-pointer ${
                   isSelected ? activeStyle : inactiveStyle
-                } bg-slate-900/40`}
+                } bg-slate-900/60`}
               >
                 <span>{chip.label}</span>
-                <span className={`px-1.5 py-0.2 rounded text-[10px] ${
-                  isSelected ? 'bg-white/10' : 'bg-slate-800/80 text-slate-500'
+                <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold ${
+                  isSelected ? 'bg-white/10' : 'bg-slate-800 text-slate-300 border border-slate-700/70'
                 }`}>
                   {chip.count}
                 </span>
@@ -647,11 +647,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
                 <div className="flex gap-4 mb-4 border-t border-b border-slate-800/50 py-3">
                   <div className="text-center">
-                    <p className="text-[10px] text-slate-500 font-mono">TEORIA</p>
+                    <p className="text-[10px] text-slate-400 font-mono font-bold">TEORIA</p>
                     <p className="text-sm font-bold text-slate-300">{card.sec02_theory?.blocks?.length || 0}</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-[10px] text-slate-500 font-mono">LAB</p>
+                    <p className="text-[10px] text-slate-400 font-mono font-bold">LAB</p>
                     <p className="text-sm font-bold text-slate-300">
                       {(card.sec05_lab?.questions?.length || 0) + (card.sec05_lab?.hardcoreQuestions?.length ? ` (+${card.sec05_lab.hardcoreQuestions.length} HC)` : '')}
                     </p>
@@ -670,7 +670,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       TRI: {score} pts
                     </span>
                   ) : (
-                    <span className="px-2.5 py-1 rounded-full bg-slate-900 border border-slate-800 text-slate-500 font-mono text-xs">
+                    <span className="px-2.5 py-1 rounded-full bg-slate-900 border border-slate-700 text-slate-300 font-mono text-xs font-semibold shadow-sm">
                       TRI: PENDENTE
                     </span>
                   )}
@@ -686,7 +686,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   <button 
                     onClick={() => onExportSingleCard(card)}
                     title="Exportar este card avulso (.JSON)"
-                    className="p-2 rounded-lg bg-slate-900 border border-slate-700 text-slate-400 hover:text-cyan-300 hover:border-cyan-500/50 hover:bg-slate-800 transition-all font-mono text-xs flex items-center justify-center">
+                    className="p-2 rounded-lg bg-slate-900 border border-slate-600 text-slate-300 hover:text-cyan-300 hover:border-cyan-400 hover:bg-slate-800 transition-all font-mono text-xs flex items-center justify-center shadow-sm">
                     📥
                   </button>
                 )}
@@ -801,9 +801,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         </div>
                         <button
                           onClick={() => handleDismissSingleError(err)}
-                          className="text-slate-500 hover:text-slate-300 text-[10px] underline cursor-pointer"
+                          className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white text-[10px] font-mono cursor-pointer transition-colors shadow-sm"
                         >
-                          Marcar Revisado
+                          ✓ Marcar Revisado
                         </button>
                       </div>
 

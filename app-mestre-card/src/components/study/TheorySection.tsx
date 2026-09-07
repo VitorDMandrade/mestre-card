@@ -301,7 +301,7 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
               setSelectedSlotId(null);
               setActiveBlockNumForSlot(null);
             }}
-            className="text-slate-400 hover:text-slate-200 text-xs font-mono px-2.5 py-1 rounded bg-slate-900 border border-slate-700 hover:border-slate-500 cursor-pointer"
+            className="text-slate-200 hover:text-white text-xs font-mono font-bold px-3 py-1 rounded-lg bg-slate-800 border border-slate-600 hover:border-slate-400 cursor-pointer transition-colors"
           >
             ✕ Fechar
           </button>
@@ -316,7 +316,7 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
               onClick={() => handleOptionSelect(activeSlot, opt, blockNumber)}
               className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-cyan-950/90 border border-slate-700 hover:border-cyan-400 text-slate-200 hover:text-cyan-300 font-mono text-xs font-bold transition-all cursor-pointer shadow-md hover:scale-[1.02] active:scale-95 disabled:opacity-50 flex items-center gap-2"
             >
-              <span className="text-slate-500 text-[10px]">[{optIdx + 1}]</span>
+              <span className="text-cyan-400 font-bold text-xs">[{optIdx + 1}]</span>
               <span>{opt.includes('$') ? <MathRenderer content={opt} /> : opt}</span>
             </button>
           ))}
@@ -441,13 +441,13 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
           </div>
 
           {/* Seletor de Modo de Leitura: Todos os Blocos vs. Foco em 1 Bloco */}
-          <div className="flex items-center gap-1.5 overflow-x-auto hide-scrollbar bg-slate-950/80 p-1 rounded-xl border border-slate-800">
+          <div className="flex items-center gap-1.5 overflow-x-auto hide-scrollbar bg-slate-950/90 p-1.5 rounded-xl border border-slate-800 shadow-inner">
             <button
               onClick={() => setActiveBlockTab('all')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer whitespace-nowrap border ${
                 activeBlockTab === 'all'
-                  ? 'bg-blue-600 text-white shadow-[0_0_12px_rgba(37,99,235,0.4)]'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-blue-600 border-blue-400 text-white shadow-[0_0_12px_rgba(37,99,235,0.4)]'
+                  : 'bg-slate-900 border-slate-700/80 text-slate-300 hover:text-white hover:border-slate-500 hover:bg-slate-800'
               }`}
             >
               📖 Todos ({card.sec02_theory.blocks.length})
@@ -456,10 +456,10 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
               <button
                 key={b.number}
                 onClick={() => setActiveBlockTab(b.number)}
-                className={`px-2.5 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer whitespace-nowrap ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer whitespace-nowrap border ${
                   activeBlockTab === b.number
-                    ? 'bg-cyan-950 border border-cyan-400 text-cyan-300 shadow-[0_0_12px_rgba(6,182,212,0.3)]'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-cyan-950 border-cyan-400 text-cyan-300 shadow-[0_0_12px_rgba(6,182,212,0.3)]'
+                    : 'bg-slate-900 border-slate-700/80 text-slate-300 hover:text-white hover:border-slate-500 hover:bg-slate-800'
                 }`}
                 title={`Focar no Bloco 0${b.number}: ${b.title}`}
               >
@@ -597,7 +597,7 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
                     <span className="px-2.5 py-0.5 rounded bg-blue-900/40 border border-blue-500/40 text-cyan-300 font-mono text-xs font-bold uppercase tracking-wider">
                       Bloco 0{currentFocusedBlock.number}
                     </span>
-                    <span className="text-xs font-mono text-slate-500">
+                    <span className="text-xs font-mono text-slate-400 font-semibold">
                       de 0{card.sec02_theory.blocks.length}
                     </span>
                   </div>
@@ -699,14 +699,14 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
               <button
                 disabled={currentFocusedBlock.number <= 1}
                 onClick={() => setActiveBlockTab(currentFocusedBlock.number - 1)}
-                className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-xs font-mono font-bold text-slate-200 flex items-center gap-1.5 transition-all cursor-pointer"
+                className="px-4 py-2 rounded-lg bg-slate-850 hover:bg-slate-800 border border-slate-700 hover:border-slate-500 disabled:opacity-30 text-xs font-mono font-bold text-slate-200 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
               >
                 <span>←</span> <span>Bloco Anterior</span>
               </button>
 
               <button
                 onClick={() => setActiveBlockTab('all')}
-                className="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 hover:border-slate-500 text-xs font-mono text-slate-400 hover:text-white transition-all cursor-pointer"
+                className="px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 hover:border-slate-500 text-xs font-mono font-bold text-slate-200 hover:text-white transition-all cursor-pointer shadow-sm"
               >
                 Ver Todos os Blocos Juntos
               </button>
@@ -744,7 +744,7 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
                           setIsDecoderMode(true);
                           playDecoderChirpSound();
                         }}
-                        className="text-[10px] font-mono font-bold text-amber-300 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/50 hover:border-amber-300 px-2.5 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 shadow-sm hover:scale-105"
+                        className="text-xs font-mono font-bold text-amber-300 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/50 hover:border-amber-300 px-3 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 shadow-sm hover:scale-105"
                         title="Ativar tarjas de censura do Protocolo Decoder para treinar este bloco"
                       >
                         <span>🕵️</span>
@@ -753,10 +753,10 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
                     )}
                     <button
                       onClick={() => setActiveBlockTab(block.number)}
-                      className="text-[10px] font-mono text-slate-500 hover:text-cyan-400 border border-slate-800 hover:border-cyan-500/40 px-2 py-0.5 rounded transition-colors cursor-pointer"
+                      className="text-xs font-mono font-bold text-cyan-300 bg-cyan-950/40 border border-cyan-500/40 hover:bg-cyan-900/60 hover:border-cyan-400 px-3 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 shadow-sm hover:scale-105"
                       title="Focar apenas neste bloco"
                     >
-                      Focar 🔍
+                      <span>Focar</span> <span>🔍</span>
                     </button>
                   </div>
                 </div>
@@ -815,7 +815,7 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
                   className={`flex-1 py-4 px-2 text-center font-bold text-sm uppercase tracking-wider transition-all border-b-2 cursor-pointer ${
                     activeRoute === pattern.id 
                       ? 'border-emerald-500 text-emerald-400 bg-emerald-950/20' 
-                      : 'border-transparent text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'
+                      : 'border-transparent text-slate-300 hover:text-white hover:bg-slate-800/60'
                   }`}
                 >
                   {pattern.name}

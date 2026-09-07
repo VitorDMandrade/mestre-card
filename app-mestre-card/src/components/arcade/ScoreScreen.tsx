@@ -98,10 +98,10 @@ export const ScoreScreen = ({ triResult, sessionErrors, xpResult, onClose }: Sco
       >
         {/* Header scanline stripe */}
         <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-b border-white/5 px-6 py-3 flex items-center justify-between">
-          <span className="text-[10px] font-mono text-slate-500 tracking-widest uppercase">
+          <span className="text-[10px] font-mono text-slate-400 font-bold tracking-widest uppercase">
             ◉ Relatório de Combate — MestreCard
           </span>
-          <span className="text-[10px] font-mono text-slate-600">
+          <span className="text-[10px] font-mono text-slate-400">
             {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
           </span>
         </div>
@@ -109,7 +109,7 @@ export const ScoreScreen = ({ triResult, sessionErrors, xpResult, onClose }: Sco
         <div className="bg-slate-950/95 px-6 pt-6 pb-5 max-h-[80vh] overflow-y-auto">
           {/* Score Odometer */}
           <div className="text-center mb-4">
-            <div className="text-[10px] font-mono text-slate-500 tracking-[0.2em] uppercase mb-1">Score TRI Final</div>
+            <div className="text-[10px] font-mono text-slate-400 font-bold tracking-[0.2em] uppercase mb-1">Score TRI Final</div>
             <div
               className={`text-7xl font-black tracking-tighter tabular-nums ${verdictStyle.color} ${verdictStyle.glow}`}
               style={{ fontFamily: 'JetBrains Mono, monospace' }}
@@ -175,7 +175,7 @@ export const ScoreScreen = ({ triResult, sessionErrors, xpResult, onClose }: Sco
               <div className="mt-2 space-y-2 max-h-44 overflow-y-auto pr-1">
                 {sessionErrors.map((err, idx) => (
                   <div key={idx} className="p-2.5 rounded-lg bg-slate-950/80 border border-red-900/40 space-y-1 text-xs font-mono">
-                    <div className="flex items-center justify-between text-[10px] text-slate-500">
+                    <div className="flex items-center justify-between text-[10px] text-slate-400 font-medium">
                       <span className="px-1.5 py-0.5 rounded bg-red-950 border border-red-800 text-red-300 font-bold">
                         {err.game === 'G1' ? 'G1: Morte Súbita' : err.game === 'G3' ? 'G3: Pressão TRI' : 'G5: O Infiltrado'}
                       </span>
