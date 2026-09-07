@@ -1,17 +1,58 @@
-import { useState } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import type { MestreCardData } from '../../types/mestre-card';
 import { MathRenderer } from '../MathRenderer';
 import { useReading } from '../../context/ReadingContext';
+import { useGame } from '../../context/GameContext';
+import { addXP } from '../../lib/xp-engine';
+import {
+  parseBlockForDecoder,
+  extractDistractorPool,
+  getRandomGlyph,
+  type DecoderSlot,
+  type DecodedBlock
+} from '../../lib/decoder-engine';
+import {
+  playDecoderChirpSound,
+  playDecodedSuccessSound,
+  playDecoderErrorSound
+} from '../../lib/audio';
 
 interface TheorySectionProps {
   card: MestreCardData;
   textSize?: 'sm' | 'md' | 'lg';
 }
 
+const useSafeGame = () => {
+  try {
+    return useGame();
+  } catch {
+    return null;
+  }
+};
+
 export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => {
   const [activeRoute, setActiveRoute] = useState<string>(card.sec02_theory.triagePatterns[0]?.id || 'route-a');
   const [activeBlockTab, setActiveBlockTab] = useState<number | 'all'>('all');
   const { setSearchTerm } = useReading();
+  const gameCtx = useSafeGame();
+
+  // Estados do Protocolo Decoder (Fase 2)
+  const [isDecoderMode, setIsDecoderMode] = useState<boolean>(false);
+  const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
+  const [activeBlockNumForSlot, setActiveBlockNumForSlot] = useState<number | null>(null);
+  const [decryptedSlotsMap, setDecryptedSlotsMap] = useState<Record<string, boolean>>({});
+  const [animatingSlot, setAnimatingSlot] = useState<{ slotId: string; glyphs: string; isMath: boolean } | null>(null);
+  const [completedBlocks, setCompletedBlocks] = useState<Record<number, boolean>>({});
+  const [wrongSlotAttempt, setWrongSlotAttempt] = useState<string | null>(null);
+  const descrambleIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (descrambleIntervalRef.current) {
+        clearInterval(descrambleIntervalRef.current);
+      }
+    };
+  }, []);
 
   const activePattern = card.sec02_theory.triagePatterns.find(p => p.id === activeRoute);
 
@@ -20,6 +61,34 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
     md: 'text-sm md:text-base',
     lg: 'text-base md:text-lg'
   }[textSize || 'md'];
+
+  // Pool inteligente de distratores e blocos decodificados pré-processados
+  const distractorPool = useMemo(() => extractDistractorPool(card), [card]);
+
+  const parsedBlocksMap = useMemo(() => {
+    const map = new Map<number, DecodedBlock>();
+    card.sec02_theory.blocks.forEach(b => {
+      map.set(b.number, parseBlockForDecoder(b.content, distractorPool));
+    });
+    return map;
+  }, [card, distractorPool]);
+
+  // Contadores globais de slots do card
+  const totalSlotsCount = useMemo(() => {
+    let count = 0;
+    parsedBlocksMap.forEach(pb => {
+      count += pb.slots.length;
+    });
+    return count;
+  }, [parsedBlocksMap]);
+
+  const totalDecryptedCount = useMemo(() => {
+    let count = 0;
+    Object.keys(decryptedSlotsMap).forEach(k => {
+      if (decryptedSlotsMap[k]) count++;
+    });
+    return count;
+  }, [decryptedSlotsMap]);
 
   // Derivação autônoma das premissas de Ancoragem Rápida
   const quickAnchors: string[] = card.sec02_theory.quickAnchoring || 
@@ -58,6 +127,228 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }, 50);
+  };
+
+  // Handler de seleção de ficha de desclassificação
+  const handleOptionSelect = (slot: DecoderSlot, chosenOption: string, blockNumber: number) => {
+    if (animatingSlot) return;
+
+    if (chosenOption === slot.correctWord) {
+      playDecoderChirpSound();
+      playDecodedSuccessSound();
+
+      const startTime = Date.now();
+      const duration = 300;
+      const intervalMs = 35;
+
+      if (descrambleIntervalRef.current) {
+        clearInterval(descrambleIntervalRef.current);
+      }
+
+      descrambleIntervalRef.current = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        if (elapsed >= duration) {
+          if (descrambleIntervalRef.current) {
+            clearInterval(descrambleIntervalRef.current);
+            descrambleIntervalRef.current = null;
+          }
+          setAnimatingSlot(null);
+
+          // Registra slot como descriptografado
+          setDecryptedSlotsMap(prev => {
+            const next = { ...prev, [slot.id]: true };
+
+            // Verifica se completou 100% dos slots deste bloco
+            const pb = parsedBlocksMap.get(blockNumber);
+            if (pb && pb.slots.length > 0) {
+              const allDecrypted = pb.slots.every(s => s.id === slot.id || next[s.id]);
+              if (allDecrypted && !completedBlocks[blockNumber]) {
+                setCompletedBlocks(c => ({ ...c, [blockNumber]: true }));
+                addXP(100);
+                gameCtx?.fireXpToast(100);
+                gameCtx?.refreshProfile();
+                gameCtx?.triggerFlash('hit');
+                playDecodedSuccessSound();
+              }
+            }
+            return next;
+          });
+
+          setSelectedSlotId(null);
+          setActiveBlockNumForSlot(null);
+
+          // Recompensa individual do slot (+25 XP)
+          addXP(25);
+          gameCtx?.fireXpToast(25);
+          gameCtx?.refreshProfile();
+        } else {
+          let glyphStr: string;
+          if (slot.isMath) {
+            glyphStr = `[ ⟳ ${Array.from({ length: 6 }, () => getRandomGlyph()).join('')} ]`;
+          } else {
+            glyphStr = Array.from({ length: Math.max(4, slot.correctWord.length) }, () => getRandomGlyph()).join('');
+          }
+          setAnimatingSlot({
+            slotId: slot.id,
+            glyphs: glyphStr,
+            isMath: slot.isMath
+          });
+        }
+      }, intervalMs);
+    } else {
+      // Opção incorreta
+      playDecoderErrorSound();
+      gameCtx?.triggerFlash('miss');
+      setWrongSlotAttempt(slot.id);
+      setTimeout(() => {
+        setWrongSlotAttempt(prev => (prev === slot.id ? null : prev));
+      }, 600);
+    }
+  };
+
+  // Renderizador do nó de cada slot dentro do fluxo de texto
+  const renderSlotToken = (token: string, blockNumber: number) => {
+    const pb = parsedBlocksMap.get(blockNumber);
+    if (!pb) return <span className="font-mono text-amber-400">{token}</span>;
+
+    const slot = pb.slots.find(s => s.token === token);
+    if (!slot) return <span className="font-mono text-amber-400">{token}</span>;
+
+    // 1. Já Descriptografado
+    if (decryptedSlotsMap[slot.id]) {
+      return (
+        <span
+          key={slot.id}
+          className="inline-flex items-center px-2 py-0.5 rounded bg-cyan-950/80 border border-cyan-400/50 text-cyan-300 font-bold shadow-[0_0_10px_rgba(6,182,212,0.3)] notranslate mx-1 align-middle"
+          translate="no"
+        >
+          <span className="text-[10px] text-cyan-400 mr-1 select-none">🔓</span>
+          {slot.isMath ? <MathRenderer content={slot.correctWord} /> : slot.correctWord}
+        </span>
+      );
+    }
+
+    // 2. Em animação de Descramble (Anti-CLS com font-mono e largura mínima estrita)
+    if (animatingSlot?.slotId === slot.id) {
+      return (
+        <span
+          key={slot.id}
+          className="descramble-active notranslate mx-1 px-2 py-0.5 rounded bg-cyan-950/90 border border-cyan-400"
+          translate="no"
+          style={{ minWidth: `${Math.max(8, slot.correctWord.length * 0.95)}ch` }}
+        >
+          {animatingSlot.glyphs}
+        </span>
+      );
+    }
+
+    // 3. Tarja Censurada
+    const isSelected = selectedSlotId === slot.id;
+    const isWrong = wrongSlotAttempt === slot.id;
+
+    return (
+      <button
+        key={slot.id}
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          playDecoderChirpSound();
+          if (isSelected) {
+            setSelectedSlotId(null);
+            setActiveBlockNumForSlot(null);
+          } else {
+            setSelectedSlotId(slot.id);
+            setActiveBlockNumForSlot(blockNumber);
+          }
+        }}
+        className={`censor-bar notranslate ${isSelected ? 'censor-bar-active' : ''} ${isWrong ? '!border-red-500 !text-red-400 animate-shake' : ''}`}
+        translate="no"
+        style={{ minWidth: `${Math.max(8, slot.correctWord.length * 0.95)}ch` }}
+        title="Clique para desclassificar esta lacuna"
+      >
+        <span className="text-[10px] text-amber-400 mr-1.5">🔒</span>
+        <span className="tracking-widest font-black text-xs">
+          █ CENSURADO #{slot.id.replace('slot-', '')} █
+        </span>
+      </button>
+    );
+  };
+
+  // Renderizador da Bandeja Tática de Fichas
+  const renderBlockOptionTray = (blockNumber: number) => {
+    if (!isDecoderMode || activeBlockNumForSlot !== blockNumber || !selectedSlotId) return null;
+
+    const pb = parsedBlocksMap.get(blockNumber);
+    if (!pb) return null;
+
+    const activeSlot = pb.slots.find(s => s.id === selectedSlotId);
+    if (!activeSlot || decryptedSlotsMap[activeSlot.id]) return null;
+
+    return (
+      <div className="mt-5 p-4 bg-slate-950/95 border-2 border-amber-500/50 rounded-2xl shadow-[0_0_25px_rgba(245,158,11,0.2)] animate-fade-in relative z-20">
+        <div className="flex items-center justify-between gap-3 mb-3 pb-2.5 border-b border-slate-800">
+          <div className="flex items-center gap-2">
+            <span className="text-amber-400 font-mono text-xs font-black animate-pulse flex items-center gap-1.5">
+              <span>⚡</span> BANDEJA DE DESCLASSIFICAÇÃO
+            </span>
+            <span className="text-[11px] font-mono text-slate-400">
+              Selecione o termo autêntico para liberar a lacuna <strong className="text-amber-300">#{activeSlot.id.replace('slot-', '')}</strong>
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedSlotId(null);
+              setActiveBlockNumForSlot(null);
+            }}
+            className="text-slate-400 hover:text-slate-200 text-xs font-mono px-2.5 py-1 rounded bg-slate-900 border border-slate-700 hover:border-slate-500 cursor-pointer"
+          >
+            ✕ Fechar
+          </button>
+        </div>
+
+        <div className="flex flex-wrap gap-2.5">
+          {activeSlot.options.map((opt, optIdx) => (
+            <button
+              key={optIdx}
+              type="button"
+              disabled={animatingSlot !== null}
+              onClick={() => handleOptionSelect(activeSlot, opt, blockNumber)}
+              className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-cyan-950/90 border border-slate-700 hover:border-cyan-400 text-slate-200 hover:text-cyan-300 font-mono text-xs font-bold transition-all cursor-pointer shadow-md hover:scale-[1.02] active:scale-95 disabled:opacity-50 flex items-center gap-2"
+            >
+              <span className="text-slate-500 text-[10px]">[{optIdx + 1}]</span>
+              <span>{opt.includes('$') ? <MathRenderer content={opt} /> : opt}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  // Carimbo Militar de Doutrina Homologada
+  const renderBlockStamp = (blockNumber: number) => {
+    if (!isDecoderMode) return null;
+    const pb = parsedBlocksMap.get(blockNumber);
+    if (!pb || pb.slots.length === 0) return null;
+
+    const isComplete = pb.slots.every(s => decryptedSlotsMap[s.id]);
+    if (!isComplete) return null;
+
+    return (
+      <div className="mt-5 p-3.5 bg-emerald-950/40 border border-emerald-500/50 rounded-xl flex items-center justify-between flex-wrap gap-3 animate-fade-in">
+        <div className="flex items-center gap-3">
+          <div className="doctrine-homologated-stamp px-3 py-1.5 text-xs rounded shadow-lg">
+            ★ DOUTRINA HOMOLOGADA ★
+          </div>
+          <span className="text-xs font-mono text-emerald-300 font-medium">
+            100% das lacunas desclassificadas com sucesso (+100 XP)
+          </span>
+        </div>
+        <span className="text-[10px] font-mono text-emerald-400/80 tracking-wider uppercase font-bold">
+          STATUS: ACESSO TOTAL // NÍVEL MESTRE
+        </span>
+      </div>
+    );
   };
 
   const currentFocusedBlock = typeof activeBlockTab === 'number'
@@ -101,9 +392,46 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
       {/* SEC 02 - Dossiê & Árvore de Triagem */}
       <section id="sec-02" className="mb-12 scroll-mt-24">
         <div className="flex items-center justify-between flex-wrap gap-4 border-b border-slate-800 pb-4 mb-6">
-          <h2 className="text-2xl font-black text-white flex items-center gap-3">
-            <span className="text-blue-500">02.</span> DOSSIÊ TEÓRICO
-          </h2>
+          <div className="flex items-center gap-4 flex-wrap">
+            <h2 className="text-2xl font-black text-white flex items-center gap-3">
+              <span className="text-blue-500">02.</span> DOSSIÊ TEÓRICO
+            </h2>
+
+            {/* Comutador Tático: Leitura Canônica vs. Protocolo Decoder */}
+            <button
+              type="button"
+              onClick={() => {
+                setIsDecoderMode(prev => {
+                  const next = !prev;
+                  if (next) playDecoderChirpSound();
+                  return next;
+                });
+                setSelectedSlotId(null);
+                setActiveBlockNumForSlot(null);
+              }}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-black tracking-wider uppercase transition-all flex items-center gap-2 cursor-pointer border ${
+                isDecoderMode
+                  ? 'bg-emerald-950/90 border-emerald-400 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.35)]'
+                  : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-slate-200 hover:border-slate-500'
+              }`}
+              title="Alternar entre modo convencional de leitura e treino ativo com tarjas de censura"
+            >
+              {isDecoderMode ? (
+                <>
+                  <span className="text-emerald-400 animate-pulse">🕵️</span>
+                  <span>Protocolo Decoder</span>
+                  <span className="px-1.5 py-0.5 rounded bg-emerald-900/90 text-[10px] text-emerald-200 font-bold border border-emerald-500/40">
+                    {totalDecryptedCount}/{totalSlotsCount}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="text-blue-400">📖</span>
+                  <span>Leitura Canônica</span>
+                </>
+              )}
+            </button>
+          </div>
 
           {/* Seletor de Modo de Leitura: Todos os Blocos vs. Foco em 1 Bloco */}
           <div className="flex items-center gap-1.5 overflow-x-auto hide-scrollbar bg-slate-950/80 p-1 rounded-xl border border-slate-800">
@@ -196,7 +524,19 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
                   {currentFocusedBlock.title}
                 </h3>
                 <div className={`max-w-prose leading-relaxed text-slate-200 space-y-4 ${textScaleClass}`}>
-                  <MathRenderer content={currentFocusedBlock.content} textClassName={textScaleClass} />
+                  {isDecoderMode ? (
+                    <div className="decoder-terminal-active p-5 rounded-2xl border border-emerald-500/40 relative overflow-hidden my-2">
+                      <MathRenderer
+                        content={parsedBlocksMap.get(currentFocusedBlock.number)?.templateText || currentFocusedBlock.content}
+                        textClassName={textScaleClass}
+                        renderSlot={(token) => renderSlotToken(token, currentFocusedBlock.number)}
+                      />
+                    </div>
+                  ) : (
+                    <MathRenderer content={currentFocusedBlock.content} textClassName={textScaleClass} />
+                  )}
+                  {renderBlockOptionTray(currentFocusedBlock.number)}
+                  {renderBlockStamp(currentFocusedBlock.number)}
                 </div>
               </div>
 
@@ -214,13 +554,19 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
                     <span className="text-[10px] font-mono text-cyan-400 font-bold uppercase tracking-wider block mb-2">
                       Palavras-Chave de Prova:
                     </span>
-                    <div className="flex flex-wrap gap-2">
-                      {currentFocusedBlock.highlight.split(/\s*\/\/\s*|\s*\/\s*/).map((tag, tIdx) => (
-                        <span key={tIdx} className="px-2.5 py-1 rounded-md bg-cyan-950/60 border border-cyan-500/40 text-cyan-200 text-xs font-mono font-semibold shadow-sm">
-                          {tag.replace(/\*\*/g, '').trim()}
-                        </span>
-                      ))}
-                    </div>
+                    {isDecoderMode ? (
+                      <span className="text-xs font-mono text-amber-400/80 bg-slate-950/80 px-2.5 py-1 rounded border border-amber-500/30 inline-block">
+                        🔒 METADADOS RETIDOS EM TREINO DECODER
+                      </span>
+                    ) : (
+                      <div className="flex flex-wrap gap-2">
+                        {currentFocusedBlock.highlight.split(/\s*\/\/\s*|\s*\/\s*/).map((tag, tIdx) => (
+                          <span key={tIdx} className="px-2.5 py-1 rounded-md bg-cyan-950/60 border border-cyan-500/40 text-cyan-200 text-xs font-mono font-semibold shadow-sm">
+                            {tag.replace(/\*\*/g, '').trim()}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -282,18 +628,36 @@ export const TheorySection = ({ card, textSize = 'md' }: TheorySectionProps) => 
                   </button>
                 </div>
                 <div className={`max-w-prose leading-relaxed text-gray-300 relative z-10 space-y-3 ${textScaleClass}`}>
-                  <MathRenderer content={block.content} textClassName={textScaleClass} />
+                  {isDecoderMode ? (
+                    <div className="decoder-terminal-active p-4 rounded-xl border border-emerald-500/40 relative overflow-hidden my-2">
+                      <MathRenderer
+                        content={parsedBlocksMap.get(block.number)?.templateText || block.content}
+                        textClassName={textScaleClass}
+                        renderSlot={(token) => renderSlotToken(token, block.number)}
+                      />
+                    </div>
+                  ) : (
+                    <MathRenderer content={block.content} textClassName={textScaleClass} />
+                  )}
+                  {renderBlockOptionTray(block.number)}
+                  {renderBlockStamp(block.number)}
                 </div>
                 {block.highlight && (
                   <div className="mt-4 p-3 bg-blue-950/40 border border-blue-500/30 rounded-xl relative z-10 flex flex-wrap gap-2 items-center">
                     <span className="text-[10px] font-mono uppercase font-black text-cyan-400 tracking-wider">
                       DESTAQUE:
                     </span>
-                    {block.highlight.split(/\s*\/\/\s*|\s*\/\s*/).map((tag, tIdx) => (
-                      <span key={tIdx} className="px-2.5 py-0.5 rounded-md bg-blue-900/40 border border-blue-500/30 text-cyan-200 text-xs font-mono font-semibold">
-                        {tag.replace(/\*\*/g, '').trim()}
+                    {isDecoderMode ? (
+                      <span className="text-xs font-mono text-amber-400/80 bg-slate-950/80 px-2.5 py-0.5 rounded border border-amber-500/30">
+                        🔒 METADADOS RETIDOS EM TREINO DECODER
                       </span>
-                    ))}
+                    ) : (
+                      block.highlight.split(/\s*\/\/\s*|\s*\/\s*/).map((tag, tIdx) => (
+                        <span key={tIdx} className="px-2.5 py-0.5 rounded-md bg-blue-900/40 border border-blue-500/30 text-cyan-200 text-xs font-mono font-semibold">
+                          {tag.replace(/\*\*/g, '').trim()}
+                        </span>
+                      ))
+                    )}
                   </div>
                 )}
               </div>

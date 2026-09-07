@@ -610,3 +610,112 @@ export function playEvidenceLockSound(enabled: boolean = true): void {
   }
 }
 
+// ============================================================================
+// SÍNTESE ACÚSTICA: PROTOCOLO DECODER (SEÇÃO 02 - TEORIA)
+// ============================================================================
+
+/**
+ * 7. Som de Chirp de Decodificação / Descramble (Terminal Analógico)
+ * Varredura rápida em onda dente de serra descendo de 1200Hz para 800Hz em 35ms.
+ */
+export function playDecoderChirpSound(enabled: boolean = true): void {
+  if (!enabled) return;
+
+  try {
+    const ctx = getAudioContext();
+    if (ctx.state === 'suspended') ctx.resume();
+
+    const t = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(1200, t);
+    osc.frequency.exponentialRampToValueAtTime(800, t + 0.035);
+
+    gain.gain.setValueAtTime(0.045, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.035);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(t);
+    osc.stop(t + 0.035);
+  } catch (e) {
+    console.warn('AudioContext decoderChirp falhou:', e);
+  }
+}
+
+/**
+ * 8. Som de Sucesso de Desclassificação de Slot (Acorde Harmônico C5 + E5)
+ * Duplo acorde senoidal simultâneo (523.25Hz + 659.25Hz) atenuando suavemente em 200ms.
+ */
+export function playDecodedSuccessSound(enabled: boolean = true): void {
+  if (!enabled) return;
+
+  try {
+    const ctx = getAudioContext();
+    if (ctx.state === 'suspended') ctx.resume();
+
+    const t = ctx.currentTime;
+    const masterGain = ctx.createGain();
+    masterGain.gain.setValueAtTime(0.09, t);
+    masterGain.gain.exponentialRampToValueAtTime(0.001, t + 0.20);
+    masterGain.connect(ctx.destination);
+
+    // C5 (523.25Hz)
+    const osc1 = ctx.createOscillator();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(523.25, t);
+    osc1.connect(masterGain);
+    osc1.start(t);
+    osc1.stop(t + 0.20);
+
+    // E5 (659.25Hz)
+    const osc2 = ctx.createOscillator();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(659.25, t);
+    osc2.connect(masterGain);
+    osc2.start(t);
+    osc2.stop(t + 0.20);
+  } catch (e) {
+    console.warn('AudioContext decodedSuccess falhou:', e);
+  }
+}
+
+/**
+ * 9. Som de Erro / Rejeição de Ficha no Slot (Zumbido Elétrico Baixo)
+ * Onda dente de serra em 130Hz com filtro passa-baixa em 300Hz durando 80ms.
+ */
+export function playDecoderErrorSound(enabled: boolean = true): void {
+  if (!enabled) return;
+
+  try {
+    const ctx = getAudioContext();
+    if (ctx.state === 'suspended') ctx.resume();
+
+    const t = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const filter = ctx.createBiquadFilter();
+    const gain = ctx.createGain();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(130, t);
+
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(300, t);
+
+    gain.gain.setValueAtTime(0.08, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(t);
+    osc.stop(t + 0.08);
+  } catch (e) {
+    console.warn('AudioContext decoderError falhou:', e);
+  }
+}
+

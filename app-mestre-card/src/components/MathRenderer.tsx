@@ -6,16 +6,17 @@ interface MathRendererProps {
   content: string;
   className?: string;
   textClassName?: string;
+  renderSlot?: (token: string) => React.ReactNode;
 }
 
 function escapeRegExp(string: string): string {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-const TAG_REGEX = /(\*\*[\s\S]*?\*\*|==[\s\S]*?==|!![\s\S]*?!!)/g;
+const TAG_REGEX = /(\{\{SLOT_\d+\}\}|\*\*[\s\S]*?\*\*|==[\s\S]*?==|!![\s\S]*?!!)/g;
 const ENTITY_REGEX = /(\b\d{1,2}º?\s+[Ss]éculo|\b[Ss]éculo\s+[IVXLCDM]+|\b(?:1[4-9]\d{2}|20\d{2})(?:[–\-–](?:1[4-9]\d{2}|20\d{2}))?\b|\b\d+[\.,]?\d*\s*%|\b(?:jamais|nunca|exclusivamente|unicamente|não confundir)\b)/gi;
 
-export const MathRenderer: React.FC<MathRendererProps> = ({ content, className = '', textClassName }) => {
+export const MathRenderer: React.FC<MathRendererProps> = ({ content, className = '', textClassName, renderSlot }) => {
   if (!content) return null;
 
   const { searchTerm, semanticColors } = useReading();
@@ -149,6 +150,18 @@ export const MathRenderer: React.FC<MathRendererProps> = ({ content, className =
                 <span key={pIndex} className="whitespace-pre-wrap">
                   {tagSegments.map((segment, sIndex) => {
                     const tagKey = `p-${pIndex}-s-${sIndex}`;
+
+                    // Tag 0: Slot do Protocolo Decoder ({{SLOT_N}})
+                    if (segment.startsWith('{{SLOT_') && segment.endsWith('}}')) {
+                      if (renderSlot) {
+                        return (
+                          <React.Fragment key={tagKey}>
+                            {renderSlot(segment)}
+                          </React.Fragment>
+                        );
+                      }
+                      return <span key={tagKey} className="font-mono text-amber-400 font-bold">{segment}</span>;
+                    }
 
                     // Tag 1: Conceito Chave (**texto**)
                     if (segment.startsWith('**') && segment.endsWith('**') && segment.length >= 4) {
