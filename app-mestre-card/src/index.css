@@ -292,3 +292,136 @@
   animation: bounceShort 0.4s ease-out;
 }
 
+/* ==========================================================================
+   BOTOEIRAS HÍBRIDAS PAPERS, PLEASE: TEXTURA RASTER + FÍSICA CSS
+   ========================================================================== */
+
+/* Moldura externa de baquelite rebaixada na mesa */
+.stamp-chassis {
+  background: #0d0f12;
+  border: 2px solid #1c2128;
+  border-top-color: #080a0c;
+  border-left-color: #080a0c;
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.9), 0 1px 0 rgba(255, 255, 255, 0.05);
+  padding: 0.5rem;
+  border-radius: 8px;
+}
+
+/* Base mecânica comum do interruptor pesado */
+.btn-inspector-hybrid {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  text-align: left;
+  user-select: none;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: transform 0.05s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.05s cubic-bezier(0.2, 0, 0, 1), filter 0.1s ease;
+}
+
+.btn-inspector-hybrid:hover {
+  filter: brightness(1.12);
+}
+
+/* Física de afundamento da mola mecânica (ao clicar ou disparar atalho) */
+.btn-inspector-hybrid:active,
+.btn-inspector-hybrid.pressed {
+  transform: translateY(4px);
+}
+
+/* --------------------------------------------------------------------------
+   BOTÃO HOMÓLOGO (VERDE MILITAR / BAQUELITE INDUSTRIAL)
+   -------------------------------------------------------------------------- */
+.btn-hybrid-homologo {
+  background-color: #065f46;
+  background-image: 
+    linear-gradient(180deg, rgba(16, 185, 129, 0.35) 0%, rgba(4, 120, 87, 0.65) 60%, rgba(2, 44, 34, 0.9) 100%),
+    repeating-linear-gradient(-45deg, rgba(0,0,0,0.18) 0px, rgba(0,0,0,0.18) 2px, transparent 2px, transparent 4px),
+    url('./assets/btn_tex_green.jpg');
+  background-size: auto, auto, 128px 128px;
+  background-blend-mode: overlay, normal, multiply;
+  
+  box-shadow: 
+    0 6px 0 #022c22,
+    0 10px 20px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.6);
+  color: #ecfdf5;
+}
+
+.btn-hybrid-homologo:active,
+.btn-hybrid-homologo.pressed {
+  box-shadow: 
+    0 2px 0 #022c22,
+    0 4px 10px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.7);
+}
+
+/* --------------------------------------------------------------------------
+   BOTÃO DENEGAR (VERMELHO CARMESIM / PERIGO INDUSTRIAL)
+   -------------------------------------------------------------------------- */
+.btn-hybrid-denegar {
+  background-color: #991b1b;
+  background-image: 
+    linear-gradient(180deg, rgba(239, 68, 68, 0.35) 0%, rgba(185, 28, 28, 0.65) 60%, rgba(69, 10, 10, 0.9) 100%),
+    repeating-linear-gradient(-45deg, rgba(0,0,0,0.2) 0px, rgba(0,0,0,0.2) 2px, transparent 2px, transparent 4px),
+    url('./assets/btn_tex_red.jpg');
+  background-size: auto, auto, 128px 128px;
+  background-blend-mode: overlay, normal, multiply;
+  
+  box-shadow: 
+    0 6px 0 #450a0a,
+    0 10px 20px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.6);
+  color: #fef2f2;
+}
+
+.btn-hybrid-denegar:active,
+.btn-hybrid-denegar.pressed {
+  box-shadow: 
+    0 2px 0 #450a0a,
+    0 4px 10px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.7);
+}
+
+/* --------------------------------------------------------------------------
+   LÂMPADA PILOTO ANALÓGICA DE ALTA TENSÃO (COM LENTE ESTRIADA)
+   -------------------------------------------------------------------------- */
+.pilot-lamp-housing {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  border-radius: 3px;
+  background: #090b0e;
+  border: 1.5px solid #27272a;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.pilot-lamp-lens {
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  background-image: repeating-linear-gradient(0deg, rgba(255,255,255,0.2) 0px, rgba(255,255,255,0.2) 1px, transparent 1px, transparent 2px);
+}
+
+.pilot-lens-green {
+  background-color: #10b981;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.85), inset 0 1px 2px rgba(255,255,255,0.8);
+}
+
+.pilot-lens-red {
+  background-color: #f43f5e;
+  box-shadow: 0 0 10px rgba(244, 63, 94, 0.85), inset 0 1px 2px rgba(255,255,255,0.8);
+}
+

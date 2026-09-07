@@ -5,6 +5,7 @@ import { useReading } from '../context/ReadingContext';
 interface MathRendererProps {
   content: string;
   className?: string;
+  textClassName?: string;
 }
 
 function escapeRegExp(string: string): string {
@@ -14,7 +15,7 @@ function escapeRegExp(string: string): string {
 const TAG_REGEX = /(\*\*[\s\S]*?\*\*|==[\s\S]*?==|!![\s\S]*?!!)/g;
 const ENTITY_REGEX = /(\b\d{1,2}º?\s+[Ss]éculo|\b[Ss]éculo\s+[IVXLCDM]+|\b(?:1[4-9]\d{2}|20\d{2})(?:[–\-–](?:1[4-9]\d{2}|20\d{2}))?\b|\b\d+[\.,]?\d*\s*%|\b(?:jamais|nunca|exclusivamente|unicamente|não confundir)\b)/gi;
 
-export const MathRenderer: React.FC<MathRendererProps> = ({ content, className = '' }) => {
+export const MathRenderer: React.FC<MathRendererProps> = ({ content, className = '', textClassName }) => {
   if (!content) return null;
 
   const { searchTerm, semanticColors } = useReading();
@@ -72,7 +73,10 @@ export const MathRenderer: React.FC<MathRendererProps> = ({ content, className =
           return (
             <span
               key={subKey}
-              className="text-amber-300 font-semibold bg-amber-500/10 px-1 py-0.5 rounded border border-amber-500/25 font-mono text-[0.93em] mx-0.5 shadow-sm inline-block"
+              className={textClassName 
+                ? "text-amber-950 font-bold bg-amber-300/40 px-1 py-0.5 rounded border border-amber-600/40 font-mono text-[0.93em] mx-0.5 shadow-sm inline-block"
+                : "text-amber-300 font-semibold bg-amber-500/10 px-1 py-0.5 rounded border border-amber-500/25 font-mono text-[0.93em] mx-0.5 shadow-sm inline-block"
+              }
             >
               {renderLeafText(part, `${subKey}-leaf`)}
             </span>
@@ -83,7 +87,10 @@ export const MathRenderer: React.FC<MathRendererProps> = ({ content, className =
           return (
             <span
               key={subKey}
-              className="text-emerald-300 font-mono font-bold bg-emerald-500/10 px-1 py-0.5 rounded border border-emerald-500/20 mx-0.5 inline-block"
+              className={textClassName
+                ? "text-emerald-950 font-mono font-black bg-emerald-300/40 px-1 py-0.5 rounded border border-emerald-600/30 mx-0.5 inline-block"
+                : "text-emerald-300 font-mono font-bold bg-emerald-500/10 px-1 py-0.5 rounded border border-emerald-500/20 mx-0.5 inline-block"
+              }
             >
               {renderLeafText(part, `${subKey}-leaf`)}
             </span>
@@ -93,7 +100,10 @@ export const MathRenderer: React.FC<MathRendererProps> = ({ content, className =
         return (
           <span
             key={subKey}
-            className="text-rose-400 font-bold underline decoration-rose-500/60 decoration-wavy mx-0.5 inline-block"
+            className={textClassName
+              ? "text-red-900 font-black underline decoration-red-600 decoration-2 mx-0.5 inline-block"
+              : "text-rose-400 font-bold underline decoration-rose-500/60 decoration-wavy mx-0.5 inline-block"
+            }
           >
             {renderLeafText(part, `${subKey}-leaf`)}
           </span>
@@ -125,7 +135,7 @@ export const MathRenderer: React.FC<MathRendererProps> = ({ content, className =
         const inlineParts = block.split(/(\$[\s\S]*?\$)/g);
 
         return (
-          <p key={index} className="text-slate-300 leading-relaxed text-sm">
+          <p key={index} className={`${textClassName || 'text-slate-300'} leading-relaxed text-sm`}>
             {inlineParts.map((part, pIndex) => {
               if (part.startsWith('$') && part.endsWith('$')) {
                 const math = part.slice(1, -1);
@@ -153,7 +163,13 @@ export const MathRenderer: React.FC<MathRendererProps> = ({ content, className =
                     if (segment.startsWith('**') && segment.endsWith('**') && segment.length >= 4) {
                       const inner = segment.slice(2, -2);
                       return (
-                        <strong key={tagKey} className="text-cyan-300 font-bold tracking-tight mx-0.5">
+                        <strong 
+                          key={tagKey} 
+                          className={textClassName
+                            ? "text-black font-black tracking-tight mx-0.5 underline decoration-amber-500/50"
+                            : "text-cyan-300 font-bold tracking-tight mx-0.5"
+                          }
+                        >
                           {renderLeafText(inner, `${tagKey}-inner`)}
                         </strong>
                       );
@@ -165,7 +181,10 @@ export const MathRenderer: React.FC<MathRendererProps> = ({ content, className =
                       return (
                         <mark
                           key={tagKey}
-                          className="bg-amber-400/20 text-amber-200 border-b-2 border-amber-400/60 px-1 py-0.5 rounded font-semibold mx-0.5 inline-block"
+                          className={textClassName
+                            ? "bg-amber-300 text-zinc-950 border-b-2 border-amber-600 px-1 py-0.5 rounded font-bold mx-0.5 inline-block"
+                            : "bg-amber-400/20 text-amber-200 border-b-2 border-amber-400/60 px-1 py-0.5 rounded font-semibold mx-0.5 inline-block"
+                          }
                         >
                           {renderLeafText(inner, `${tagKey}-inner`)}
                         </mark>

@@ -1,0 +1,269 @@
+Misturar os dois é exatamente a **fórmula de ouro da computação gráfica para interfaces táticas**:
+
+* A imagem da Nano Banana entrega o que o CSS não inventa sozinho (o desgaste microscópico, a poeira nos cantos, ranhuras imperfeitas e a porosidade da baquelite soviética dos anos 80).
+* O CSS entrega o que a imagem estática não faz (a iluminação direcional dinâmica, o chanfro mecânico de 6px, o afundamento físico de 4px no clique/teclado e o LED piloto translúcido).
+
+O segredo técnico é usar **CSS Multiple Backgrounds** com `background-blend-mode: overlay` (ou `multiply`). A imagem de textura fica na base e o gradiente vetorial de iluminação fica por cima. Se a imagem ainda estiver carregando (ou falhar), o CSS funciona sozinho sem quebrar a tela.
+
+---
+
+### 1. Os 2 Prompts da Nano Banana (Texturas de Base Ranhurada)
+
+Gere essas duas texturas em proporção quadrada (**1:1**, 512x512 ou 256x256 é suficiente). Não precisa de botões desenhados, apenas a **superfície bruta do material**:
+
+#### A. Textura Homólogo (`public/assets/inspector/btn_tex_green.png`)
+
+> `Macro top-down seamless texture of vintage 1980s Eastern European industrial machinery console panel, weathered dark military olive-drab bakelite polymer, dense horizontal anti-slip knurled grip ridges, subtle surface micro-scratches, industrial grime in grooves, matte finish, perfectly flat orthographic lighting, seamless tileable material.`
+
+#### B. Textura Denegar (`public/assets/inspector/btn_tex_red.png`)
+
+> `Macro top-down seamless texture of an urgent industrial hazard control surface, worn deep Soviet crimson red vulcanized rubberized switch plate, dense diagonal diamond tread knurling, micro surface scuffs, grease marks and faded paint patina, matte industrial finish, flat top-down orthographic lighting, seamless tileable material.`
+
+---
+
+### 2. O Motor Híbrido: CSS 3D + Fusão de Textura (`src/index.css`)
+
+Injete este bloco no seu `src/index.css`. Note como o CSS combina a imagem rasterizada com a ranhura processual, o relevo mecânico e os estados de pressionamento:
+
+```css
+/* ==========================================================================
+   BOTOEIRAS HÍBRIDAS PAPERS, PLEASE: TEXTURA RASTER + FÍSICA CSS
+   ========================================================================== */
+
+/* Moldura externa de baquelite rebaixada na mesa */
+.stamp-chassis {
+  background: #0d0f12;
+  border: 2px solid #1c2128;
+  border-top-color: #080a0c;
+  border-left-color: #080a0c;
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.9), 0 1px 0 rgba(255, 255, 255, 0.05);
+  padding: 0.5rem;
+  border-radius: 8px;
+}
+
+/* Base mecânica comum do interruptor pesado */
+.btn-inspector-hybrid {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  text-align: left;
+  user-select: none;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: transform 0.05s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.05s cubic-bezier(0.2, 0, 0, 1), filter 0.1s ease;
+}
+
+.btn-inspector-hybrid:hover {
+  filter: brightness(1.12);
+}
+
+/* Física de afundamento da mola mecânica (ao clicar ou disparar atalho) */
+.btn-inspector-hybrid:active,
+.btn-inspector-hybrid.pressed {
+  transform: translateY(4px);
+}
+
+/* --------------------------------------------------------------------------
+   BOTÃO HOMÓLOGO (VERDE MILITAR / BAQUELITE INDUSTRIAL)
+   -------------------------------------------------------------------------- */
+.btn-hybrid-homologo {
+  background-color: #065f46;
+  background-image: 
+    linear-gradient(180deg, rgba(16, 185, 129, 0.35) 0%, rgba(4, 120, 87, 0.65) 60%, rgba(2, 44, 34, 0.9) 100%),
+    repeating-linear-gradient(-45deg, rgba(0,0,0,0.18) 0px, rgba(0,0,0,0.18) 2px, transparent 2px, transparent 4px),
+    url('/assets/inspector/btn_tex_green.png');
+  background-size: auto, auto, 128px 128px;
+  background-blend-mode: overlay, normal, multiply;
+  
+  box-shadow: 
+    0 6px 0 #022c22,
+    0 10px 20px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.6);
+  color: #ecfdf5;
+}
+
+.btn-hybrid-homologo:active,
+.btn-hybrid-homologo.pressed {
+  box-shadow: 
+    0 2px 0 #022c22,
+    0 4px 10px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.7);
+}
+
+/* --------------------------------------------------------------------------
+   BOTÃO DENEGAR (VERMELHO CARMESIM / PERIGO INDUSTRIAL)
+   -------------------------------------------------------------------------- */
+.btn-hybrid-denegar {
+  background-color: #991b1b;
+  background-image: 
+    linear-gradient(180deg, rgba(239, 68, 68, 0.35) 0%, rgba(185, 28, 28, 0.65) 60%, rgba(69, 10, 10, 0.9) 100%),
+    repeating-linear-gradient(-45deg, rgba(0,0,0,0.2) 0px, rgba(0,0,0,0.2) 2px, transparent 2px, transparent 4px),
+    url('/assets/inspector/btn_tex_red.png');
+  background-size: auto, auto, 128px 128px;
+  background-blend-mode: overlay, normal, multiply;
+  
+  box-shadow: 
+    0 6px 0 #450a0a,
+    0 10px 20px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.6);
+  color: #fef2f2;
+}
+
+.btn-hybrid-denegar:active,
+.btn-hybrid-denegar.pressed {
+  box-shadow: 
+    0 2px 0 #450a0a,
+    0 4px 10px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.7);
+}
+
+/* --------------------------------------------------------------------------
+   LÂMPADA PILOTO ANALÓGICA DE ALTA TENSÃO (COM LENTE ESTRIADA)
+   -------------------------------------------------------------------------- */
+.pilot-lamp-housing {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  border-radius: 3px;
+  background: #090b0e;
+  border: 1.5px solid #27272a;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.pilot-lamp-lens {
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  background-image: repeating-linear-gradient(0deg, rgba(255,255,255,0.2) 0px, rgba(255,255,255,0.2) 1px, transparent 1px, transparent 2px);
+}
+
+.pilot-lens-green {
+  background-color: #10b981;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.85), inset 0 1px 2px rgba(255,255,255,0.8);
+}
+
+.pilot-lens-red {
+  background-color: #f43f5e;
+  box-shadow: 0 0 10px rgba(244, 63, 94, 0.85), inset 0 1px 2px rgba(255,255,255,0.8);
+}
+
+```
+
+---
+
+### 3. Integração Limpa no JSX (`InspectionDesk.tsx`)
+
+O JSX fica expressivo e montado dentro do chassi rebaixado:
+
+```tsx
+<div className="stamp-chassis flex items-center gap-4">
+  {/* BOTOEIRA HOMÓLOGO */}
+  <button
+    onClick={() => handleAuditAction(true)}
+    className="btn-inspector-hybrid btn-hybrid-homologo group"
+    title="Aprovar documento em conformidade (Tecla A / 1)"
+  >
+    <div className="pilot-lamp-housing">
+      <div className="pilot-lamp-lens pilot-lens-green group-hover:brightness-125 transition-all" />
+    </div>
+    <div>
+      <div className="text-sm font-black tracking-widest uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+        HOMÓLOGO
+      </div>
+      <div className="text-[10px] font-mono tracking-widest text-emerald-200/90 font-bold">
+        [TECLA A / 1]
+      </div>
+    </div>
+  </button>
+
+  {/* BOTOEIRA DENEGAR */}
+  <button
+    onClick={() => handleAuditAction(false)}
+    className="btn-inspector-hybrid btn-hybrid-denegar group"
+    title="Denegar documento fraudulento (Tecla D / 2)"
+  >
+    <div className="pilot-lamp-housing">
+      <div className="pilot-lamp-lens pilot-lens-red group-hover:brightness-125 transition-all" />
+    </div>
+    <div>
+      <div className="text-sm font-black tracking-widest uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+        DENEGAR (FRAUDE)
+      </div>
+      <div className="text-[10px] font-mono tracking-widest text-red-200/90 font-bold">
+        [TECLA D / 2]
+      </div>
+    </div>
+  </button>
+</div>
+
+```
+
+---
+
+### Prompt Diretivo para o Agente da IDE (Antigravity)
+
+Copie e envie o bloco abaixo no chat da IDE:
+
+```markdown
+/goal Implementar as Botoeiras Híbridas Papers, Please (Fusão de Textura Raster + Física 3D e Lâmpadas Piloto) no InspectionDesk.
+
+[CHECKPOINT DE ROLLBACK]
+git add -A && git commit -m "checkpoint(safety): pre-hybrid-inspector-buttons"
+
+[TOUCH-LIST]
+- app-mestre-card/src/index.css
+- app-mestre-card/src/components/inspector/InspectionDesk.tsx
+
+[NON-GOALS]
+- NÃO alterar a lógica de auditoria nem o mapeador em `inspectorAdapter.ts`.
+- NÃO alterar os atalhos de teclado ('A', 'D', '1', '2').
+- NÃO remover os fallbacks procedurais de gradiente caso as imagens ainda não existam no diretório.
+
+[PREMISSAS]
+1. As texturas `/assets/inspector/btn_tex_green.png` e `/assets/inspector/btn_tex_red.png` são combinadas via CSS multiple backgrounds com background-blend-mode.
+2. A classe `.stamp-chassis` aloja as duas botoeiras em um rebaixo escuro com sombra interna simulando a mesa militar.
+3. O botão afunda 4px sob o seletor :active e quando a tecla correspondente for pressionada.
+
+[ESCOPO & BLAST RADIUS]
+- Injeção das regras de estilização mecânica híbrida no `src/index.css` e atualização do encapsulamento dos botões no `src/components/inspector/InspectionDesk.tsx`. Zero impacto em outros componentes ou stores.
+
+[INSTRUÇÃO]
+1. No `src/index.css`:
+   - Adicione as classes `.stamp-chassis`, `.btn-inspector-hybrid`, `.btn-hybrid-homologo`, `.btn-hybrid-denegar`, `.pilot-lamp-housing`, `.pilot-lamp-lens`, `.pilot-lens-green` e `.pilot-lens-red`.
+   - Garanta a fusão de `background-blend-mode: overlay, normal, multiply` misturando o gradiente semântico, o padrão de ranhuras e o arquivo raster da pasta `/assets/inspector/`.
+   - Configure o chanfro 3D sólido de 6px (`box-shadow: 0 6px 0 ...`) e o deslocamento elástico `translateY(4px)` no acionamento.
+2. No `src/components/inspector/InspectionDesk.tsx`:
+   - Atualize a gaveta de carimbadas para utilizar o invólucro `.stamp-chassis`.
+   - Atualize os dois botões ("HOMÓLOGO" e "DENEGAR") para `.btn-inspector-hybrid` com as respectivas lâmpadas piloto.
+   - Conecte o estado de tecla pressionada (quando o usuário aperta 'A' ou 'D') para injetar momentaneamente a classe `.pressed` nos botões, gerando resposta tátil visual sincronizada ao teclado.
+
+[VALIDAÇÃO AUTÔNOMA]
+- Execute `npx tsc --noEmit` confirmando tipagem estrita sem erros.
+- Execute `npm run build` confirmando compilação com exit code 0.
+- No dev server/preview, abra a Mesa de Inspeção via DevTools MCP:
+  1. Verifique se os botões exibem a fusão visual de textura física com a iluminação tática e chanfro 3D.
+  2. Clique nos botões ou aperte 'A' e 'D': certifique-se de que os botões afundam 4px fisicamente com som mecânico correspondente.
+  3. Confirme que não há layout shift no restante da mesa durante o pressionamento.
+
+[CRITÉRIOS DE ACEITE (DoD)]
+1. Compilação TypeScript com código 0 e build estático validado.
+2. Botoeiras renderizadas com fusão de textura, lâmpadas piloto estriadas e chassi rebaixado.
+3. Afundamento mecânico de 4px responsivo ao clique e aos atalhos de teclado.
+
+```
+
+---
+
+[REGISTRAR NO HISTÓRICO]: [ADR-35] 2026-09-06: Adoção do motor híbrido de botoeiras táticas Papers, Please; combinação de micro-texturas rasterizadas via background-blend-mode com física mecânica CSS 3D (chanfro de 6px, curso de 4px e lâmpadas piloto estriadas).

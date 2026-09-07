@@ -2,11 +2,21 @@ import type { MestreCardData, InspectionCase } from '../types/mestre-card';
 
 // Fotos dos postulantes disponíveis na pasta pública /inspection/
 export const APPLICANT_PHOTOS = [
-  './inspection/applicant-1.jpg', // Ana Maria Silva - Auxiliar Administrativo
-  './inspection/applicant-2.jpg', // Dr. Eleanor Vance - Classical Studies
-  './inspection/applicant-3.jpg', // Pesquisador / Perito em Ciências
-  './inspection/applicant-4.jpg', // Prof. A. Thompson - History / Exact Sciences
-  './inspection/applicant-5.jpg', // Cadete / Postulante de Medicina
+  './inspection/applicant-1.jpg',
+  './inspection/applicant-2.jpg',
+  './inspection/applicant-3.jpg',
+  './inspection/applicant-4.jpg',
+  './inspection/applicant-5.jpg',
+  './inspection/applicant-6.jpg',
+  './inspection/applicant-7.jpg',
+  './inspection/applicant-8.jpg',
+  './inspection/applicant-9.jpg',
+  './inspection/applicant-10.jpg',
+  './inspection/applicant-11.jpg',
+  './inspection/applicant-12.jpg',
+  './inspection/applicant-13.jpg',
+  './inspection/applicant-14.jpg',
+  './inspection/applicant-15.jpg',
 ];
 
 const APPLICANT_PROFILES = [
@@ -14,7 +24,17 @@ const APPLICANT_PROFILES = [
   { name: 'Dra. Eleanor Vance', title: 'Cátedra de Estudos Aplicados', dept: 'Divisão de Investigação Epistemológica', photo: './inspection/applicant-2.jpg' },
   { name: 'Dr. Arthur Pendelton', title: 'Perito Científico Chefe', dept: 'Comissão de Análise de Reagentes', photo: './inspection/applicant-3.jpg' },
   { name: 'Prof. A. Thompson', title: 'Catedrático de Fundamentos', dept: 'Instituto Central de Pesquisa', photo: './inspection/applicant-4.jpg' },
-  { name: 'Cadete Marcos Valente', title: 'Aspirante a Médico-Cirurgião', dept: 'Corpo de Cadetes Universitários', photo: './inspection/applicant-5.jpg' }
+  { name: 'Cadete Marcos Valente', title: 'Aspirante a Médico-Cirurgião', dept: 'Corpo de Cadetes Universitários', photo: './inspection/applicant-5.jpg' },
+  { name: 'Dra. Helena Rostova', title: 'Auditora de Ensaios Clínicos', dept: 'Gabinete de Biometria e Fisiologia', photo: './inspection/applicant-6.jpg' },
+  { name: 'Eng. Viktor Koval', title: 'Inspetor Chefe de Termodinâmica', dept: 'Superintendência de Motores e Reatores', photo: './inspection/applicant-7.jpg' },
+  { name: 'Profa. Clara Mendonça', title: 'Especialista em Análise Historiográfica', dept: 'Arquivo Geral de Doutrina e Tratados', photo: './inspection/applicant-8.jpg' },
+  { name: 'Dr. Boris Belov', title: 'Pesquisador de Cinética Molecular', dept: 'Laboratório Central de Síntese Orgânica', photo: './inspection/applicant-9.jpg' },
+  { name: 'Dra. Miriam Alencar', title: 'Analista de Citologia e Genética', dept: 'Gabinete de Triagem Celular', photo: './inspection/applicant-10.jpg' },
+  { name: 'Cadete Samuel Prado', title: 'Aspirante a Oficial de Engenharia', dept: 'Corpo Técnico Auxiliar', photo: './inspection/applicant-11.jpg' },
+  { name: 'Prof. Dmitri Volkov', title: 'Titular de Eletrodinâmica', dept: 'Divisão de Circuitos e Campos', photo: './inspection/applicant-12.jpg' },
+  { name: 'Dra. Teresa Brandão', title: 'Pesquisadora em Ecologia e Biomas', dept: 'Conselho de Preservação e Recursos', photo: './inspection/applicant-13.jpg' },
+  { name: 'Dr. Lucas Fontes', title: 'Curador de Geopolítica Clássica', dept: 'Instituto de Estratégia e Fronteiras', photo: './inspection/applicant-14.jpg' },
+  { name: 'Profa. Sofia Chen', title: 'Catedrática de Métodos Quantitativos', dept: 'Divisão de Estatística e Modelagem', photo: './inspection/applicant-15.jpg' }
 ];
 
 /**

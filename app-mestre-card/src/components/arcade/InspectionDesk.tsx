@@ -46,6 +46,68 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
   const [isRulebookOpen, setIsRulebookOpen] = useState(false);
   const [rulebookTab, setRulebookTab] = useState<'theory' | 'traps' | 'mnemonics'>('theory');
 
+  // Estado de clique físico mecânico sincronizado ao teclado
+  const [isAPressed, setIsAPressed] = useState(false);
+  const [isDPressed, setIsDPressed] = useState(false);
+
+  // Helper para limpar e estruturar mnemônicos sem asteriscos crus (**) ou barras (//)
+  const renderRulebookMnemonic = (rule: string) => {
+    if (!rule) return null;
+    const items = rule.split(/\s*\/\/\s*|\n+/).map(s => s.trim()).filter(Boolean);
+    if (items.length > 1) {
+      return (
+        <div className="space-y-1.5 mt-2">
+          {items.map((item, idx) => {
+            let badge = '';
+            const match = item.match(/^\*{0,2}([A-Z0-9À-Ú])\*{0,2}/i);
+            if (match && match[1]) {
+              badge = match[1].toUpperCase();
+            }
+            const cleanText = item.replace(/\*\*/g, '').trim();
+
+            return (
+              <div key={idx} className="p-2 rounded bg-cyan-950/40 border border-cyan-800/40 flex items-start gap-2 text-xs font-sans">
+                {badge ? (
+                  <span className="w-5 h-5 rounded bg-cyan-400 text-black font-mono font-black flex items-center justify-center shrink-0 text-xs shadow-sm">
+                    {badge}
+                  </span>
+                ) : (
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 mt-1.5 shrink-0"></span>
+                )}
+                <span className="text-stone-200 font-medium leading-relaxed flex-1">{cleanText}</span>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+    return <MathRenderer content={rule.replace(/\*\*/g, '')} />;
+  };
+
+  // Helper para limpar e estruturar pontos cegos sem barras (//) ou asteriscos (**)
+  const renderRulebookBlindSpot = (analysis: string) => {
+    if (!analysis) return null;
+    const clean = analysis.replace(/\*\*/g, '');
+    if (clean.includes('//')) {
+      const parts = clean.split(/\s*\/\/\s*/);
+      return (
+        <div className="space-y-1.5 mt-1.5 text-xs font-sans">
+          <div className="bg-red-950/60 border-l-2 border-red-500 p-2.5 rounded-r text-red-200">
+            <span className="font-bold block text-[10px] uppercase text-red-400 font-mono mb-0.5">❌ A ARMADILHA / MITO:</span>
+            {parts[0]}
+          </div>
+          {parts[1] && (
+            <div className="bg-emerald-950/50 border-l-2 border-emerald-400 p-2.5 rounded-r text-emerald-200">
+              <span className="font-bold block text-[10px] uppercase text-emerald-400 font-mono mb-0.5">✅ A REALIDADE COBRADA:</span>
+              {parts.slice(1).join(' ')}
+            </div>
+          )}
+        </div>
+      );
+    }
+    return <p className="text-stone-300 text-xs font-sans">{clean}</p>;
+  };
+
   // Estatísticas do turno de inspeção
   const [shiftStats, setShiftStats] = useState({
     totalProcessed: 0,
@@ -161,7 +223,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
     }
   };
 
-  // Atalhos de teclado (A = Aprovar, D = Denegar, M = Manual)
+  // Atalhos de teclado (A = Aprovar, D = Denegar, M = Manual) com física mecânica
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
@@ -169,9 +231,11 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
 
       if (e.key === 'a' || e.key === 'A' || e.key === '1') {
         e.preventDefault();
+        setIsAPressed(true);
         handleVerdict('APPROVED');
       } else if (e.key === 'd' || e.key === 'D' || e.key === '2') {
         e.preventDefault();
+        setIsDPressed(true);
         handleVerdict('DENIED');
       } else if (e.key === 'm' || e.key === 'M') {
         e.preventDefault();
@@ -183,8 +247,20 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
       }
     };
 
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === 'a' || e.key === 'A' || e.key === '1') {
+        setIsAPressed(false);
+      } else if (e.key === 'd' || e.key === 'D' || e.key === '2') {
+        setIsDPressed(false);
+      }
+    };
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
   }, [handleVerdict, citation.isOpen, soundEnabled]);
 
   // Reinicia o turno com casos reembaralhados
@@ -438,13 +514,18 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                 </div>
               </div>
 
-              {/* TESE SUBMETIDA PARA AUDITORIA */}
+              {/* TESE SUBMETIDA PARA AUDITORIA (Alto Contraste Estilo Dossiê Oficial Datilografado) */}
               <div className="space-y-3 my-4">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-[#7a6450] font-bold block border-b border-[#5c4a3b]/20 pb-1">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-[#5c4a3b] font-bold block border-b border-[#5c4a3b]/20 pb-1">
                   ▶ TESE SUBMETIDA PELO POSTULANTE (AUDITAR CONTRADIÇÕES):
                 </span>
-                <div className="p-4 rounded bg-[#f7f2e7] border border-[#c4b59f] shadow-inner text-sm font-serif leading-relaxed text-[#1e1711] italic">
-                  <MathRenderer content={currentCase.thesisStatement} />
+                <div className="p-4 rounded-md bg-white/95 border-2 border-[#8c7864] shadow-sm">
+                  <div className="text-zinc-950 font-mono font-bold text-sm leading-relaxed">
+                    <MathRenderer 
+                      content={currentCase.thesisStatement} 
+                      textClassName="text-zinc-950 font-bold font-mono text-sm leading-relaxed" 
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -485,39 +566,53 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
               )}
             </div>
 
-            {/* A GAVETA DE CARIMBOS MECÂNICOS (Stamp Controls) */}
+            {/* A GAVETA DE CARIMBOS MECÂNICOS (Stamp Controls - Botoeiras Híbridas 3D) */}
             <div className="mt-4 p-4 rounded-xl bg-[#1c1612] border-2 border-[#423122] flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
               <div className="text-xs font-mono space-y-0.5 text-stone-400">
                 <span className="text-amber-500 font-bold text-[11px] block uppercase">
                   MESA DE DESPACHO DISCIPLINAR:
                 </span>
-                <span>Analise o texto contra as diretrizes oficiais. Aplique o carimbo correspondente.</span>
+                <span>Analise o texto contra as diretrizes oficiais. Aplique a decisão correspondente.</span>
               </div>
 
-              <div className="flex items-center gap-3 w-full sm:w-auto">
-                {/* Carimbo Verde: HOMOLOGAR */}
+              <div className="stamp-chassis flex items-center gap-4 w-full sm:w-auto justify-end">
+                {/* BOTOEIRA HOMÓLOGO */}
                 <button
                   onClick={() => handleVerdict('APPROVED')}
                   disabled={stampStatus !== 'none' || citation.isOpen}
-                  className="flex-1 sm:flex-initial px-5 py-3 rounded-lg bg-gradient-to-b from-emerald-700 to-emerald-900 hover:from-emerald-600 hover:to-emerald-800 disabled:opacity-40 disabled:cursor-not-allowed text-white font-mono font-bold text-xs uppercase tracking-wider transition-all border-2 border-emerald-500/80 shadow-[0_4px_12px_rgba(16,185,129,0.3)] hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center gap-2 group"
+                  className={`btn-inspector-hybrid btn-hybrid-homologo group ${isAPressed ? 'pressed' : ''} disabled:opacity-40 disabled:cursor-not-allowed`}
+                  title="Aprovar documento em conformidade (Tecla A / 1)"
                 >
-                  <span className="text-base group-hover:rotate-12 transition-transform">🟩</span>
-                  <div className="text-left">
-                    <span className="block leading-tight">HOMOLOGAR</span>
-                    <span className="text-[9px] opacity-75 block">[Tecla A / 1]</span>
+                  <div className="pilot-lamp-housing">
+                    <div className="pilot-lamp-lens pilot-lens-green group-hover:brightness-125 transition-all" />
+                  </div>
+                  <div>
+                    <div className="text-xs sm:text-sm font-black tracking-widest uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                      HOMÓLOGO
+                    </div>
+                    <div className="text-[10px] font-mono tracking-widest text-emerald-200/90 font-bold">
+                      [TECLA A / 1]
+                    </div>
                   </div>
                 </button>
 
-                {/* Carimbo Vermelho: DENEGAR */}
+                {/* BOTOEIRA DENEGAR */}
                 <button
                   onClick={() => handleVerdict('DENIED')}
                   disabled={stampStatus !== 'none' || citation.isOpen}
-                  className="flex-1 sm:flex-initial px-5 py-3 rounded-lg bg-gradient-to-b from-red-700 to-red-900 hover:from-red-600 hover:to-red-800 disabled:opacity-40 disabled:cursor-not-allowed text-white font-mono font-bold text-xs uppercase tracking-wider transition-all border-2 border-red-500/80 shadow-[0_4px_12px_rgba(239,68,68,0.3)] hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center gap-2 group"
+                  className={`btn-inspector-hybrid btn-hybrid-denegar group ${isDPressed ? 'pressed' : ''} disabled:opacity-40 disabled:cursor-not-allowed`}
+                  title="Denegar documento fraudulento (Tecla D / 2)"
                 >
-                  <span className="text-base group-hover:-rotate-12 transition-transform">🟥</span>
-                  <div className="text-left">
-                    <span className="block leading-tight">DENEGAR (FRAUDE)</span>
-                    <span className="text-[9px] opacity-75 block">[Tecla D / 2]</span>
+                  <div className="pilot-lamp-housing">
+                    <div className="pilot-lamp-lens pilot-lens-red group-hover:brightness-125 transition-all" />
+                  </div>
+                  <div>
+                    <div className="text-xs sm:text-sm font-black tracking-widest uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                      DENEGAR (FRAUDE)
+                    </div>
+                    <div className="text-[10px] font-mono tracking-widest text-red-200/90 font-bold">
+                      [TECLA D / 2]
+                    </div>
                   </div>
                 </button>
               </div>
@@ -594,9 +689,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                           <span className="text-[11px] font-mono font-bold text-red-300 block">
                             ⛔ {spot.title}
                           </span>
-                          <p className="text-stone-300 text-xs">
-                            {spot.analysis}
-                          </p>
+                          {renderRulebookBlindSpot(spot.analysis)}
                         </div>
                       ))
                     ) : (
@@ -616,7 +709,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                           <span className="font-bold text-cyan-300 block">
                             ⚡ {mnem.title || mnem.trigger}
                           </span>
-                          <p className="text-stone-300 font-sans">{mnem.rule}</p>
+                          {renderRulebookMnemonic(mnem.rule)}
                         </div>
                       ))
                     ) : (
