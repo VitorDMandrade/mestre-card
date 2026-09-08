@@ -1243,3 +1243,165 @@ export function playAcervoOpenSound(enabled = true): void {
     console.warn('AudioContext playAcervoOpenSound falhou:', e);
   }
 }
+
+/* ==========================================================================
+   CONSTELAÇÃO NEURAL 3D // ENGENHARIA ACÚSTICA CÓSMICA
+   ========================================================================== */
+
+let constellationDroneAudio: HTMLAudioElement | null = null;
+
+/**
+ * Inicia a reprodução em loop contínuo do Drone de Foco Tático
+ */
+export function playConstellationDrone(volume = 0.35): void {
+  try {
+    if (!constellationDroneAudio) {
+      constellationDroneAudio = new Audio('./assets/audio/tactical_focus_drone.mp3');
+      constellationDroneAudio.loop = true;
+    }
+    constellationDroneAudio.volume = Math.max(0, Math.min(1, volume));
+    const playPromise = constellationDroneAudio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(err => {
+        console.warn('Autoplay do drone bloqueado pelo navegador:', err);
+      });
+    }
+  } catch (e) {
+    console.warn('Falha ao iniciar constellation drone:', e);
+  }
+}
+
+/**
+ * Pausa suavemente o drone cósmico
+ */
+export function stopConstellationDrone(): void {
+  try {
+    if (constellationDroneAudio) {
+      constellationDroneAudio.pause();
+    }
+  } catch (e) {
+    console.warn('Falha ao pausar constellation drone:', e);
+  }
+}
+
+/**
+ * Ajusta o volume do drone cósmico em tempo real
+ */
+export function setConstellationDroneVolume(volume: number): void {
+  if (constellationDroneAudio) {
+    constellationDroneAudio.volume = Math.max(0, Math.min(1, volume));
+  }
+}
+
+/**
+ * Verifica se o drone cósmico está tocando
+ */
+export function isConstellationDronePlaying(): boolean {
+  return constellationDroneAudio ? !constellationDroneAudio.paused : false;
+}
+
+/**
+ * Chime etéreo de alta frequência ao passar o cursor sobre um nó estelar
+ */
+export function playConstellationHoverSound(enabled = true): void {
+  if (!enabled) return;
+  try {
+    const ctx = getAudioContext();
+    if (ctx.state === 'suspended') ctx.resume();
+    const now = ctx.currentTime;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+
+    // Frequência harmônica cristalina
+    osc.frequency.setValueAtTime(1046.5, now); // C6
+    osc.frequency.exponentialRampToValueAtTime(1318.5, now + 0.06); // E6
+
+    gain.gain.setValueAtTime(0.001, now);
+    gain.gain.linearRampToValueAtTime(0.04, now + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.09);
+  } catch (e) {
+    console.warn('AudioContext playConstellationHoverSound falhou:', e);
+  }
+}
+
+/**
+ * Pulso de acoplamento estelar (onda de choque acústica grave com brilho agudo)
+ */
+export function playConstellationSelectSound(enabled = true): void {
+  if (!enabled) return;
+  try {
+    const ctx = getAudioContext();
+    if (ctx.state === 'suspended') ctx.resume();
+    const now = ctx.currentTime;
+
+    // Sub-grave de ancoragem gravitacional
+    const subOsc = ctx.createOscillator();
+    const subGain = ctx.createGain();
+    subOsc.type = 'sine';
+    subOsc.frequency.setValueAtTime(130, now);
+    subOsc.frequency.exponentialRampToValueAtTime(65, now + 0.25);
+
+    subGain.gain.setValueAtTime(0.18, now);
+    subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+
+    subOsc.connect(subGain);
+    subGain.connect(ctx.destination);
+    subOsc.start(now);
+    subOsc.stop(now + 0.25);
+
+    // Chime agudo ressonante
+    const chimeOsc = ctx.createOscillator();
+    const chimeGain = ctx.createGain();
+    chimeOsc.type = 'triangle';
+    chimeOsc.frequency.setValueAtTime(880, now);
+    chimeOsc.frequency.exponentialRampToValueAtTime(1760, now + 0.15);
+
+    chimeGain.gain.setValueAtTime(0.08, now);
+    chimeGain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+
+    chimeOsc.connect(chimeGain);
+    chimeGain.connect(ctx.destination);
+    chimeOsc.start(now);
+    chimeOsc.stop(now + 0.2);
+  } catch (e) {
+    console.warn('AudioContext playConstellationSelectSound falhou:', e);
+  }
+}
+
+/**
+ * Som de salto no hiperespaço (Warp Speed) ao entrar em um card a partir da constelação
+ */
+export function playConstellationWarpSound(enabled = true): void {
+  if (!enabled) return;
+  try {
+    const ctx = getAudioContext();
+    if (ctx.state === 'suspended') ctx.resume();
+    const now = ctx.currentTime;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sawtooth';
+
+    osc.frequency.setValueAtTime(220, now);
+    osc.frequency.exponentialRampToValueAtTime(2400, now + 0.4);
+
+    gain.gain.setValueAtTime(0.01, now);
+    gain.gain.linearRampToValueAtTime(0.12, now + 0.15);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.45);
+  } catch (e) {
+    console.warn('AudioContext playConstellationWarpSound falhou:', e);
+  }
+}
+

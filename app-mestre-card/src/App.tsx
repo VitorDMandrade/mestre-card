@@ -8,10 +8,12 @@ import { StudyView } from './components/StudyView';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal';
 import { AcervoModal } from './components/acervo/AcervoModal';
+import { ConstellationView } from './components/constellation/ConstellationView';
 import 'katex/dist/katex.min.css';
 
 function App() {
-  const [currentView, setCurrentView] = useState<'dashboard' | 'study'>('dashboard');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'study' | 'constellation'>('dashboard');
+  const [previousView, setPreviousView] = useState<'dashboard' | 'study'>('dashboard');
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [isAcervoOpen, setIsAcervoOpen] = useState(false);
@@ -38,6 +40,35 @@ function App() {
   const showToast = (message: string, type: 'success' | 'info' | 'error' = 'success') => {
     setToast({ message, type });
   };
+
+  const handleOpenConstellation = () => {
+    setPreviousView(currentView === 'constellation' ? 'dashboard' : currentView);
+    setCurrentView('constellation');
+  };
+
+  const handleCloseConstellation = () => {
+    setCurrentView(previousView);
+  };
+
+  // Shortcut 'G' to toggle Constellation View
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+        return;
+      }
+      if ((e.key === 'g' || e.key === 'G') && !e.ctrlKey && !e.altKey && !e.metaKey) {
+        e.preventDefault();
+        setCurrentView(prev => {
+          if (prev === 'constellation') return previousView;
+          setPreviousView(prev);
+          return 'constellation';
+        });
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [previousView]);
 
   useEffect(() => {
     if (!toast) return;
@@ -271,6 +302,7 @@ function App() {
               setAcervoBanca(banca || 'todas');
               setIsAcervoOpen(true);
             }}
+            onOpenConstellation={handleOpenConstellation}
           />
         )}
         
@@ -286,6 +318,24 @@ function App() {
             onNextQueueItem={handleNextInQueue}
             onOpenAcervoModal={(query, banca) => {
               setAcervoQuery(query || activeCard.topic || '');
+              setAcervoBanca(banca || 'todas');
+              setIsAcervoOpen(true);
+            }}
+            onOpenConstellation={handleOpenConstellation}
+          />
+        )}
+
+        {currentView === 'constellation' && (
+          <ConstellationView
+            cards={cards}
+            activeCardId={activeCardId}
+            onSelectCard={(id) => {
+              handleSelectCard(id);
+              setCurrentView('study');
+            }}
+            onClose={handleCloseConstellation}
+            onOpenAcervo={(banca, query) => {
+              setAcervoQuery(query || '');
               setAcervoBanca(banca || 'todas');
               setIsAcervoOpen(true);
             }}
@@ -316,6 +366,17 @@ function App() {
           >
             <span>🏛️</span>
             <span className="hidden sm:inline">Acervo (598)</span>
+          </button>
+
+          <button
+            onClick={handleOpenConstellation}
+            aria-label="Constelação Neural 3D"
+            className="px-3.5 py-2 rounded-full bg-slate-900/95 hover:bg-cyan-950 border border-cyan-500/50 hover:border-cyan-400 text-cyan-300 hover:text-cyan-200 shadow-xl shadow-cyan-950/40 backdrop-blur-md transition-all text-xs font-mono font-bold flex items-center gap-2 cursor-pointer"
+            title="Abrir Constelação Neural 3D e Grafo do Conhecimento (G)"
+          >
+            <span>🌌</span>
+            <span className="hidden sm:inline">Grafo 3D</span>
+            <kbd className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-600 text-[10px] text-cyan-300 font-bold shadow-inner">G</kbd>
           </button>
         </div>
 

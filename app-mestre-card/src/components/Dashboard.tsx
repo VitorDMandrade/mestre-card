@@ -15,6 +15,7 @@ interface DashboardProps {
   onExportFiltered?: (cards: MestreCardData[], categoryLabel: string) => void;
   onStartQueue?: (cardIds: string[]) => void;
   onOpenAcervoModal?: (query?: string, banca?: string) => void;
+  onOpenConstellation?: () => void;
 }
 
 export type SubjectCategory = 'TODOS' | 'BIOLOGIA' | 'QUÍMICA' | 'FÍSICA' | 'MATEMÁTICA' | 'HUMANAS' | 'LINGUAGENS' | 'OUTROS';
@@ -53,7 +54,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onExportSingleCard,
   onExportFiltered,
   onStartQueue,
-  onOpenAcervoModal
+  onOpenAcervoModal,
+  onOpenConstellation
 }) => {
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
   const [jsonInput, setJsonInput] = useState('');
@@ -347,6 +349,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
             title="Abrir Biblioteca Completa do Acervo Oficial (598 PDFs de provas e cadernos)">
             <span>🏛️</span>
             <span>ACERVO OFICIAL (598)</span>
+          </button>
+
+          <button 
+            onClick={() => onOpenConstellation ? onOpenConstellation() : null}
+            className="bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/50 text-cyan-300 px-3.5 py-2 rounded-lg text-xs font-mono font-bold transition-all uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,245,255,0.2)] cursor-pointer"
+            title="Abrir Constelação Neural 3D e Grafo Interativo de Conexões">
+            <span>🌌</span>
+            <span>CONSTELAÇÃO NEURAL</span>
           </button>
 
           <button 

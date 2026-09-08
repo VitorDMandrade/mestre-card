@@ -38,6 +38,7 @@ interface StudyHUDProps {
   isOledMode?: boolean;
   onToggleOledMode?: () => void;
   onOpenAcervoModal?: () => void;
+  onOpenConstellation?: () => void;
 }
 
 export const StudyHUD = ({ 
@@ -55,7 +56,8 @@ export const StudyHUD = ({
   onToggleZenMode,
   isOledMode = false,
   onToggleOledMode,
-  onOpenAcervoModal
+  onOpenAcervoModal,
+  onOpenConstellation
 }: StudyHUDProps) => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeHash, setActiveHash] = useState('sec-01');
@@ -289,6 +291,17 @@ export const StudyHUD = ({
                   >
                     <span>🏛️</span>
                     <span className="hidden sm:inline">Acervo</span>
+                  </button>
+                )}
+
+                {onOpenConstellation && (
+                  <button
+                    onClick={onOpenConstellation}
+                    className="px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer border bg-slate-900 border-cyan-500/50 hover:border-cyan-400 text-cyan-300 hover:text-white shadow-[0_0_8px_rgba(0,245,255,0.2)]"
+                    title="Abrir Constelação Neural 3D centrada neste Card"
+                  >
+                    <span>🌌</span>
+                    <span className="hidden sm:inline">Grafo</span>
                   </button>
                 )}
               </div>

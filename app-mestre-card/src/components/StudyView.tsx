@@ -34,9 +34,10 @@ interface StudyViewProps {
   queueInfo?: { current: number; total: number; hasNext: boolean } | null;
   onNextQueueItem?: () => void;
   onOpenAcervoModal?: (query?: string, banca?: string) => void;
+  onOpenConstellation?: () => void;
 }
 
-export const StudyView: FC<StudyViewProps> = ({ card, onBack, queueInfo, onNextQueueItem, onOpenAcervoModal }) => {
+export const StudyView: FC<StudyViewProps> = ({ card, onBack, queueInfo, onNextQueueItem, onOpenAcervoModal, onOpenConstellation }) => {
   const [bestSession, setBestSession] = useState<StudySessionRecord | null>(null);
   
   // Lifted States
@@ -140,6 +141,7 @@ export const StudyView: FC<StudyViewProps> = ({ card, onBack, queueInfo, onNextQ
           isOledMode={isOledMode}
           onToggleOledMode={() => setIsOledMode(!isOledMode)}
           onOpenAcervoModal={onOpenAcervoModal ? () => onOpenAcervoModal(card.topic) : undefined}
+          onOpenConstellation={onOpenConstellation}
         />
 
         <div className={`max-w-6xl mx-auto px-4 pb-20 space-y-12 transition-all duration-300 study-font-${textSize} ${isZenMode ? 'zen-focus-active' : ''}`}>

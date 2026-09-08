@@ -40,6 +40,11 @@ export const KeyboardShortcutsModal: React.FC<KeyboardShortcutsModalProps> = ({ 
       desc: 'Avança para a próxima questão ou fecha pareceres de feedback.'
     },
     {
+      keys: ['G'],
+      label: 'Constelação Neural 3D',
+      desc: 'Alterna entre o Centro de Comando e o Grafo Galáctico de Conexões.'
+    },
+    {
       keys: ['?'],
       label: 'Guia de Controles',
       desc: 'Abre e fecha este painel tático de comandos.'
