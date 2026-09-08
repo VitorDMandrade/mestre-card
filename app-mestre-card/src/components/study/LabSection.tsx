@@ -9,6 +9,7 @@ import {
   playShieldBlockSound,
   playFocusOracleSound,
   playBossHitRoarSound,
+  playPhaseBreakSound,
   startBossBattleMusic,
   stopBossBattleMusic,
   playBossVictoryFanfareAudio
@@ -16,7 +17,12 @@ import {
 import { db } from '../../lib/db';
 import { useGame } from '../../context/GameContext';
 import { addXP } from '../../lib/xp-engine';
-import { initBossCombat, type BossCombatState, EXAMINER_TAUNTS } from '../../lib/boss-engine';
+import { 
+  initGauntletCombat, 
+  type BossCombatState, 
+  BOSS_IDENTITIES 
+} from '../../lib/boss-engine';
+import { classifyContent } from '../../lib/question-classifier';
 
 const useSafeGame = () => {
   try {
@@ -77,9 +83,19 @@ export function parseDistractorAnalysis(
   return { success: true, fullText: analysisText, items };
 }
 
+interface GauntletRound {
+  title: string;
+  phaseLabel: string;
+  prompt: string;
+  options: string[];
+  letters: string[];
+  correctIndex: number;
+  weaknessClue: string;
+}
+
 export const LabSection = ({ 
   cardId, 
-  cardTitle, 
+  cardTitle = 'Dossiê Tático', 
   questions, 
   hardcoreQuestions, 
   bossFight, 
@@ -94,8 +110,8 @@ export const LabSection = ({
   const [selectedTab, setSelectedTab] = useState<'standard' | 'hardcore'>(isHardcore && hasHardcore ? 'hardcore' : 'standard');
   const [prevHardcore, setPrevHardcore] = useState(isHardcore);
 
-  // Estados da Arena Roguelike (Via 3)
-  const [combat, setCombat] = useState<BossCombatState>(initBossCombat());
+  // Estados da Arena Roguelike Gauntlet (Via 3)
+  const [combat, setCombat] = useState<BossCombatState>(initGauntletCombat('standard'));
   const [bossShake, setBossShake] = useState(false);
   const [screenSlash, setScreenSlash] = useState(false);
   const [showOracleModal, setShowOracleModal] = useState(false);
@@ -113,42 +129,75 @@ export const LabSection = ({
   const activeQuestions = selectedTab === 'hardcore' && hasHardcore ? hardcoreQuestions : questions;
   const isViewingHardcore = selectedTab === 'hardcore' && hasHardcore;
 
-  // Normalização dos dados de desafio da banca para o Boss Fight
-  const bossData = useMemo(() => {
+  // Classificador inteligente de conteúdo baseado no Dossiê
+  const classification = useMemo(() => {
+    const sampleText = `${cardTitle} ${bossFight?.context || ''} ${questions[0]?.enunciado || ''}`;
+    return classifyContent(sampleText, cardTitle);
+  }, [cardTitle, bossFight, questions]);
+
+  // Montagem dinâmica das 3 Fases do Gauntlet
+  const gauntletRounds = useMemo<GauntletRound[]>(() => {
+    const rounds: GauntletRound[] = [];
+
+    // FASE 1: Proposição Preliminar (Questão Padrão do Card)
+    const q1 = questions[0];
+    if (q1 && q1.options && q1.options.length > 0) {
+      const correctIdx = q1.options.findIndex(o => o.isCorrect);
+      rounds.push({
+        title: 'FASE 1: PROPOSIÇÃO PRELIMINAR',
+        phaseLabel: 'Fase 1 // Crivo Inicial da Banca',
+        prompt: q1.enunciado,
+        options: q1.options.map(o => o.text),
+        letters: q1.options.map(o => o.letter),
+        correctIndex: correctIdx >= 0 ? correctIdx : 0,
+        weaknessClue: q1.resolution?.technicalVerdict || 'A banca oculta a invariância na primeira lei da matéria.'
+      });
+    }
+
+    // FASE 2: Desafio Hardcore / Ponto Cego da Matéria
+    const q2 = (hardcoreQuestions && hardcoreQuestions.length > 0) ? hardcoreQuestions[0] : (questions[1] || questions[0]);
+    if (q2 && q2.options && q2.options.length > 0) {
+      const correctIdx = q2.options.findIndex(o => o.isCorrect);
+      rounds.push({
+        title: 'FASE 2: PONTO CEGO & RIGOR ANALÍTICO',
+        phaseLabel: 'Fase 2 // Dificuldade 2ª Fase',
+        prompt: q2.enunciado,
+        options: q2.options.map(o => o.text),
+        letters: q2.options.map(o => o.letter),
+        correctIndex: correctIdx >= 0 ? correctIdx : 0,
+        weaknessClue: q2.resolution?.technicalVerdict || 'A falácia intermediária viola as condições de contorno do sistema.'
+      });
+    }
+
+    // FASE 3: Julgamento Supremo / Boss Fight Oficial
     if (bossFight && bossFight.options && bossFight.options.length > 0) {
       const correctIdx = bossFight.options.findIndex(o => o.isCorrect);
-      return {
-        title: bossFight.title || 'O Examinador Implacável',
-        prompt: bossFight.context || 'Identifique a tese inviolável que refuta a barreira de sofismas da banca.',
+      rounds.push({
+        title: `FASE 3: JULGAMENTO SUPREMO - ${bossFight.title.toUpperCase()}`,
+        phaseLabel: 'Fase 3 // Contenda Suprema da Banca',
+        prompt: bossFight.context,
         options: bossFight.options.map(o => o.text),
         letters: bossFight.options.map(o => o.letter),
         correctIndex: correctIdx >= 0 ? correctIdx : 0,
-        weaknessClue: bossFight.stepByStepResolution || 'Fraqueza detectada: A banca omite a invariância dimensional e as condições de contorno na etapa intermediária.'
-      };
+        weaknessClue: bossFight.stepByStepResolution || 'Fraqueza detectada: A banca desconsidera a simetria termodinâmica da reação.'
+      });
+    } else {
+      // Fallback seguro se não houver bossFight
+      rounds.push({
+        title: 'FASE 3: JULGAMENTO SUPREMO DA BANCA',
+        phaseLabel: 'Fase 3 // Contenda Suprema',
+        prompt: 'Confronte a comissão julgadora e estabeleça a tese axiomática inviolável.',
+        options: ['Tese Axiomática Canônica', 'Falácia por Inversão Causal', 'Sofisma de Falsa Equivalência', 'Premissa Sem Nexo Físico'],
+        letters: ['A', 'B', 'C', 'D'],
+        correctIndex: 0,
+        weaknessClue: 'A conservação e a simetria dimensional refutam as variáveis espúrias.'
+      });
     }
 
-    const fallbackQ = (hardcoreQuestions && hardcoreQuestions.length > 0 ? hardcoreQuestions[0] : questions[0]);
-    if (fallbackQ && fallbackQ.options && fallbackQ.options.length > 0) {
-      const correctIdx = fallbackQ.options.findIndex(o => o.isCorrect);
-      return {
-        title: 'Auditoria da Banca Central',
-        prompt: fallbackQ.enunciado,
-        options: fallbackQ.options.map(o => o.text),
-        letters: fallbackQ.options.map(o => o.letter),
-        correctIndex: correctIdx >= 0 ? correctIdx : 0,
-        weaknessClue: fallbackQ.resolution?.technicalVerdict || 'Fraqueza detectada: A premissa central é refutada pela fundamentação axiomática da questão.'
-      };
-    }
-
-    return {
-      title: 'O Examinador Implacável',
-      prompt: 'Confronte a banca e identifique a tese canônica inviolável.',
-      options: ['Tese Axiomática Canônica', 'Falácia por Inversão Causal', 'Sofisma de Falsa Equivalência', 'Premissa Sem Nexo Físico'],
-      letters: ['A', 'B', 'C', 'D'],
-      correctIndex: 0,
-      weaknessClue: 'A conservação de energia e simetria matemática eliminam as alternativas que introduzem variáveis espúrias.'
-    };
+    return rounds;
   }, [bossFight, hardcoreQuestions, questions]);
+
+  const currentRound = gauntletRounds[combat.currentRoundIndex] || gauntletRounds[0];
 
   // Gestão contínua da trilha sonora de batalha no modo Roguelike
   useEffect(() => {
@@ -162,53 +211,91 @@ export const LabSection = ({
     };
   }, [mode, combat.isVictory, combat.isDefeat, soundEnabled]);
 
-  // Ataque do Candidato na Arena Roguelike
-  const handleAttack = (idx: number) => {
-    if (combat.isVictory || combat.isDefeat) return;
+  // Alternador dinâmico de identidade de banca oficial
+  const handleSelectIdentity = (idKey: string) => {
+    setCombat(initGauntletCombat(idKey));
+    setAnsweredQs({});
+  };
 
-    const letter = bossData.letters[idx] || String.fromCharCode(65 + idx);
-    const isCorrect = idx === bossData.correctIndex;
+  // Ataque do Candidato na Arena Roguelike Gauntlet
+  const handleAttack = (idx: number) => {
+    if (combat.isVictory || combat.isDefeat || combat.isPhaseTransition) return;
+
+    const letter = currentRound.letters[idx] || String.fromCharCode(65 + idx);
+    const isCorrect = idx === currentRound.correctIndex;
 
     if (isCorrect) {
-      // GOLPE CRÍTICO DE TESE
-      setScreenSlash(true);
-      setBossShake(true);
-      playSwordSlashSound(soundEnabled);
-      playBossHitRoarSound(soundEnabled);
+      if (combat.currentRoundIndex < combat.totalRounds - 1) {
+        // QUEBRA DE FASE (Fases 1 e 2)
+        playSwordSlashSound(soundEnabled);
+        playPhaseBreakSound(soundEnabled);
 
-      if (typeof navigator !== 'undefined' && navigator.vibrate) {
-        navigator.vibrate([30, 40, 60]);
+        const nextRound = combat.currentRoundIndex + 1;
+        const damage = Math.floor(1000 / combat.totalRounds);
+        const nextHp = Math.max(0, combat.bossHp - damage);
+
+        setCombat(prev => ({
+          ...prev,
+          bossHp: nextHp,
+          currentRoundIndex: nextRound,
+          isPhaseTransition: true,
+          actionPoints: Math.min(prev.maxActionPoints, prev.actionPoints + 1), // Recupera +1 PA
+          eliminatedDistractors: [],
+          combatLog: [
+            {
+              id: `log-${Date.now()}-break`,
+              type: 'crit',
+              text: `★ FASE ${prev.currentRoundIndex + 1} VENCIDA! A blindagem da banca ruiu (-${damage} HP). Iniciando Fase ${nextRound + 1}!`
+            },
+            ...prev.combatLog
+          ]
+        }));
+
+        setTimeout(() => {
+          setCombat(prev => ({ ...prev, isPhaseTransition: false }));
+        }, 650);
+
+      } else {
+        // VITÓRIA TOTAL NO GAUNTLET (Fase 3 Final)
+        setScreenSlash(true);
+        setBossShake(true);
+        playSwordSlashSound(soundEnabled);
+        playBossHitRoarSound(soundEnabled);
+
+        if (typeof navigator !== 'undefined' && navigator.vibrate) {
+          navigator.vibrate([30, 40, 60]);
+        }
+
+        setTimeout(() => {
+          setBossShake(false);
+          setScreenSlash(false);
+          playBossVictoryFanfareAudio(soundEnabled);
+        }, 400);
+
+        setCombat(prev => ({
+          ...prev,
+          bossHp: 0,
+          isVictory: true,
+          combatLog: [
+            {
+              id: `log-${Date.now()}`,
+              type: 'crit',
+              text: `★ COLISEU CONCLUÍDO! ${prev.selectedIdentity.name} foi inteiramente refutado(a) nas 3 Fases!`
+            },
+            ...prev.combatLog
+          ]
+        }));
+
+        addXP(300);
+        game?.fireXpToast(300, `★ ${combat.selectedIdentity.badge} REFUTADO (+300 XP) ★`);
       }
-
-      setTimeout(() => {
-        setBossShake(false);
-        setScreenSlash(false);
-        playBossVictoryFanfareAudio(soundEnabled);
-      }, 400);
-
-      setCombat(prev => ({
-        ...prev,
-        bossHp: 0,
-        isVictory: true,
-        combatLog: [
-          {
-            id: `log-${Date.now()}`,
-            type: 'crit',
-            text: '★ GOLPE CRÍTICO DE TESE! O Sofisma da Banca foi reduzido a pó (1.000 Dano)!'
-          },
-          ...prev.combatLog
-        ]
-      }));
-
-      // Recompensa real de +300 XP
-      addXP(300);
-      game?.fireXpToast(300, '★ EXAMINADOR DERROTADO NO ROGUELIKE (+300 XP) ★');
     } else {
       // CONTRA-ATAQUE DA BANCA
       playShieldBlockSound(soundEnabled);
       const damage = 35 + combat.bossRageLevel * 5;
       const nextHp = Math.max(0, combat.playerHp - damage);
-      const taunt = EXAMINER_TAUNTS[combat.bossRageLevel % EXAMINER_TAUNTS.length];
+      const tauntList = combat.selectedIdentity.taunts;
+      const taunt = tauntList[combat.bossRageLevel % tauntList.length];
 
       setBossShake(true);
       setTimeout(() => setBossShake(false), 350);
@@ -223,7 +310,7 @@ export const LabSection = ({
           {
             id: `log-${Date.now()}-boss`,
             type: 'boss',
-            text: `⚠️ CONTRA-ATAQUE: -${damage} HP! O Examinador brada: "${taunt}"`
+            text: `⚠️ CONTRA-ATAQUE: -${damage} HP! ${combat.selectedIdentity.name}: ${taunt}`
           },
           {
             id: `log-${Date.now()}-player`,
@@ -238,11 +325,11 @@ export const LabSection = ({
       if (cardId) {
         db.recordSessionError({
           cardId,
-          cardTitle: cardTitle || 'Dossiê Tático',
-          game: 'Lab-BossRoguelike',
-          prompt: bossData.prompt,
-          userWrongAnswer: `Alternativa ${letter}: ${bossData.options[idx]}`,
-          explanation: bossData.weaknessClue,
+          cardTitle,
+          game: `Coliseu-${combat.selectedIdentity.id}`,
+          prompt: currentRound.prompt,
+          userWrongAnswer: `Alternativa ${letter}: ${currentRound.options[idx]}`,
+          explanation: currentRound.weaknessClue,
           timestamp: Date.now()
         }).catch(err => console.error('Erro ao registrar falha do Boss no DB:', err));
       }
@@ -251,18 +338,18 @@ export const LabSection = ({
 
   // Escudo Mnemônico: Vaporiza 1 sofisma incorreto (-1 PA)
   const handleUseMnemonicShield = () => {
-    if (combat.actionPoints < 1 || combat.isVictory || combat.isDefeat) return;
+    if (combat.actionPoints < 1 || combat.isVictory || combat.isDefeat || combat.isPhaseTransition) return;
 
-    const availableDistractors = bossData.options
+    const availableDistractors = currentRound.options
       .map((opt, i) => ({ opt, i }))
-      .filter(({ i, opt }) => i !== bossData.correctIndex && !combat.eliminatedDistractors.includes(opt));
+      .filter(({ i, opt }) => i !== currentRound.correctIndex && !combat.eliminatedDistractors.includes(opt));
 
     if (availableDistractors.length === 0) return;
 
     const target = availableDistractors[0];
     playShieldBlockSound(soundEnabled);
 
-    const letter = bossData.letters[target.i] || String.fromCharCode(65 + target.i);
+    const letter = currentRound.letters[target.i] || String.fromCharCode(65 + target.i);
 
     setCombat(prev => ({
       ...prev,
@@ -281,7 +368,7 @@ export const LabSection = ({
 
   // Oráculo de Foco: Revela fraqueza da banca (-2 PA)
   const handleUseOracleSiphon = () => {
-    if (combat.actionPoints < 2 || combat.oracleHintUsed || combat.isVictory || combat.isDefeat) return;
+    if (combat.actionPoints < 2 || combat.oracleHintUsed || combat.isVictory || combat.isDefeat || combat.isPhaseTransition) return;
     playFocusOracleSound(soundEnabled);
     setShowOracleModal(true);
 
@@ -293,7 +380,7 @@ export const LabSection = ({
         {
           id: `log-${Date.now()}`,
           type: 'system',
-          text: '📜 ORÁCULO REVELADO: O ponto fraco da banca foi descriptografado! (-2 PA)'
+          text: `📜 ORÁCULO ATIVADO: Fraqueza da Fase ${prev.currentRoundIndex + 1} descriptografada! (-2 PA)`
         },
         ...prev.combatLog
       ]
@@ -343,7 +430,7 @@ export const LabSection = ({
 
         db.recordSessionError({
           cardId,
-          cardTitle: cardTitle || 'Dossiê Tático',
+          cardTitle,
           game: isViewingHardcore ? 'Lab-Hardcore' : questionId === 'boss' ? 'Lab-Boss' : 'Lab',
           prompt: promptText,
           userWrongAnswer: wrongText,
@@ -366,14 +453,19 @@ export const LabSection = ({
       {/* Cabeçalho da Seção com Comutador de Modo */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-slate-800 pb-4">
         <div>
-          <span className="text-[10px] font-mono uppercase tracking-widest text-cyan-400">SEÇÃO 05 // LABORATÓRIO TÁTICO</span>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-cyan-400">SEÇÃO 05 // LABORATÓRIO TÁTICO</span>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-950/60 text-blue-300 border border-blue-500/30">
+              {classification.disciplineLabel} • {classification.primaryTopic}
+            </span>
+          </div>
           <h2 className="text-2xl font-black text-white flex items-center gap-3">
             <span className="text-blue-500">05.</span> LABORATÓRIO PRÁTICO
           </h2>
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">
-          {/* Comutador de Modo Canônico ⇄ Boss Fight Roguelike */}
+          {/* Comutador Canônico ⇄ Coliseu Roguelike */}
           <div className="flex items-center p-1 rounded-xl bg-slate-900 border border-slate-800">
             <button
               onClick={() => setMode('proof')}
@@ -393,7 +485,7 @@ export const LabSection = ({
                   : 'text-red-400 hover:text-red-300'
               }`}
             >
-              ⚔️ Boss Fight Roguelike <span className="text-[10px] bg-red-500 text-slate-950 font-black px-1 rounded-sm">+300 XP</span>
+              ⚔️ Coliseu Roguelike (3 Fases) <span className="text-[10px] bg-red-500 text-slate-950 font-black px-1 rounded-sm">+300 XP</span>
             </button>
           </div>
 
@@ -729,27 +821,72 @@ export const LabSection = ({
       )}
 
       {/* ═════════════════════════════════════════════════════════════════════
-          MODO BOSS FIGHT ROGUELIKE (VIA 3 - ARENA EM TURNOS)
+          MODO COLISEU ROGUELIKE (VIA 3 - GAUNTLET EM 3 FASES DA BANCA)
          ═════════════════════════════════════════════════════════════════════ */}
       {mode === 'roguelike' && (
         <div 
           className={`relative rounded-3xl border border-red-500/40 p-5 sm:p-7 overflow-hidden shadow-2xl transition-all space-y-6 ${
             bossShake ? 'boss-damaged' : ''
-          } ${combat.bossRageLevel > 0 ? 'boss-rage-active' : ''}`}
+          } ${combat.bossRageLevel > 0 ? 'boss-rage-active' : ''} ${
+            combat.isPhaseTransition ? 'phase-transition-flash' : ''
+          }`}
           style={{
             backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.94), rgba(2, 6, 23, 0.97)), url('/assets/boss/arena_bg.jpg')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }}
         >
-          {/* Topo do Duelo: Avatar e Barra Monolítica de 1.000 HP do Examinador */}
+          {/* Barra de Seletor de Identidade da Banca Oficial */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-2xl bg-slate-950/80 border border-slate-800">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest font-black mr-1">
+                BANCA EXAMINADORA:
+              </span>
+              {Object.values(BOSS_IDENTITIES).map(b => (
+                <button
+                  key={b.id}
+                  onClick={() => handleSelectIdentity(b.id)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer border ${
+                    combat.selectedIdentity.id === b.id
+                      ? 'bg-red-500/25 text-red-300 border-red-500/60 shadow-[0_0_12px_rgba(239,68,68,0.3)] scale-[1.02]'
+                      : 'bg-slate-900/80 border-slate-800 text-slate-400 hover:text-white'
+                  }`}
+                  title={b.title}
+                >
+                  {b.id === 'einstein' ? '🩺 Einstein' : b.id === 'enem' ? '🌐 ENEM' : b.id === 'unesp' ? '🏛️ UNESP' : '⚖️ Padrão'}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-2 font-mono text-xs">
+              <span className="text-slate-400 text-[10px]">PROGRESSO DO RAID:</span>
+              <div className="flex gap-1">
+                {[0, 1, 2].map(roundIdx => (
+                  <span
+                    key={roundIdx}
+                    className={`px-2 py-0.5 rounded text-[10px] font-bold border transition-all ${
+                      roundIdx < combat.currentRoundIndex
+                        ? 'bg-emerald-950 border-emerald-500/50 text-emerald-300'
+                        : roundIdx === combat.currentRoundIndex
+                        ? 'bg-red-950 border-red-500 text-red-300 animate-pulse'
+                        : 'bg-slate-900 border-slate-800 text-slate-600'
+                    }`}
+                  >
+                    FASE {roundIdx + 1}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Topo do Duelo: Avatar e Barra de 1.000 HP do Examinador */}
           <div className="relative p-5 rounded-2xl bg-slate-950/85 border border-red-500/30 backdrop-blur-md">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-red-500/60 shadow-[0_0_20px_rgba(239,68,68,0.4)] relative flex-shrink-0 bg-slate-900">
                   <img
-                    src="/assets/boss/examiner_avatar.jpg"
-                    alt="O Examinador Implacável"
+                    src={combat.selectedIdentity.avatarUrl}
+                    alt={combat.selectedIdentity.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       (e.target as HTMLElement).style.display = 'none';
@@ -763,14 +900,14 @@ export const LabSection = ({
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="text-base sm:text-lg font-black text-white tracking-wide font-mono">
-                      {bossData.title.toUpperCase()}
+                      {combat.selectedIdentity.name.toUpperCase()}
                     </h3>
                     <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-red-950 text-red-400 border border-red-500/40 font-black">
-                      NÍVEL 99
+                      {combat.selectedIdentity.badge}
                     </span>
                   </div>
                   <p className="text-xs font-mono text-slate-400">
-                    Banca Examinadora Central // Auditoria Epistêmica da Prova
+                    {combat.selectedIdentity.title}
                   </p>
                   {combat.bossRageLevel > 0 && (
                     <span className="inline-flex items-center gap-1 text-[10px] font-mono text-amber-400 font-bold mt-1 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-500/40 animate-pulse">
@@ -841,7 +978,7 @@ export const LabSection = ({
               <div className="flex gap-2">
                 <button
                   onClick={handleUseMnemonicShield}
-                  disabled={combat.actionPoints < 1 || combat.isVictory || combat.isDefeat}
+                  disabled={combat.actionPoints < 1 || combat.isVictory || combat.isDefeat || combat.isPhaseTransition}
                   className="flex-1 py-2 px-3 rounded-xl bg-slate-900 border border-slate-700 hover:border-cyan-400 text-[11px] font-mono font-bold text-cyan-300 hover:bg-cyan-950/30 transition-all flex items-center justify-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-sm"
                   title="Elimina 1 alternativa falsa (distrator) do tabuleiro"
                 >
@@ -856,7 +993,7 @@ export const LabSection = ({
 
                 <button
                   onClick={handleUseOracleSiphon}
-                  disabled={combat.actionPoints < 2 || combat.oracleHintUsed || combat.isVictory || combat.isDefeat}
+                  disabled={combat.actionPoints < 2 || combat.oracleHintUsed || combat.isVictory || combat.isDefeat || combat.isPhaseTransition}
                   className="flex-1 py-2 px-3 rounded-xl bg-slate-900 border border-slate-700 hover:border-amber-400 text-[11px] font-mono font-bold text-amber-300 hover:bg-amber-950/30 transition-all flex items-center justify-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-sm"
                   title="Revela a fraqueza conceitual da banca"
                 >
@@ -866,12 +1003,19 @@ export const LabSection = ({
             </div>
           </div>
 
-          {/* Enunciado do Dilema Tático */}
+          {/* Indicador de Fase Ativa e Enunciado da Rodada */}
           <div className="p-5 rounded-2xl bg-slate-950/90 border border-slate-800/90 text-sm leading-relaxed text-slate-200 shadow-inner">
-            <span className="text-[10px] font-mono text-red-400 uppercase tracking-widest font-black block mb-2">
-              PROPOSIÇÃO DA BANCA EXAMINADORA:
-            </span>
-            <MathRenderer content={bossData.prompt} />
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[11px] font-mono text-amber-400 uppercase tracking-widest font-black">
+                {currentRound.title}
+              </span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-900 text-cyan-300 border border-cyan-500/30">
+                FASE {combat.currentRoundIndex + 1} DE {combat.totalRounds}
+              </span>
+            </div>
+            <div className="text-gray-200 text-sm leading-relaxed">
+              <MathRenderer content={currentRound.prompt} />
+            </div>
           </div>
 
           {/* Modal / Alerta do Oráculo Descriptografado */}
@@ -879,7 +1023,7 @@ export const LabSection = ({
             <div className="relative p-4 rounded-xl bg-amber-950/50 border border-amber-500/60 space-y-2 animate-pulse-subtle">
               <div className="flex justify-between items-center">
                 <span className="text-xs font-mono font-bold text-amber-300 flex items-center gap-2">
-                  <span>📜</span> DESCRIPTOGRAFIA DO ORÁCULO DE FOCO:
+                  <span>📜</span> DESCRIPTOGRAFIA DA FASE {combat.currentRoundIndex + 1}:
                 </span>
                 <button
                   onClick={() => setShowOracleModal(false)}
@@ -889,15 +1033,15 @@ export const LabSection = ({
                 </button>
               </div>
               <div className="text-xs font-mono text-amber-200 leading-relaxed pl-2 border-l-2 border-amber-500/50">
-                <MathRenderer content={bossData.weaknessClue} />
+                <MathRenderer content={currentRound.weaknessClue} />
               </div>
             </div>
           )}
 
           {/* Alternativas de Ataque (Golpes de Tese) */}
           <div className="relative grid grid-cols-1 gap-3">
-            {bossData.options.map((opt, idx) => {
-              const letter = bossData.letters[idx] || String.fromCharCode(65 + idx);
+            {currentRound.options.map((opt, idx) => {
+              const letter = currentRound.letters[idx] || String.fromCharCode(65 + idx);
               const isEliminated = combat.eliminatedDistractors.includes(opt);
 
               if (isEliminated) {
@@ -919,7 +1063,7 @@ export const LabSection = ({
                 <button
                   key={idx}
                   onClick={() => handleAttack(idx)}
-                  disabled={combat.isVictory || combat.isDefeat}
+                  disabled={combat.isVictory || combat.isDefeat || combat.isPhaseTransition}
                   className="group p-4 text-left rounded-xl bg-slate-900/90 border border-slate-800 hover:border-red-500/70 hover:shadow-[0_0_20px_rgba(239,68,68,0.25)] text-xs font-mono text-slate-300 hover:text-white transition-all flex items-start gap-3 disabled:cursor-not-allowed cursor-pointer"
                 >
                   <span className="px-2 py-1 rounded bg-slate-950 border border-slate-700 text-red-400 text-[10px] font-bold group-hover:border-red-500 flex-shrink-0">
@@ -936,14 +1080,14 @@ export const LabSection = ({
             })}
           </div>
 
-          {/* Banner de Vitória Épica */}
+          {/* Banner de Vitória Épica do Coliseu */}
           {combat.isVictory && (
             <div className="relative p-6 rounded-2xl bg-emerald-950/60 border-2 border-emerald-500 text-center space-y-3 shadow-[0_0_35px_rgba(16,185,129,0.35)] animate-bounce-subtle">
               <div className="text-xl sm:text-2xl font-black text-emerald-300 font-mono flex items-center justify-center gap-2">
-                <span>🏆</span> VITÓRIA ÉPICA: O EXAMINADOR FOI REFUTADO! <span>🏆</span>
+                <span>🏆</span> COLISEU CONCLUÍDO: {combat.selectedIdentity.badge} REFUTADO! <span>🏆</span>
               </div>
               <p className="text-xs sm:text-sm font-mono text-emerald-200 max-w-xl mx-auto leading-relaxed">
-                Sua tese axiomática desarmou todos os sofismas da banca examinadora com rigor impecável. 
+                Você superou com louvor todas as 3 fases do Gauntlet epistêmico contra a comissão examinadora.
                 A recompensa de <strong className="text-amber-300 font-black">+300 XP</strong> foi transferida para o seu perfil tático!
               </p>
             </div>
@@ -953,16 +1097,16 @@ export const LabSection = ({
           {combat.isDefeat && (
             <div className="relative p-6 rounded-2xl bg-red-950/60 border-2 border-red-500 text-center space-y-4 shadow-[0_0_35px_rgba(239,68,68,0.4)]">
               <div className="text-xl sm:text-2xl font-black text-red-400 font-mono flex items-center justify-center gap-2">
-                <span>💀</span> SANIDADE ESGOTADA: VOCÊ FOI ANULADO PELA BANCA
+                <span>💀</span> SANIDADE ESGOTADA: O TRIBUNAL DA BANCA INDEFERIU SUA TESE
               </div>
               <p className="text-xs sm:text-sm font-mono text-red-200 max-w-xl mx-auto leading-relaxed">
-                Os sofismas e contra-ataques drenaram sua estamina. Rearme sua fundamentação e tente novamente com a mente lúcida.
+                Os contra-ataques drenaram sua estamina. Rearme sua fundamentação teórica e retorne ao Coliseu.
               </p>
               <button
-                onClick={() => setCombat(initBossCombat())}
+                onClick={() => setCombat(initGauntletCombat(combat.selectedIdentity.id))}
                 className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-mono text-xs font-bold transition-all shadow-[0_0_15px_rgba(239,68,68,0.5)] cursor-pointer flex items-center gap-2 mx-auto"
               >
-                <span>🔄</span> REINICIAR DUELO COM A BANCA
+                <span>🔄</span> REINICIAR COLISEU COM A BANCA
               </button>
             </div>
           )}
@@ -970,7 +1114,7 @@ export const LabSection = ({
           {/* Terminal de Logs de Batalha */}
           <div className="relative p-4 rounded-xl bg-slate-950/95 border border-slate-800/90 font-mono text-[11px] max-h-36 overflow-y-auto space-y-1.5 shadow-inner">
             <div className="text-[10px] text-slate-500 uppercase tracking-widest border-b border-slate-800/80 pb-1 mb-2">
-              TERMINAL DE AUDITORIA & REGISTRO DE COMBATE //
+              TERMINAL DE AUDITORIA & REGISTRO DO COLISEU //
             </div>
             {combat.combatLog.map((log) => (
               <div

@@ -1126,3 +1126,58 @@ export function playBossDefeatedFanfare(enabled = true): void {
   }
 }
 
+/**
+ * 19. Som de estilhaçamento de fase (escudo quebrando + transição no Gauntlet)
+ */
+export function playPhaseBreakSound(enabled = true): void {
+  if (!enabled) return;
+  try {
+    const ctx = getAudioContext();
+    if (ctx.state === 'suspended') ctx.resume();
+    const now = ctx.currentTime;
+
+    // Impacto metálico descendente
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(480, now);
+    osc.frequency.exponentialRampToValueAtTime(110, now + 0.3);
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(1400, now);
+    filter.frequency.exponentialRampToValueAtTime(300, now + 0.3);
+    filter.Q.setValueAtTime(4.0, now);
+
+    gain.gain.setValueAtTime(0.35, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.3);
+
+    // Ruído branco estilhaçado
+    const bufferSize = Math.floor(ctx.sampleRate * 0.18);
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.25));
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.2, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+    noise.connect(noiseGain);
+    noiseGain.connect(ctx.destination);
+    noise.start(now + 0.03);
+    noise.stop(now + 0.21);
+  } catch (e) {
+    console.warn('AudioContext phaseBreak falhou:', e);
+  }
+}
+
+

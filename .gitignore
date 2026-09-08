@@ -1,0 +1,15 @@
+# Node & build
+node_modules/
+dist/
+dist-ssr/
+*.log
+
+# Raw exam archives (large PDF binaries > 100MB rejected by GitHub)
+Provas Oficiais e Exercícios/
+*.pdf
+
+# Editor & OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
