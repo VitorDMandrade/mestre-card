@@ -167,3 +167,56 @@ export function getAcervoStats() {
     provasOficiais
   };
 }
+
+/**
+ * Retorna a contagem de itens por banca no catálogo
+ */
+export function getAcervoBancaCounts(): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const item of ACERVO_CATALOG) {
+    const key = item.banca || 'Outras';
+    counts[key] = (counts[key] || 0) + 1;
+  }
+  return counts;
+}
+
+/**
+ * Retorna as provas e gabaritos de uma banca específica, com ordenação por relevância temática se fornecido tópico
+ */
+export function getAcervoForBanca(bancaName: string, topic?: string, limit = 24): AcervoItem[] {
+  if (!bancaName || bancaName === 'todas' || bancaName === 'standard') {
+    if (topic) {
+      return matchAcervoToCard({ topic }, limit).map(r => r.item);
+    }
+    return ACERVO_CATALOG.slice(0, limit);
+  }
+
+  const normBanca = normalize(bancaName);
+  let filtered = ACERVO_CATALOG.filter(item => {
+    const normItemBanca = normalize(item.banca || '');
+    return normItemBanca.includes(normBanca) || normBanca.includes(normItemBanca);
+  });
+
+  if (filtered.length === 0) {
+    // Se for 'cadernos', busca por caderno_exercicios
+    if (normBanca.includes('caderno') || normBanca.includes('poliedro') || normBanca.includes('ferretto')) {
+      filtered = ACERVO_CATALOG.filter(item => item.category === 'caderno_exercicios');
+    } else {
+      filtered = ACERVO_CATALOG.slice(0, limit);
+    }
+  }
+
+  if (topic) {
+    const normTopic = normalize(topic);
+    const tokens = normTopic.split(/\s+/).filter(t => t.length > 2);
+    filtered.sort((a, b) => {
+      const aTitle = normalize(a.title + ' ' + a.topics.join(' '));
+      const bTitle = normalize(b.title + ' ' + b.topics.join(' '));
+      const aMatches = tokens.filter(t => aTitle.includes(t)).length;
+      const bMatches = tokens.filter(t => bTitle.includes(t)).length;
+      return bMatches - aMatches;
+    });
+  }
+
+  return filtered.slice(0, limit);
+}

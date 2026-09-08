@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import type { LabQuestion, BossFight } from '../../types/mestre-card';
 import { MathRenderer } from '../MathRenderer';
 import { 
@@ -24,7 +24,7 @@ import {
   BOSS_IDENTITIES 
 } from '../../lib/boss-engine';
 import { classifyContent } from '../../lib/question-classifier';
-import { matchAcervoToCard } from '../../lib/acervo-matcher';
+import { matchAcervoToCard, getAcervoForBanca, getAcervoBancaCounts } from '../../lib/acervo-matcher';
 
 const useSafeGame = () => {
   try {
@@ -147,67 +147,117 @@ export const LabSection = ({
     return classifyContent(sampleText, cardTitle);
   }, [cardTitle, bossFight, questions]);
 
-  // Montagem dinâmica das 3 Fases do Gauntlet
+  const bancaRailRef = useRef<HTMLDivElement>(null);
+  const provasRailRef = useRef<HTMLDivElement>(null);
+
+  const scrollBancaRail = (direction: 'left' | 'right') => {
+    if (bancaRailRef.current) {
+      const offset = direction === 'left' ? -260 : 260;
+      bancaRailRef.current.scrollBy({ left: offset, behavior: 'smooth' });
+    }
+  };
+
+  const scrollProvasRail = (direction: 'left' | 'right') => {
+    if (provasRailRef.current) {
+      const offset = direction === 'left' ? -280 : 280;
+      provasRailRef.current.scrollBy({ left: offset, behavior: 'smooth' });
+    }
+  };
+
+  const bancaCounts = useMemo(() => {
+    return getAcervoBancaCounts();
+  }, []);
+
+  const bancaExams = useMemo(() => {
+    return getAcervoForBanca(
+      combat.selectedIdentity.bancaCatalogName,
+      card?.topic || cardTitle,
+      20
+    );
+  }, [combat.selectedIdentity, card?.topic, cardTitle]);
+
+  // Montagem dinâmica das 3 Fases do Gauntlet por Banca Oficial
   const gauntletRounds = useMemo<GauntletRound[]>(() => {
+    const identity = combat.selectedIdentity;
+    const allPool = [
+      ...(questions || []),
+      ...(hardcoreQuestions || [])
+    ];
+
+    // Se houver questões com menção explícita à banca no enunciado, prioriza
+    const bancaKey = identity.id.toLowerCase();
+    const bancaCatalog = (identity.bancaCatalogName || '').toLowerCase();
+
+    const specificQuestions = allPool.filter(q => {
+      const text = (q.enunciado || '').toLowerCase();
+      return text.includes(bancaKey) || (bancaCatalog && text.includes(bancaCatalog));
+    });
+
+    const candidatePool = specificQuestions.length > 0 ? specificQuestions : allPool;
+
+    // Rotação determinística para cada banca selecionada (garante perguntas diferentes por banca)
+    const hash = identity.id.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+    const total = Math.max(1, candidatePool.length);
+
+    const q1 = candidatePool[hash % total] || questions[0];
+    const q2 = candidatePool[(hash + 1) % total] || (hardcoreQuestions && hardcoreQuestions[0]) || questions[1] || q1;
+
     const rounds: GauntletRound[] = [];
 
-    // FASE 1: Proposição Preliminar (Questão Padrão do Card)
-    const q1 = questions[0];
+    // FASE 1: Proposição Preliminar no Estilo da Banca
     if (q1 && q1.options && q1.options.length > 0) {
       const correctIdx = q1.options.findIndex(o => o.isCorrect);
       rounds.push({
-        title: 'FASE 1: PROPOSIÇÃO PRELIMINAR',
-        phaseLabel: 'Fase 1 // Crivo Inicial da Banca',
-        prompt: q1.enunciado,
+        title: `FASE 1: CRIVO PRELIMINAR // ${identity.badge}`,
+        phaseLabel: `Fase 1 // Padrão Oficial ${identity.name}`,
+        prompt: q1.enunciado.startsWith('[') ? q1.enunciado : `[${identity.badge} // PROPOSIÇÃO INICIAL]\n\n${q1.enunciado}`,
         options: q1.options.map(o => o.text),
         letters: q1.options.map(o => o.letter),
         correctIndex: correctIdx >= 0 ? correctIdx : 0,
-        weaknessClue: q1.resolution?.technicalVerdict || 'A banca oculta a invariância na primeira lei da matéria.'
+        weaknessClue: q1.resolution?.technicalVerdict || `Fraqueza ${identity.badge}: ${identity.biasDescription}`
       });
     }
 
-    // FASE 2: Desafio Hardcore / Ponto Cego da Matéria
-    const q2 = (hardcoreQuestions && hardcoreQuestions.length > 0) ? hardcoreQuestions[0] : (questions[1] || questions[0]);
+    // FASE 2: Ponto Cego & Dificuldade 2ª Fase da Banca
     if (q2 && q2.options && q2.options.length > 0) {
       const correctIdx = q2.options.findIndex(o => o.isCorrect);
       rounds.push({
-        title: 'FASE 2: PONTO CEGO & RIGOR ANALÍTICO',
-        phaseLabel: 'Fase 2 // Dificuldade 2ª Fase',
-        prompt: q2.enunciado,
+        title: `FASE 2: PONTO CEGO & RIGOR // ${identity.name.toUpperCase()}`,
+        phaseLabel: `Fase 2 // Dificuldade 2ª Fase ${identity.badge}`,
+        prompt: q2.enunciado.startsWith('[') ? q2.enunciado : `[${identity.badge} // DISCURSIVA / 2ª FASE]\n\n${q2.enunciado}`,
         options: q2.options.map(o => o.text),
         letters: q2.options.map(o => o.letter),
         correctIndex: correctIdx >= 0 ? correctIdx : 0,
-        weaknessClue: q2.resolution?.technicalVerdict || 'A falácia intermediária viola as condições de contorno do sistema.'
+        weaknessClue: q2.resolution?.technicalVerdict || `Fraqueza ${identity.badge}: A falácia intermediária viola as condições de contorno do sistema.`
       });
     }
 
-    // FASE 3: Julgamento Supremo / Boss Fight Oficial
+    // FASE 3: Julgamento Supremo da Banca Oficial
     if (bossFight && bossFight.options && bossFight.options.length > 0) {
       const correctIdx = bossFight.options.findIndex(o => o.isCorrect);
       rounds.push({
-        title: `FASE 3: JULGAMENTO SUPREMO - ${bossFight.title.toUpperCase()}`,
-        phaseLabel: 'Fase 3 // Contenda Suprema da Banca',
-        prompt: bossFight.context,
+        title: `FASE 3: JULGAMENTO SUPREMO - ${bossFight.title ? bossFight.title.toUpperCase() : identity.name.toUpperCase()}`,
+        phaseLabel: `Fase 3 // Contenda Suprema ${identity.badge}`,
+        prompt: `[COMISSÃO EXAMINADORA ${identity.badge}]:\n\n${bossFight.context}`,
         options: bossFight.options.map(o => o.text),
         letters: bossFight.options.map(o => o.letter),
         correctIndex: correctIdx >= 0 ? correctIdx : 0,
-        weaknessClue: bossFight.stepByStepResolution || 'Fraqueza detectada: A banca desconsidera a simetria termodinâmica da reação.'
+        weaknessClue: bossFight.stepByStepResolution || `Fraqueza detectada no perfil ${identity.badge}: ${identity.biasDescription}`
       });
     } else {
-      // Fallback seguro se não houver bossFight
       rounds.push({
-        title: 'FASE 3: JULGAMENTO SUPREMO DA BANCA',
-        phaseLabel: 'Fase 3 // Contenda Suprema',
-        prompt: 'Confronte a comissão julgadora e estabeleça a tese axiomática inviolável.',
+        title: `FASE 3: JULGAMENTO SUPREMO // ${identity.name.toUpperCase()}`,
+        phaseLabel: `Fase 3 // Contenda Suprema ${identity.badge}`,
+        prompt: `[${identity.badge}] Confronte a comissão examinadora de ${identity.name} e fundamente a tese axiomática inviolável sobre ${cardTitle}.`,
         options: ['Tese Axiomática Canônica', 'Falácia por Inversão Causal', 'Sofisma de Falsa Equivalência', 'Premissa Sem Nexo Físico'],
         letters: ['A', 'B', 'C', 'D'],
         correctIndex: 0,
-        weaknessClue: 'A conservação e a simetria dimensional refutam as variáveis espúrias.'
+        weaknessClue: `A conservação e a simetria dimensional refutam as variáveis espúrias segundo o crivo de ${identity.badge}.`
       });
     }
 
     return rounds;
-  }, [bossFight, hardcoreQuestions, questions]);
+  }, [combat.selectedIdentity, bossFight, hardcoreQuestions, questions, cardTitle]);
 
   const currentRound = gauntletRounds[combat.currentRoundIndex] || gauntletRounds[0];
 
@@ -227,6 +277,7 @@ export const LabSection = ({
   const handleSelectIdentity = (idKey: string) => {
     setCombat(initGauntletCombat(idKey));
     setAnsweredQs({});
+    playSwordSlashSound(soundEnabled);
   };
 
   // Ataque do Candidato na Arena Roguelike Gauntlet
@@ -573,8 +624,8 @@ export const LabSection = ({
                     ? 'border-2 border-red-500/50 bg-gradient-to-b from-red-950/20 to-slate-900 shadow-[0_0_25px_rgba(239,68,68,0.15)]' 
                     : 'bg-slate-900 border border-slate-700/80 hover:border-slate-600'
                 }`}>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+                    <div className="flex items-center gap-3 flex-wrap">
                       <div className={`font-bold font-mono px-3 py-1 rounded text-sm border ${
                         isViewingHardcore
                           ? 'bg-red-900/40 text-red-400 border-red-500/40'
@@ -585,6 +636,9 @@ export const LabSection = ({
                       <div className={`text-sm font-medium ${isViewingHardcore ? 'text-red-300/90 font-mono text-xs' : 'text-slate-400'}`}>
                         {isViewingHardcore ? '⚡ 2ª Fase / Rigor Analítico' : 'Treinamento Padrão'}
                       </div>
+                      <span className="px-2 py-0.5 rounded bg-blue-950/80 border border-blue-500/40 text-[10px] font-mono text-blue-300 font-bold">
+                        {q.enunciado.match(/\(([^)]*(?:ENEM|UNESP|FUVEST|UNICAMP|UERJ|UECE|EINSTEIN|UFG|UEMA|UFT|UNIRG|UNIRV|UNITINS)[^)]*)\)/i)?.[1] || `${classification.suggestedBancas?.[0] || combat.selectedIdentity.badge} // OFICIAL`}
+                      </span>
                     </div>
                     {isAnswered && (
                       <span className="text-xs font-mono text-slate-400">
@@ -898,65 +952,207 @@ export const LabSection = ({
             backgroundPosition: 'center'
           }}
         >
-          {/* Barra de Seletor de Identidade da Banca Oficial */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-2xl bg-slate-950/80 border border-slate-800">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest font-black mr-1">
-                BANCA EXAMINADORA:
-              </span>
-              {Object.values(BOSS_IDENTITIES).map(b => (
-                <button
-                  key={b.id}
-                  onClick={() => handleSelectIdentity(b.id)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer border ${
-                    combat.selectedIdentity.id === b.id
-                      ? 'bg-red-500/25 text-red-300 border-red-500/60 shadow-[0_0_12px_rgba(239,68,68,0.3)] scale-[1.02]'
-                      : 'bg-slate-900/80 border-slate-800 text-slate-400 hover:text-white'
-                  }`}
-                  title={b.title}
-                >
-                  {b.id === 'einstein' ? '🩺 Einstein' : b.id === 'enem' ? '🌐 ENEM' : b.id === 'unesp' ? '🏛️ UNESP' : '⚖️ Padrão'}
-                </button>
-              ))}
+          {/* Barra de Seletor de Identidade da Banca Oficial com Navegação Horizontal */}
+          <div className="p-4 rounded-2xl bg-slate-950/90 border border-slate-800 shadow-xl space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono font-black text-amber-400 flex items-center gap-1.5 uppercase tracking-wider">
+                  <span>🏛️</span> BANCAS EXAMINADORAS ({Object.keys(BOSS_IDENTITIES).length}):
+                </span>
+                <span className="text-[10px] font-mono text-slate-400 hidden sm:inline">
+                  Navegue lateralmente para selecionar a comissão examinadora
+                </span>
+              </div>
 
-              {onOpenAcervoModal && (
-                <button
-                  onClick={() => {
-                    const bancaMap: Record<string, string> = {
-                      einstein: 'Albert Einstein',
-                      enem: 'ENEM',
-                      unesp: 'UNESP'
-                    };
-                    const bancaName = bancaMap[combat.selectedIdentity.id] || 'todas';
-                    onOpenAcervoModal('', bancaName);
-                  }}
-                  className="px-2.5 py-1.5 rounded-lg text-xs font-mono font-bold bg-purple-950/40 hover:bg-purple-900/60 border border-purple-500/50 text-purple-300 hover:text-purple-100 transition-all flex items-center gap-1.5 cursor-pointer ml-1"
-                  title="Abrir Acervo Oficial de Provas e Gabaritos desta Banca"
-                >
-                  <span>🏛️</span>
-                  <span>Provas no Acervo</span>
-                </button>
-              )}
+              {/* Controles de Navegação Horizontal ‹ e › */}
+              <div className="flex items-center justify-between sm:justify-end gap-3">
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => scrollBancaRail('left')}
+                    className="w-7 h-7 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-lg font-bold transition-all cursor-pointer shadow hover:border-red-500/50"
+                    title="Rolar bancas para a esquerda"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => scrollBancaRail('right')}
+                    className="w-7 h-7 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-lg font-bold transition-all cursor-pointer shadow hover:border-red-500/50"
+                    title="Rolar bancas para a direita"
+                  >
+                    ›
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-2 font-mono text-xs">
+                  <span className="text-slate-400 text-[10px] hidden sm:inline">RAID:</span>
+                  <div className="flex gap-1">
+                    {[0, 1, 2].map(roundIdx => (
+                      <span
+                        key={roundIdx}
+                        className={`px-2 py-0.5 rounded text-[10px] font-bold border transition-all ${
+                          roundIdx < combat.currentRoundIndex
+                            ? 'bg-emerald-950 border-emerald-500/50 text-emerald-300'
+                            : roundIdx === combat.currentRoundIndex
+                            ? 'bg-red-950 border-red-500 text-red-300 animate-pulse'
+                            : 'bg-slate-900 border-slate-800 text-slate-600'
+                        }`}
+                      >
+                        FASE {roundIdx + 1}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="flex items-center gap-2 font-mono text-xs">
-              <span className="text-slate-400 text-[10px]">PROGRESSO DO RAID:</span>
-              <div className="flex gap-1">
-                {[0, 1, 2].map(roundIdx => (
-                  <span
-                    key={roundIdx}
-                    className={`px-2 py-0.5 rounded text-[10px] font-bold border transition-all ${
-                      roundIdx < combat.currentRoundIndex
-                        ? 'bg-emerald-950 border-emerald-500/50 text-emerald-300'
-                        : roundIdx === combat.currentRoundIndex
-                        ? 'bg-red-950 border-red-500 text-red-300 animate-pulse'
-                        : 'bg-slate-900 border-slate-800 text-slate-600'
+            {/* Rail de Rolagem Horizontal das 13 Bancas */}
+            <div 
+              ref={bancaRailRef}
+              onWheel={(e) => {
+                if (bancaRailRef.current && e.deltaY !== 0) {
+                  bancaRailRef.current.scrollLeft += e.deltaY;
+                }
+              }}
+              className="flex items-center gap-2 overflow-x-auto pb-1.5 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent scroll-smooth select-none"
+            >
+              {Object.values(BOSS_IDENTITIES).map(b => {
+                const isSelected = combat.selectedIdentity.id === b.id;
+                const count = b.bancaCatalogName === 'todas' 
+                  ? 598 
+                  : (bancaCounts[b.bancaCatalogName] || 0);
+
+                return (
+                  <button
+                    key={b.id}
+                    onClick={() => handleSelectIdentity(b.id)}
+                    className={`flex-shrink-0 flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer border ${
+                      isSelected
+                        ? 'bg-gradient-to-r from-red-950 via-slate-900 to-red-950 text-red-200 border-red-500 shadow-[0_0_16px_rgba(239,68,68,0.4)] scale-[1.02]'
+                        : 'bg-slate-900/90 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700 hover:bg-slate-850'
                     }`}
+                    title={`${b.name} - ${b.biasDescription}`}
                   >
-                    FASE {roundIdx + 1}
-                  </span>
-                ))}
+                    <span className="text-sm">{b.icon}</span>
+                    <span className="whitespace-nowrap">{b.badge}</span>
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
+                      isSelected ? 'bg-red-500/30 text-red-300' : 'bg-slate-800 text-slate-500'
+                    }`}>
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Rail de Provas e Gabaritos Oficiais no Acervo para a Banca Selecionada */}
+          <div className="p-3.5 rounded-2xl bg-gradient-to-r from-slate-950/95 via-purple-950/25 to-slate-950/95 border border-purple-500/30 shadow-xl space-y-2.5">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono font-black text-purple-300 flex items-center gap-1.5 uppercase tracking-wider">
+                  <span>📂</span> PROVAS & GABARITOS DESTA BANCA NO ACERVO ({bancaExams.length}):
+                </span>
+                <span className="text-[10px] font-mono text-slate-400 hidden md:inline">
+                  Acesso aos cadernos originais em PDF catalogados
+                </span>
               </div>
+
+              <div className="flex items-center gap-2">
+                {onOpenAcervoModal && (
+                  <button
+                    onClick={() => onOpenAcervoModal('', combat.selectedIdentity.bancaCatalogName)}
+                    className="text-[10px] font-mono font-bold text-purple-400 hover:text-purple-200 underline cursor-pointer"
+                  >
+                    Ver todas ({bancaCounts[combat.selectedIdentity.bancaCatalogName] || 598}) →
+                  </button>
+                )}
+                {/* Controles de Navegação Horizontal ‹ e › */}
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => scrollProvasRail('left')}
+                    className="w-7 h-7 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-lg font-bold transition-all cursor-pointer shadow hover:border-purple-500/50"
+                    title="Rolar provas para a esquerda"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => scrollProvasRail('right')}
+                    className="w-7 h-7 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-lg font-bold transition-all cursor-pointer shadow hover:border-purple-500/50"
+                    title="Rolar provas para a direita"
+                  >
+                    ›
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Rail Horizontal de Cards de Provas Oficiais */}
+            <div
+              ref={provasRailRef}
+              onWheel={(e) => {
+                if (provasRailRef.current && e.deltaY !== 0) {
+                  provasRailRef.current.scrollLeft += e.deltaY;
+                }
+              }}
+              className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-purple-900/60 scrollbar-track-transparent scroll-smooth select-none"
+            >
+              {bancaExams.length > 0 ? (
+                bancaExams.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex-shrink-0 w-64 p-3 rounded-xl bg-slate-900/90 border border-purple-500/30 hover:border-purple-400/70 transition-all flex flex-col justify-between gap-2 shadow hover:shadow-[0_0_12px_rgba(168,85,247,0.2)] group"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-1 mb-1">
+                        <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-500/30">
+                          {item.banca}
+                        </span>
+                        {item.year && (
+                          <span className="text-[9px] font-mono font-bold text-amber-400">
+                            {item.year}
+                          </span>
+                        )}
+                        <span className="text-[9px] font-mono text-slate-500">
+                          {item.sizeFormatted}
+                        </span>
+                      </div>
+                      <h4 className="text-xs font-mono font-bold text-slate-200 line-clamp-2 leading-tight group-hover:text-purple-200">
+                        {item.title}
+                      </h4>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 pt-1 border-t border-slate-800">
+                      <a
+                        href={item.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => playAcervoOpenSound(soundEnabled)}
+                        className="flex-1 py-1 px-2 rounded-lg bg-purple-950/60 hover:bg-purple-900 border border-purple-500/40 text-[10px] font-mono font-bold text-purple-200 text-center transition-all flex items-center justify-center gap-1 cursor-pointer"
+                      >
+                        <span>📄</span>
+                        <span>Ver PDF</span>
+                      </a>
+                      {onOpenAcervoModal && (
+                        <button
+                          onClick={() => onOpenAcervoModal(item.title, item.banca)}
+                          className="py-1 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-[10px] font-mono text-slate-300 text-center transition-all cursor-pointer"
+                          title="Detalhes no Acervo"
+                        >
+                          🔍
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="py-3 px-4 text-xs font-mono text-slate-400 italic">
+                  Nenhuma prova arquivada especificamente sob esta sigla. Navegue para outra banca ou consulte o Acervo completo.
+                </div>
+              )}
             </div>
           </div>
 
@@ -966,7 +1162,7 @@ export const LabSection = ({
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-red-500/60 shadow-[0_0_20px_rgba(239,68,68,0.4)] relative flex-shrink-0 bg-slate-900 flex items-center justify-center">
                   <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-red-950 via-slate-900 to-slate-950 text-red-400 font-bold text-2xl select-none">
-                    {combat.selectedIdentity.id === 'einstein' ? '🩺' : combat.selectedIdentity.id === 'enem' ? '🌐' : combat.selectedIdentity.id === 'unesp' ? '🏛️' : '⚖️'}
+                    {combat.selectedIdentity.icon || '🏛️'}
                   </div>
                   <img
                     src={combat.selectedIdentity.avatarUrl}

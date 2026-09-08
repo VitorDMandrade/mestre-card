@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import type { MestreCardData, InspectionCase, InspectionVerdict, InterrogationDialog } from '../../types/mestre-card';
-import { generateInspectionCases, extractCandidateTerms } from '../../lib/inspection-engine';
+import { generateInspectionCases, extractCandidateTerms, resolveApplicantPhoto } from '../../lib/inspection-engine';
 import { MathRenderer } from '../MathRenderer';
 import { DailyShiftModal } from './DailyShiftModal';
 import { useGame } from '../../context/GameContext';
@@ -692,14 +692,30 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                 </div>
 
                 {/* Foto 3x4 do Postulante com Grampo e Carimbo de Registro */}
-                <div className="relative flex-shrink-0 w-24 h-28 border-2 border-[#5c4a3b] bg-black p-0.5 shadow-md rotate-[1deg]">
+                <div className="relative flex-shrink-0 w-24 h-28 border-2 border-[#5c4a3b] bg-stone-900 p-0.5 shadow-md rotate-[1deg] overflow-hidden flex items-center justify-center">
                   <div className="absolute -top-1.5 left-2 w-5 h-1 bg-[#888] rounded-sm z-20 rotate-[5deg] shadow"></div>
+                  {/* Fallback Silhueta Retrô se a imagem falhar ou demorar */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-stone-500 font-mono text-[9px] select-none p-1 text-center bg-gradient-to-b from-stone-900 to-stone-950">
+                    <span className="text-3xl opacity-60">👤</span>
+                    <span className="truncate w-full mt-1 text-[8px] text-amber-500/80 font-bold uppercase tracking-wider">{currentCase.applicantName.split(' ')[0]}</span>
+                    <span className="text-[7px] text-stone-400 font-mono">POSTULANTE</span>
+                  </div>
                   <img 
-                    src={currentCase.applicantPhoto} 
-                    alt={currentCase.applicantName}
-                    className="w-full h-full object-cover filter grayscale contrast-125"
+                    src={resolveApplicantPhoto(currentCase.applicantPhoto, currentIndex)} 
+                    alt=""
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      const fallbackNum = (currentIndex % 15) + 1;
+                      const secondarySrc = `./assets/inspection/applicant-${fallbackNum}.jpg`;
+                      if (!target.src.includes('assets/inspection')) {
+                        target.src = secondarySrc;
+                      } else {
+                        target.style.opacity = '0';
+                      }
+                    }}
+                    className="w-full h-full object-cover filter grayscale contrast-125 relative z-10 transition-opacity duration-200"
                   />
-                  <div className="absolute bottom-0 inset-x-0 bg-black/70 text-[8px] text-center font-mono text-stone-300 py-0.5">
+                  <div className="absolute bottom-0 inset-x-0 bg-black/75 text-[8px] text-center font-mono text-amber-200/90 py-0.5 z-20 border-t border-amber-900/40">
                     {currentCase.fileNumber.split('-')[2] || 'REG-SSP'}
                   </div>
                 </div>
@@ -852,11 +868,22 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                   <div className="space-y-2.5 text-xs">
                     {/* Postulante */}
                     <div className="flex items-start gap-2.5 bg-[#1e1712] p-2 rounded border border-[#423122]">
-                      <div className="w-8 h-8 rounded border border-stone-600 overflow-hidden flex-shrink-0 bg-black">
+                      <div className="w-8 h-8 rounded border border-stone-600 overflow-hidden flex-shrink-0 bg-stone-900 relative flex items-center justify-center">
+                        <span className="absolute text-xs text-stone-500 select-none">👤</span>
                         <img 
-                          src={currentCase.applicantPhoto} 
-                          alt="Postulante" 
-                          className="w-full h-full object-cover grayscale"
+                          src={resolveApplicantPhoto(currentCase.applicantPhoto, currentIndex)} 
+                          alt="" 
+                          onError={(e) => {
+                            const target = e.currentTarget;
+                            const fallbackNum = (currentIndex % 15) + 1;
+                            const secondarySrc = `./assets/inspection/applicant-${fallbackNum}.jpg`;
+                            if (!target.src.includes('assets/inspection')) {
+                              target.src = secondarySrc;
+                            } else {
+                              target.style.opacity = '0';
+                            }
+                          }}
+                          className="w-full h-full object-cover grayscale relative z-10"
                         />
                       </div>
                       <div className="space-y-0.5 flex-1">

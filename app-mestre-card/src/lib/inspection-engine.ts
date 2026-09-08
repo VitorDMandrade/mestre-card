@@ -38,6 +38,41 @@ const APPLICANT_PROFILES = [
 ];
 
 /**
+ * Resolve e normaliza URLs de fotos de postulantes para evitar 404 em caminhos relativos
+ */
+export function resolveApplicantPhoto(photo: string | undefined, index: number): string {
+  const fallbackNum = (Math.abs(index) % 15) + 1;
+  const standardPath = `./inspection/applicant-${fallbackNum}.jpg`;
+
+  if (!photo || typeof photo !== 'string' || photo.trim() === '') {
+    return standardPath;
+  }
+
+  const clean = photo.trim();
+
+  // Converte caminhos absolutos /inspection/ para caminhos relativos ./inspection/
+  if (clean.startsWith('/inspection/')) {
+    return `.${clean}`;
+  }
+  if (clean.startsWith('inspection/')) {
+    return `./${clean}`;
+  }
+  if (/^\.\/inspection\/applicant-\d+\.jpg$/i.test(clean)) {
+    return clean;
+  }
+
+  // Se tiver applicant-X no nome da imagem
+  const match = clean.match(/applicant-(\d+)/i);
+  if (match) {
+    const num = Math.min(15, Math.max(1, parseInt(match[1], 10)));
+    return `./inspection/applicant-${num}.jpg`;
+  }
+
+  // Fallback determinístico baseado no índice do caso
+  return standardPath;
+}
+
+/**
  * Helper resiliente para extrair termos e premissas candidatos para investigação/confronto.
  * Garante que TODO e qualquer caso (seja legítimo ou fraudulento) possua de 2 a 4 termos investigáveis.
  */
@@ -128,7 +163,7 @@ export function generateInspectionCases(card: MestreCardData): InspectionCase[] 
         thesisStatement: rawThesis || `\"Parecer técnico sob análise para fins de homologação perante o Ministério.\"`,
         applicantName: c.applicantName || profile.name,
         applicantTitle: c.applicantTitle || profile.title,
-        applicantPhoto: c.applicantPhoto || profile.photo,
+        applicantPhoto: resolveApplicantPhoto(c.applicantPhoto || profile.photo, i),
         department: c.department || profile.dept,
         fileNumber: c.fileNumber || `MKA-88-${2000 + i * 421}`,
         suspiciousTerms: candidateTerms,
