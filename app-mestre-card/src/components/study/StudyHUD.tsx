@@ -37,6 +37,7 @@ interface StudyHUDProps {
   onToggleZenMode?: () => void;
   isOledMode?: boolean;
   onToggleOledMode?: () => void;
+  onOpenAcervoModal?: () => void;
 }
 
 export const StudyHUD = ({ 
@@ -53,7 +54,8 @@ export const StudyHUD = ({
   isZenMode = false,
   onToggleZenMode,
   isOledMode = false,
-  onToggleOledMode
+  onToggleOledMode,
+  onOpenAcervoModal
 }: StudyHUDProps) => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeHash, setActiveHash] = useState('sec-01');
@@ -276,6 +278,17 @@ export const StudyHUD = ({
                   >
                     <span>🌙</span>
                     <span className="hidden sm:inline">OLED</span>
+                  </button>
+                )}
+
+                {onOpenAcervoModal && (
+                  <button
+                    onClick={onOpenAcervoModal}
+                    className="px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer border bg-slate-900 border-slate-700 hover:border-cyan-400 text-cyan-300 hover:text-white"
+                    title="Abrir Biblioteca Completa do Acervo Oficial (598 PDFs)"
+                  >
+                    <span>🏛️</span>
+                    <span className="hidden sm:inline">Acervo</span>
                   </button>
                 )}
               </div>

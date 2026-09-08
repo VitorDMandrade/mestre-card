@@ -1,29 +1,37 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import type { MestreCardData } from '../../types/mestre-card';
 import { MathRenderer } from '../MathRenderer';
-import { playSound } from '../../lib/audio';
+import { playSound, playAcervoOpenSound } from '../../lib/audio';
+import { matchAcervoToCard } from '../../lib/acervo-matcher';
 
 interface RadarSectionProps {
   card: MestreCardData;
   soundEnabled: boolean;
+  onOpenAcervoModal?: (query?: string) => void;
 }
 
-export const RadarSection = ({ card, soundEnabled }: RadarSectionProps) => {
+export const RadarSection = ({ card, soundEnabled, onOpenAcervoModal }: RadarSectionProps) => {
   const [revealedTriggers, setRevealedTriggers] = useState<Set<number>>(new Set());
+  const [copiedAcervoId, setCopiedAcervoId] = useState<string | null>(null);
+
+  // Vinculação automática aos 598 arquivos do acervo em tempo real
+  const matchedAcervo = useMemo(() => matchAcervoToCard(card, 6), [card]);
 
   // Estado das barras de expansão (sanfona tática)
-  // Deixamos a primeira expandida por padrão e as outras colapsadas para evitar poluição visual
+  // Deixamos mnemônicos e o dossiê do acervo expandidos por padrão
   const [expandedSections, setExpandedSections] = useState<{
     mnemonics: boolean;
     blindSpots: boolean;
     triggerWords: boolean;
+    acervo: boolean;
   }>({
     mnemonics: true,
     blindSpots: false,
     triggerWords: false,
+    acervo: true,
   });
 
-  const toggleSection = (section: 'mnemonics' | 'blindSpots' | 'triggerWords') => {
+  const toggleSection = (section: 'mnemonics' | 'blindSpots' | 'triggerWords' | 'acervo') => {
     if (soundEnabled) {
       playSound(true);
     }
@@ -35,12 +43,12 @@ export const RadarSection = ({ card, soundEnabled }: RadarSectionProps) => {
 
   const expandAll = () => {
     if (soundEnabled) playSound(true);
-    setExpandedSections({ mnemonics: true, blindSpots: true, triggerWords: true });
+    setExpandedSections({ mnemonics: true, blindSpots: true, triggerWords: true, acervo: true });
   };
 
   const collapseAll = () => {
     if (soundEnabled) playSound(false);
-    setExpandedSections({ mnemonics: false, blindSpots: false, triggerWords: false });
+    setExpandedSections({ mnemonics: false, blindSpots: false, triggerWords: false, acervo: false });
   };
 
   const handleRevealTrigger = (index: number) => {
@@ -407,6 +415,148 @@ export const RadarSection = ({ card, soundEnabled }: RadarSectionProps) => {
                   );
                 })}
               </div>
+            </div>
+          )}
+        </div>
+
+        {/* ------------------------------------------------------------- */}
+        {/* BARRA 4: 🏛️ DOSSIÊ DO ACERVO OFICIAL (PROVAS & CADERNOS)       */}
+        {/* ------------------------------------------------------------- */}
+        <div className="rounded-2xl border border-cyan-500/40 bg-slate-900/90 overflow-hidden shadow-lg transition-all duration-300">
+          <button
+            onClick={() => toggleSection('acervo')}
+            className="w-full p-4 sm:p-5 flex items-center justify-between gap-4 bg-gradient-to-r from-slate-900 via-cyan-950/30 to-slate-900 hover:bg-slate-800/60 transition-colors text-left cursor-pointer select-none"
+          >
+            <div className="flex items-center gap-3.5 min-w-0">
+              <div className="w-11 h-11 rounded-xl overflow-hidden border border-cyan-500/50 relative shrink-0 shadow-[0_0_15px_rgba(6,182,212,0.35)] bg-slate-950 flex items-center justify-center">
+                <img
+                  src="./assets/dossier_icon.jpg"
+                  alt="Dossiê"
+                  className="w-full h-full object-cover relative z-10"
+                  onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
+                />
+                <span className="absolute inset-0 flex items-center justify-center text-xl select-none">🏛️</span>
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="text-sm sm:text-base font-black uppercase tracking-wider text-cyan-200 truncate">
+                    DOSSIÊ DO ACERVO OFICIAL: PROVAS & CADERNOS VINCULADOS
+                  </h3>
+                  <span className="text-[10px] font-mono bg-cyan-950 text-cyan-300 border border-cyan-500/40 px-2 py-0.5 rounded shrink-0 font-bold">
+                    {matchedAcervo.length} MATERIAIS VINCULADOS
+                  </span>
+                </div>
+                {!expandedSections.acervo && (
+                  <p className="text-xs font-mono text-cyan-400/80 truncate mt-0.5">
+                    {matchedAcervo.slice(0, 3).map(m => m.item.title).join(' • ') || 'Provas oficiais e gabaritos comentados'}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-xs font-mono text-slate-400 hidden sm:inline">
+                {expandedSections.acervo ? 'Recolher' : 'Expandir'}
+              </span>
+              <span className={`text-slate-400 transition-transform duration-300 transform ${expandedSections.acervo ? 'rotate-180 text-cyan-400' : ''}`}>
+                ▼
+              </span>
+            </div>
+          </button>
+
+          {/* Gaveta de Conteúdo do Acervo */}
+          {expandedSections.acervo && (
+            <div className="p-4 sm:p-6 border-t border-cyan-500/20 bg-slate-950/70 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-800 text-xs">
+                <span className="text-slate-400">
+                  Cadernos temáticos e provas das bancas que cobram <b className="text-white">{card.topic}</b>:
+                </span>
+                {onOpenAcervoModal && (
+                  <button
+                    onClick={() => onOpenAcervoModal(card.topic)}
+                    className="text-[11px] font-mono font-bold text-cyan-400 hover:text-cyan-200 flex items-center gap-1 cursor-pointer transition-colors"
+                  >
+                    <span>🔍 Abrir Biblioteca Completa (598 PDFs)</span>
+                    <span>→</span>
+                  </button>
+                )}
+              </div>
+
+              {matchedAcervo.length === 0 ? (
+                <div className="p-6 rounded-xl bg-slate-900/50 border border-slate-800 text-center text-xs text-slate-400">
+                  Nenhum material correspondente direto indexado para este tópico. Você pode pesquisar manualmente na biblioteca geral.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                  {matchedAcervo.map(({ item, matchReason }) => (
+                    <div
+                      key={item.id}
+                      className="p-3.5 rounded-xl bg-slate-900/70 border border-slate-800/90 hover:border-cyan-500/50 transition-all flex flex-col justify-between group shadow-sm"
+                    >
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${
+                            item.banca === 'Albert Einstein'
+                              ? 'bg-emerald-950/80 border-emerald-500/50 text-emerald-300'
+                              : item.banca === 'ENEM'
+                              ? 'bg-blue-950/80 border-blue-500/50 text-blue-300'
+                              : item.banca === 'UNESP'
+                              ? 'bg-purple-950/80 border-purple-500/50 text-purple-300'
+                              : 'bg-slate-950 border-slate-800 text-cyan-400'
+                          }`}>
+                            {item.banca !== 'Outras' ? `🏛️ ${item.banca}` : `📖 ${item.discipline.toUpperCase()}`}
+                          </span>
+                          <div className="flex items-center gap-1.5 text-[9px] font-mono text-slate-500">
+                            {item.year && <span>{item.year} •</span>}
+                            <span>{item.sizeFormatted}</span>
+                          </div>
+                        </div>
+
+                        <h4 className="text-xs font-bold text-slate-100 group-hover:text-cyan-300 transition-colors line-clamp-2" title={item.filename}>
+                          {item.title}
+                        </h4>
+
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-cyan-950/60 text-cyan-400 border border-cyan-800/40">
+                            {matchReason}
+                          </span>
+                          <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slate-950 text-slate-400 border border-slate-800">
+                            {item.category === 'prova_oficial'
+                              ? 'Prova Oficial'
+                              : item.category === 'gabarito_comentado'
+                              ? 'Gabarito Comentado'
+                              : 'Caderno Temático'}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="pt-3 mt-2.5 border-t border-slate-800/60 flex items-center justify-between gap-2">
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(item.githubUrl);
+                            setCopiedAcervoId(item.id);
+                            setTimeout(() => setCopiedAcervoId(null), 2000);
+                          }}
+                          className="text-[10px] font-mono text-slate-400 hover:text-white px-2 py-1 rounded bg-slate-950 border border-slate-800 cursor-pointer transition-all"
+                        >
+                          {copiedAcervoId === item.id ? '✓ Copiado!' : '📋 Link'}
+                        </button>
+
+                        <a
+                          href={item.githubUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() => playAcervoOpenSound(soundEnabled)}
+                          className="px-3 py-1.5 rounded-lg bg-cyan-950/80 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 hover:border-cyan-400 text-[11px] font-mono font-bold flex items-center gap-1.5 transition-all shadow-sm"
+                        >
+                          <span>📖 Abrir Prova / Caderno</span>
+                          <span className="text-xs">↗</span>
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>

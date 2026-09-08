@@ -14,6 +14,7 @@ interface DashboardProps {
   onExportSingleCard?: (card: MestreCardData) => void;
   onExportFiltered?: (cards: MestreCardData[], categoryLabel: string) => void;
   onStartQueue?: (cardIds: string[]) => void;
+  onOpenAcervoModal?: (query?: string, banca?: string) => void;
 }
 
 export type SubjectCategory = 'TODOS' | 'BIOLOGIA' | 'QUÍMICA' | 'FÍSICA' | 'MATEMÁTICA' | 'HUMANAS' | 'LINGUAGENS' | 'OUTROS';
@@ -51,7 +52,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onExportBackup,
   onExportSingleCard,
   onExportFiltered,
-  onStartQueue
+  onStartQueue,
+  onOpenAcervoModal
 }) => {
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
   const [jsonInput, setJsonInput] = useState('');
@@ -337,6 +339,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
             title="Abrir Caderno de Erros Global de sessões anteriores">
             <span>{historicErrors.length > 0 ? '🚨' : '🛡️'}</span>
             <span>{historicErrors.length > 0 ? `REPESCAGEM: ${historicErrors.length} ${historicErrors.length === 1 ? 'ERRO' : 'ERROS'}` : 'CADERNO DE ERROS (0)'}</span>
+          </button>
+
+          <button 
+            onClick={() => onOpenAcervoModal ? onOpenAcervoModal() : null}
+            className="bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/50 text-purple-300 px-3.5 py-2 rounded-lg text-xs font-mono font-bold transition-all uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_12px_rgba(168,85,247,0.2)] cursor-pointer"
+            title="Abrir Biblioteca Completa do Acervo Oficial (598 PDFs de provas e cadernos)">
+            <span>🏛️</span>
+            <span>ACERVO OFICIAL (598)</span>
           </button>
 
           <button 

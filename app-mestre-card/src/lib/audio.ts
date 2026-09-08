@@ -1196,4 +1196,50 @@ export function playPhaseBreakSound(enabled = true): void {
   }
 }
 
+/**
+ * 16. Som tático de abertura de Dossiê do Acervo Oficial (Chirp eletrônico + folheamento digital)
+ */
+export function playAcervoOpenSound(enabled = true): void {
+  if (!enabled) return;
+  try {
+    const ctx = getAudioContext();
+    if (ctx.state === 'suspended') ctx.resume();
+    const now = ctx.currentTime;
 
+    // 1. Chirp eletrônico de autenticação tática (440Hz -> 880Hz)
+    const osc = ctx.createOscillator();
+    const oscGain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(440, now);
+    osc.frequency.exponentialRampToValueAtTime(880, now + 0.08);
+
+    oscGain.gain.setValueAtTime(0.01, now);
+    oscGain.gain.linearRampToValueAtTime(0.18, now + 0.02);
+    oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+
+    osc.connect(oscGain);
+    oscGain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.1);
+
+    // 2. Micro-ruído de papel digital / arquivo desbloqueado
+    const bufferSize = Math.floor(ctx.sampleRate * 0.05);
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.3));
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.08, now + 0.02);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+
+    noise.connect(noiseGain);
+    noiseGain.connect(ctx.destination);
+    noise.start(now + 0.02);
+    noise.stop(now + 0.07);
+  } catch (e) {
+    console.warn('AudioContext playAcervoOpenSound falhou:', e);
+  }
+}

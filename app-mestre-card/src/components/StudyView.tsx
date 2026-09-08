@@ -33,9 +33,10 @@ interface StudyViewProps {
   onBack: () => void;
   queueInfo?: { current: number; total: number; hasNext: boolean } | null;
   onNextQueueItem?: () => void;
+  onOpenAcervoModal?: (query?: string, banca?: string) => void;
 }
 
-export const StudyView: FC<StudyViewProps> = ({ card, onBack, queueInfo, onNextQueueItem }) => {
+export const StudyView: FC<StudyViewProps> = ({ card, onBack, queueInfo, onNextQueueItem, onOpenAcervoModal }) => {
   const [bestSession, setBestSession] = useState<StudySessionRecord | null>(null);
   
   // Lifted States
@@ -138,6 +139,7 @@ export const StudyView: FC<StudyViewProps> = ({ card, onBack, queueInfo, onNextQ
           onToggleZenMode={() => setIsZenMode(!isZenMode)}
           isOledMode={isOledMode}
           onToggleOledMode={() => setIsOledMode(!isOledMode)}
+          onOpenAcervoModal={onOpenAcervoModal ? () => onOpenAcervoModal(card.topic) : undefined}
         />
 
         <div className={`max-w-6xl mx-auto px-4 pb-20 space-y-12 transition-all duration-300 study-font-${textSize} ${isZenMode ? 'zen-focus-active' : ''}`}>
@@ -150,19 +152,21 @@ export const StudyView: FC<StudyViewProps> = ({ card, onBack, queueInfo, onNextQ
           </ErrorBoundary>
           
           <ErrorBoundary fallbackTitle="Erro na Seção de Radar">
-            <RadarSection card={card} soundEnabled={soundEnabled} />
+            <RadarSection card={card} soundEnabled={soundEnabled} onOpenAcervoModal={onOpenAcervoModal} />
           </ErrorBoundary>
           
           <ErrorBoundary fallbackTitle="Erro no Laboratório Tático">
             <LabSection 
               cardId={card.id}
               cardTitle={card.title}
+              card={card}
               questions={card.sec05_lab?.questions || []}
               hardcoreQuestions={card.sec05_lab?.hardcoreQuestions}
               bossFight={card.sec05_lab?.bossFight}
               isHardcore={isHardcore}
               soundEnabled={soundEnabled}
               onApplyDamage={handleDamage}
+              onOpenAcervoModal={onOpenAcervoModal}
             />
           </ErrorBoundary>
           

@@ -12,7 +12,8 @@ import {
   playPhaseBreakSound,
   startBossBattleMusic,
   stopBossBattleMusic,
-  playBossVictoryFanfareAudio
+  playBossVictoryFanfareAudio,
+  playAcervoOpenSound
 } from '../../lib/audio';
 import { db } from '../../lib/db';
 import { useGame } from '../../context/GameContext';
@@ -23,6 +24,7 @@ import {
   BOSS_IDENTITIES 
 } from '../../lib/boss-engine';
 import { classifyContent } from '../../lib/question-classifier';
+import { matchAcervoToCard } from '../../lib/acervo-matcher';
 
 const useSafeGame = () => {
   try {
@@ -35,12 +37,14 @@ const useSafeGame = () => {
 interface LabSectionProps {
   cardId?: string;
   cardTitle?: string;
+  card?: any;
   questions: LabQuestion[];
   hardcoreQuestions?: LabQuestion[];
   bossFight: BossFight;
   isHardcore: boolean;
   soundEnabled: boolean;
   onApplyDamage: (amount: number) => void;
+  onOpenAcervoModal?: (query?: string, banca?: string) => void;
 }
 
 export function parseDistractorAnalysis(
@@ -96,12 +100,14 @@ interface GauntletRound {
 export const LabSection = ({ 
   cardId, 
   cardTitle = 'Dossiê Tático', 
+  card,
   questions, 
   hardcoreQuestions, 
   bossFight, 
   isHardcore, 
   soundEnabled, 
-  onApplyDamage 
+  onApplyDamage,
+  onOpenAcervoModal
 }: LabSectionProps) => {
   const game = useSafeGame();
   const [mode, setMode] = useState<'proof' | 'roguelike'>('proof');
@@ -109,6 +115,12 @@ export const LabSection = ({
   const hasHardcore = Array.isArray(hardcoreQuestions) && hardcoreQuestions.length > 0;
   const [selectedTab, setSelectedTab] = useState<'standard' | 'hardcore'>(isHardcore && hasHardcore ? 'hardcore' : 'standard');
   const [prevHardcore, setPrevHardcore] = useState(isHardcore);
+
+  // Evidências do Acervo Oficial (598 PDFs) Vinculadas ao Tema do Card
+  const matchedOfficialMaterials = useMemo(() => {
+    if (!card) return [];
+    return matchAcervoToCard(card, 4);
+  }, [card]);
 
   // Estados da Arena Roguelike Gauntlet (Via 3)
   const [combat, setCombat] = useState<BossCombatState>(initGauntletCombat('standard'));
@@ -736,6 +748,56 @@ export const LabSection = ({
                           </div>
                         );
                       })()}
+
+                      {/* Cartucho do Acervo Oficial: Provas & Gabaritos Comentados */}
+                      {matchedOfficialMaterials.length > 0 && (
+                        <div className="mt-4 pt-3 border-t border-slate-800/80">
+                          <div className="flex items-center justify-between gap-2 mb-2.5">
+                            <span className="text-[11px] font-mono font-bold text-cyan-400 flex items-center gap-1.5">
+                              <span>🏛️</span> EVIDÊNCIA FORENSE NO ACERVO OFICIAL ({matchedOfficialMaterials.length})
+                            </span>
+                            {onOpenAcervoModal && (
+                              <button
+                                onClick={() => onOpenAcervoModal(card?.topic || cardTitle)}
+                                className="text-[10px] font-mono text-cyan-400 hover:text-cyan-200 underline cursor-pointer"
+                              >
+                                Consultar Acervo Completo ↗
+                              </button>
+                            )}
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {matchedOfficialMaterials.slice(0, 2).map(({ item, matchReason }) => (
+                              <a
+                                key={item.id}
+                                href={item.githubUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={() => playAcervoOpenSound(soundEnabled)}
+                                className="p-2.5 rounded-xl bg-slate-950/90 border border-slate-800 hover:border-cyan-500/50 hover:bg-cyan-950/20 flex items-center justify-between gap-2 text-left group transition-all"
+                              >
+                                <div className="overflow-hidden">
+                                  <div className="flex items-center gap-1.5 mb-1">
+                                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/50">
+                                      {item.banca !== 'Outras' ? item.banca : item.discipline.toUpperCase()}
+                                    </span>
+                                    <span className="text-[9px] font-mono text-slate-500">{item.sizeFormatted}</span>
+                                  </div>
+                                  <h6 className="text-[11px] font-semibold text-slate-200 truncate group-hover:text-cyan-300" title={item.filename}>
+                                    {item.title}
+                                  </h6>
+                                  <span className="text-[9px] font-mono text-amber-400/80">
+                                    {matchReason}
+                                  </span>
+                                </div>
+                                <span className="text-xs font-mono text-cyan-400 group-hover:translate-x-0.5 transition-transform shrink-0 font-bold">
+                                  ↗
+                                </span>
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </details>
                 </div>
@@ -856,6 +918,25 @@ export const LabSection = ({
                   {b.id === 'einstein' ? '🩺 Einstein' : b.id === 'enem' ? '🌐 ENEM' : b.id === 'unesp' ? '🏛️ UNESP' : '⚖️ Padrão'}
                 </button>
               ))}
+
+              {onOpenAcervoModal && (
+                <button
+                  onClick={() => {
+                    const bancaMap: Record<string, string> = {
+                      einstein: 'Albert Einstein',
+                      enem: 'ENEM',
+                      unesp: 'UNESP'
+                    };
+                    const bancaName = bancaMap[combat.selectedIdentity.id] || 'todas';
+                    onOpenAcervoModal('', bancaName);
+                  }}
+                  className="px-2.5 py-1.5 rounded-lg text-xs font-mono font-bold bg-purple-950/40 hover:bg-purple-900/60 border border-purple-500/50 text-purple-300 hover:text-purple-100 transition-all flex items-center gap-1.5 cursor-pointer ml-1"
+                  title="Abrir Acervo Oficial de Provas e Gabaritos desta Banca"
+                >
+                  <span>🏛️</span>
+                  <span>Provas no Acervo</span>
+                </button>
+              )}
             </div>
 
             <div className="flex items-center gap-2 font-mono text-xs">
@@ -1090,6 +1171,25 @@ export const LabSection = ({
                 Você superou com louvor todas as 3 fases do Gauntlet epistêmico contra a comissão examinadora.
                 A recompensa de <strong className="text-amber-300 font-black">+300 XP</strong> foi transferida para o seu perfil tático!
               </p>
+              {onOpenAcervoModal && (
+                <div className="pt-2">
+                  <button
+                    onClick={() => {
+                      const bancaMap: Record<string, string> = {
+                        einstein: 'Albert Einstein',
+                        enem: 'ENEM',
+                        unesp: 'UNESP'
+                      };
+                      const bancaName = bancaMap[combat.selectedIdentity.id] || 'todas';
+                      onOpenAcervoModal(card?.topic || '', bancaName);
+                    }}
+                    className="px-4 py-2 rounded-xl bg-purple-950/80 border border-purple-500/60 hover:border-purple-400 text-purple-200 font-mono text-xs font-bold transition-all shadow-md hover:bg-purple-900/60 cursor-pointer inline-flex items-center gap-2"
+                  >
+                    <span>🏛️</span>
+                    <span>CONSULTAR GABARITOS & PROVAS DESTA BANCA NO ACERVO (598 PDFs) ➔</span>
+                  </button>
+                </div>
+              )}
             </div>
           )}
 

@@ -7,12 +7,16 @@ import { Dashboard } from './components/Dashboard';
 import { StudyView } from './components/StudyView';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal';
+import { AcervoModal } from './components/acervo/AcervoModal';
 import 'katex/dist/katex.min.css';
 
 function App() {
   const [currentView, setCurrentView] = useState<'dashboard' | 'study'>('dashboard');
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+  const [isAcervoOpen, setIsAcervoOpen] = useState(false);
+  const [acervoQuery, setAcervoQuery] = useState('');
+  const [acervoBanca, setAcervoBanca] = useState('todas');
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' | 'error' } | null>(null);
   
   const [cards, setCards] = useState<MestreCardData[]>([]);
@@ -262,6 +266,11 @@ function App() {
             onExportSingleCard={handleExportSingleCard}
             onExportFiltered={handleExportFiltered}
             onStartQueue={handleStartQueue}
+            onOpenAcervoModal={(query, banca) => {
+              setAcervoQuery(query || '');
+              setAcervoBanca(banca || 'todas');
+              setIsAcervoOpen(true);
+            }}
           />
         )}
         
@@ -275,23 +284,52 @@ function App() {
               hasNext: queueState.currentIndex < queueState.cardIds.length - 1
             } : null}
             onNextQueueItem={handleNextInQueue}
+            onOpenAcervoModal={(query, banca) => {
+              setAcervoQuery(query || activeCard.topic || '');
+              setAcervoBanca(banca || 'todas');
+              setIsAcervoOpen(true);
+            }}
           />
         )}
 
-        {/* Floating Keyboard Shortcuts Trigger */}
-        <button
-          onClick={() => setIsShortcutsOpen(true)}
-          aria-label="Atalhos do Teclado"
-          className="fixed bottom-6 left-6 z-40 px-3.5 py-2 rounded-full bg-slate-900/95 hover:bg-slate-800 border border-slate-600 hover:border-cyan-400 text-slate-200 hover:text-cyan-300 shadow-xl backdrop-blur-md transition-all text-xs font-mono font-bold flex items-center gap-2 group cursor-pointer"
-        >
-          <span>⌨️</span>
-          <span className="hidden sm:inline">Atalhos</span>
-          <kbd className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-600 text-[10px] text-cyan-300 font-bold shadow-inner">?</kbd>
-        </button>
+        {/* Floating Controls Bar (Bottom Left) */}
+        <div className="fixed bottom-6 left-6 z-40 flex items-center gap-2">
+          <button
+            onClick={() => setIsShortcutsOpen(true)}
+            aria-label="Atalhos do Teclado"
+            className="px-3.5 py-2 rounded-full bg-slate-900/95 hover:bg-slate-800 border border-slate-600 hover:border-cyan-400 text-slate-200 hover:text-cyan-300 shadow-xl backdrop-blur-md transition-all text-xs font-mono font-bold flex items-center gap-2 group cursor-pointer"
+          >
+            <span>⌨️</span>
+            <span className="hidden sm:inline">Atalhos</span>
+            <kbd className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-600 text-[10px] text-cyan-300 font-bold shadow-inner">?</kbd>
+          </button>
+
+          <button
+            onClick={() => {
+              setAcervoQuery(activeCard ? activeCard.topic : '');
+              setAcervoBanca('todas');
+              setIsAcervoOpen(true);
+            }}
+            aria-label="Biblioteca do Acervo Oficial"
+            className="px-3.5 py-2 rounded-full bg-slate-900/95 hover:bg-purple-950 border border-purple-500/50 hover:border-purple-400 text-purple-300 hover:text-purple-200 shadow-xl shadow-purple-950/40 backdrop-blur-md transition-all text-xs font-mono font-bold flex items-center gap-2 cursor-pointer"
+            title="Abrir Biblioteca Completa de Provas Oficiais (598 PDFs)"
+          >
+            <span>🏛️</span>
+            <span className="hidden sm:inline">Acervo (598)</span>
+          </button>
+        </div>
 
         <KeyboardShortcutsModal 
           isOpen={isShortcutsOpen} 
           onClose={() => setIsShortcutsOpen(false)} 
+        />
+
+        <AcervoModal
+          isOpen={isAcervoOpen}
+          onClose={() => setIsAcervoOpen(false)}
+          initialQuery={acervoQuery}
+          initialBanca={acervoBanca}
+          soundEnabled={true}
         />
       </div>
     </ErrorBoundary>
