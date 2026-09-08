@@ -1,0 +1,26 @@
+Esta aula aborda os principais conceitos e mecanismos de biotecnologia, englobando a engenharia genética através da transgenia, terapia gênica, doping genético e clonagem. É explicado como a técnica de transgenia cria organismos com DNA recombinante de espécies diferentes para fins produtivos, enquanto a terapia gênica e o doping genético lidam com genes da mesma espécie para fins terapêuticos ou de aprimoramento físico. Por fim, o professor detalha o funcionamento da clonagem reprodutiva e da clonagem terapêutica, destacando o papel das células-tronco e os debates bioéticos que cercam essas tecnologias.
+
+
+00:00
+Transgenia e DNA Recombinante
+A transgenia é a transferência de genes entre espécies diferentes para manifestar novas características, como na produção de insulina humana por bactérias. Esse processo utiliza enzimas de restrição para cortar o DNA e a enzima ligase para unir os fragmentos, gerando o DNA recombinante.
+
+
+10:00
+Terapia Gênica e Vetores Virais
+Terapia gênica consiste no tratamento de doenças por meio da inserção ou correção de genes usando vírus modificados como vetores de transporte. O procedimento pode ocorrer in vivo, diretamente no paciente, ou ex vivo, manipulando as células em laboratório antes de reinseri-las.
+
+
+20:00
+Doping Genético e Pleiotropia
+O doping genético refere-se ao uso de engenharia genética em indivíduos saudáveis para ampliar o desempenho esportivo. Essa prática traz riscos à saúde associados à pleiotropia, fenômeno no qual um único gene controla múltiplas características físicas.
+
+
+24:00
+Clonagem Reprodutiva
+A clonagem tradicional cria cópias idênticas inserindo o núcleo de uma célula somática em um óvulo anucleado. O zigoto desenvolvido é implantado em uma barriga de aluguel, gerando um clone que possui o DNA nuclear do doador e o DNA mitocondrial do óvulo original.
+
+
+30:00
+Clonagem Terapêutica
+Diferente da reprodutiva, a clonagem terapêutica desenvolve o blastocisto do clone para extrair células-tronco do embrioblasto. Essas células são direcionadas para formar tecidos ou órgãos idênticos ao paciente, eliminando riscos de rejeição pós-transplante.

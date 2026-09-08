@@ -1,0 +1,101 @@
+Esta aula explora os fundamentos das teorias evolutivas, contrastando o Lamarckismo, baseado na adaptação induzida pelo ambiente e na herança de caracteres adquiridos, com o Darwinismo, fundamentado na seleção natural dos indivíduos mais aptos. Além disso, são detalhados os três tipos de seleção natural — direcional, estabilizadora e disruptiva — ilustrados com exemplos práticos, finalizando com a análise da resistência bacteriana a antibióticos como um caso contemporâneo de seleção direcional.
+
+
+00:00
+Lamarckismo: Uso, Desuso e Caracteres Adquiridos
+Jean-Baptiste de Lamarck propôs que o uso contínuo de um órgão o desenvolve, enquanto o desuso o atrofia, teorizando também que tais alterações seriam transmitidas aos descendentes. Essa hipótese do ambiente induzindo a adaptação foi posteriormente refutada pelo experimento de Weisman com caudas de ratos.
+
+
+06:00
+Darwinismo e a Seleção Natural
+Charles Darwin introduziu o conceito de seleção natural, no qual indivíduos com variações mais adaptativas ao ambiente sobrevivem e deixam descendentes. Embora tenha explicado a sobrevivência dos mais aptos, Darwin não conseguiu detalhar a origem e a transmissão dessas variações biológicas por desconhecer a genética.
+
+
+12:00
+Tipos de Seleção Natural
+A seleção natural se divide em três dinâmicas: a direcional, que favorece um único fenótipo extremo; a estabilizadora, que privilegia as características intermediárias; e a disruptiva, que beneficia ambos os extremos fenotípicos em detrimento do intermediário.
+
+
+18:00
+Resistência Bacteriana e Superbactérias
+A resistência bacteriana é apresentada como um exemplo prático de seleção de tipo direcional. Os antibióticos não geram novas características nas bactérias, mas apenas selecionam no organismo aquelas que já possuem mutações de resistência prévias.Esta aula aborda o processo de especiação, detalhando as cinco etapas cruciais para a formação de novas espécies e destacando o isolamento reprodutivo como o marco definidor desse evento. O conteúdo explora a classificação da especiação em alopátrica (que ocorre por isolamento geográfico) e simpátrica (baseada em fatores comportamentais), além de aprofundar em seus respectivos subtipos: a especiação peripátrica, caracterizada pelo efeito fundador, e a especiação parapátrica, marcada por variações ambientais em grandes territórios e pela presença de zonas híbridas.
+
+
+00:00
+O Processo de Especiação em Cinco Etapas
+A especiação é o processo de formação de novas espécies, que se desenvolve ao longo de cinco fases consecutivas. Essas etapas compreendem a separação de um grupo, a ocorrência de mutações genéticas, a seleção natural destas novas características, a diferenciação gradual e, por fim, a consolidação da nova espécie.
+
+
+02:00
+Isolamento Reprodutivo
+O isolamento reprodutivo é o critério que confirma o surgimento de uma nova espécie. Ele ocorre quando indivíduos de populações diferentes já não conseguem mais cruzar e gerar descendentes férteis, como exemplificado pelo cruzamento entre éguas e jumentos que gera híbridos estéreis.
+
+
+04:00
+Especiação Alopátrica versus Simpátrica
+A especiação divide-se em dois tipos principais: a alopátrica, que exige uma barreira geográfica física para separar as populações, e a simpátrica, que se desenvolve sem barreiras geográficas, motivada por preferências de comportamento ou habitat das espécies.
+
+
+06:00
+Especiação Peripátrica e o Efeito Fundador
+Sendo um subtipo de especiação alopátrica, a peripátrica ocorre com base no efeito fundador. Esse fenômeno acontece quando uma pequena parcela de uma população migra para uma área isolada que antes não possuía indivíduos daquela espécie, fundando uma nova população.
+
+
+08:00
+Especiação Parapátrica e a Zona Híbrida
+A especiação parapátrica é um subtipo da simpátrica comum em plantas e associada a grandes territórios com condições ecológicas variáveis. O principal indicador desse processo é surgimento de uma zona híbrida, onde indivíduos das diferentes espécies vizinhas se encontram e se reproduzem.Esta aula aborda os tipos de isolamento reprodutivo que mantêm a distinção entre as espécies, além de analisar as evidências evolutivas baseadas na embriologia e anatomia comparada. Inicialmente, são detalhados os fatores de isolamento pré-zigótico (como os anatômicos, sazonais, comportamentais e químicos) e pós-zigótico (inviabilidade, esterilidade e desmoronamento do híbrido). Por fim, o conteúdo discute as semelhanças no desenvolvimento dos cordados e as diferenças cruciais entre órgãos homólogos e análogos, associando-os aos processos de divergência evolutiva e convergência adaptativa promovidos pela seleção natural.
+
+
+00:00
+Mecanismos de Isolamento Pré-Zigótico
+Barreiras reprodutivas que atuam antes da fecundação para impedir a formação do zigoto. Podem ocorrer por incompatibilidade anatômica, isolamento sazonal, fatores etológicos ou comportamentais, isolamento por habitat ou afinidade química dos gametas.
+
+
+04:00
+Isolamento Pós-Zigótico e Embriologia Comparada
+Processos de isolamento que impedem a viabilidade reprodutiva do híbrido após a fecundação. Adicionalmente, analisa-se como a embriologia comparada demonstra as semelhanças e o parentesco evolutivo nas fases iniciais do desenvolvimento dos cordados.
+
+
+06:00
+Anatomia Comparada e Órgãos Homólogos
+Estudo das semelhanças estruturais que possuem a mesma origem embrionária, mas que podem desempenhar funções distintas. Esse fenômeno é resultado da seleção natural adaptando-as a habitats diferentes, um processo denominado divergência evolutiva.
+
+
+08:00
+Órgãos Análogos e Convergência Adaptativa
+Estruturas com origens embrionárias distintas que desempenham funções semelhantes no organismo, como asas de aves e de insetos. Isso decorre da evolução convergente de espécies expostas a pressões seletivas similares na natureza.Esta aula aborda as principais teorias sobre a origem da vida na Terra, dividindo-se entre os embates históricos entre abiogênese e biogênese — resolvidos definitivamente por Louis Pasteur —, e as hipóteses modernas sobre o surgimento dos primeiros seres vivos. São detalhados os modelos de evolução química propostos por Oparin e Haldane, os experimentos de Miller, Urey e Fox que simularam a atmosfera primitiva e a formação de coacervados, além de analisar as teorias heterotrófica e autotrófica sobre o metabolismo dos pioneiros organismos vivos, finalizando com o criacionismo e a panspermia.
+
+
+00:00
+Abiogênese versus Biogênese
+A teoria da abiogênese defendia que a vida surgia de matéria inanimada por geração espontânea. Francesco Redi questionou essa ideia ao demonstrar que larvas na carne vinham de ovos de moscas, e não de forma espontânea.
+
+
+04:00
+O Embate de Needham e Spallanzani
+Com a evolução do microscópio, a discussão voltou-se para os micro-organismos. Needham defendeu a abiogênese mostrando micróbios em caldos fervidos mal vedados, enquanto Spallanzani rebateu com fervura prolongada e fechamento hermético.
+
+
+08:00
+Louis Pasteur e a Queda da Abiogênese
+No século XIX, Louis Pasteur refutou definitivamente a geração espontânea utilizando frascos com pescoço de cisne, que permitiam o contato com o ar mas impediam a contaminação por agentes externos, consolidando a biogênese.
+
+
+12:00
+Hipótese da Evolução Química de Oparin e Haldane
+Proposta na década de 1920, a teoria de Oparin e Haldane sugere que a atmosfera da Terra primitiva continha gases que, sob o efeito de calor e fortes descargas elétricas, originaram as primeiras moléculas orgânicas.
+
+
+16:00
+Experimentos de Miller, Urey e Fox
+Em 1953, Miller e Urey simularam as condições da Terra primitiva e criaram aminoácidos em laboratório. Posteriormente, Fox demonstrou que o calor poderia unir esses compostos em proteínas, dando origem aos coacervados.
+
+
+20:00
+Hipóteses Heterotrófica e Autotrófica
+A hipótese heterotrófica postula que os primeiros seres vivos faziam fermentação. Já a autotrófica aponta que os pioneiros eram quimiolitoautotróficos e faziam quimiossíntese ao redor de fendas vulcânicas e gêiseres.
+
+
+26:00
+Criacionismo e Panspermia
+A aula conclui apresentando o criacionismo, teoria baseada na fixidez das espécies criadas por ação divina, e a panspermia, hipótese que sugere a chegada da vida à Terra por meio de corpos celestes vindos do espaço.

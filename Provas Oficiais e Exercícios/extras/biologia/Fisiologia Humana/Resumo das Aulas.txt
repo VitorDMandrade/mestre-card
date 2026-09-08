@@ -1,0 +1,306 @@
+Esta aula de fisiologia humana apresenta de forma detalhada o sistema digestório, abordando suas três funções essenciais: a digestão de alimentos, a absorção de nutrientes e a excreção de resíduos. Ao longo do conteúdo, são diferenciados os órgãos do tubo digestório de suas glândulas anexas (fígado, pâncreas e glândulas salivares), além de serem explicados os processos mecânicos e químicos da digestão. O percurso do alimento é detalhado cronologicamente desde a boca, passando pelas variações de pH no estômago e intestinos, até a importância de enzimas e secreções cruciais, como a bile e o suco pancreático, encerrando com a formação do bolo fecal no intestino grosso.
+
+
+00:00
+Funções do Sistema Digestório
+O sistema digestório desempenha três funções principais: a extração de nutrientes por meio da digestão, a facilitação da absorção desses nutrientes na corrente sanguínea e a eliminação de resíduos metabólicos através das fezes.
+
+
+02:00
+Tubo Digestório e Glândulas Anexas
+Diferencia-se o tubo digestório — composto por boca, faringe, esôfago, estômago, intestinos, reto e ânus — das glândulas anexas, que incluem as glândulas salivares, o pâncreas e o fígado.
+
+
+06:00
+Digestão Mecânica e Química
+A digestão mecânica envolve a trituração e mistura do alimento pelos dentes, língua e movimentos peristálticos involuntários do esôfago, estômago e intestinos. Paralelamente, a digestão química é realizada por enzimas que aceleram as reações de quebra.
+
+
+08:00
+Digestão na Boca e Esôfago
+Na boca, com pH neutro, a amilase salivar (pitialina) inicia a digestão do amido em maltose, formando o bolo alimentar. Em seguida, o esôfago realiza movimentos peristálticos para conduzir o alimento ao estômago.
+
+
+12:00
+Processos Digestivos no Estômago
+Com um pH altamente ácido de aproximadamente 2 devido ao ácido clorídrico (HCl), o estômago converte o pepsinogênio em pepsina para digerir proteínas. Esse processo transforma o bolo alimentar em quimo, sob a proteção de uma camada mucosa.
+
+
+16:00
+Intestino Delgado e Suco Entérico
+O quimo chega ao intestino delgado, onde o duodeno concentra a maior parte da digestão e absorção. As microvilosidades celulares ampliam a superfície de absorção de nutrientes, auxiliadas pelas enzimas do suco entérico.
+
+
+20:00
+Atuação do Pâncreas e da Bile
+O pâncreas secreta o suco pancreático alcalino para neutralizar a acidez do quimo e digerir diversos nutrientes. A bile, produzida no fígado, atua emulsificando as gorduras sem utilizar enzimas digestivas.
+
+
+28:00
+Intestino Grosso e a Variação de pH
+No intestino grosso, ocorre a absorção de água e sais minerais para a formação do bolo fecal. A aula conclui destacando a variação de pH no trato digestório, fator essencial para a regulação do trabalho enzimático.Esta aula apresenta o funcionamento e a anatomia do sistema cardiovascular humano, destacando a importância do sangue como meio de transporte de nutrientes, gases e hormônios. Explica-se a estrutura das cavidades cardíacas (átrios e ventrículos) e a diferença funcional entre artérias e veias, detalhando o percurso da circulação sanguínea entre o coração, pulmões e tecidos em ciclos de sístole e diástole. Por fim, o conteúdo aborda os tipos de circulação pulmonar e sistêmica, bem como as adaptações estruturais dos vasos sanguíneos para lidar com gradientes de pressão e garantir o retorno venoso.
+
+
+00:00
+Importância e Composição do Sangue
+O sangue atua como um meio essencial para o transporte de nutrientes, gases respiratórios, hormônios e células de defesa pelo organismo. Quando submetido à centrifugação, ele se divide em plasma, glóbulos brancos e glóbulos vermelhos de acordo com a densidade de cada componente.
+
+
+02:00
+Estrutura do Coração e Tipos de Vasos
+O sistema circulatório é composto pelo coração e pelos vasos sanguíneos. O coração possui cavidades específicas de fluxo, onde os átrios recebem o sangue que chega e os ventrículos são responsáveis por expulsá-lo, dependendo das veias para a entrada e das artérias para a saída.
+
+
+06:00
+O Caminho do Sangue e as Exceções Pulmonares
+O sangue pobre em oxigênio chega ao lado direito do coração e é impulsionado para os pulmões pela artéria pulmonar para ser oxigenado. Ao retornar rico em oxigênio para o lado esquerdo cardíaco, é distribuído ao corpo pela artéria aorta, destacando-se que os vasos pulmonares são exceções em relação ao tipo de sangue que carregam.
+
+
+12:00
+Válvulas Cardíacas e Ciclos de Sístole e Diástole
+Válvulas atrioventriculares e semilunares regulam o fluxo interno do coração, gerando a pressão necessária para a circulação e impedindo o refluxo sanguíneo. Os movimentos do músculo cardíaco alternam-se entre sístole (contração) e diástole (relaxamento), produzindo o som característico dos batimentos cardíacos.
+
+
+18:00
+Tipos de Circulação e Características do Coração Humano
+A circulação humana divide-se em pulmonar (pequena) e sistêmica (grande). Ela é classificada como dupla, fechada e completa, o que significa que o sangue passa duas vezes pelo coração sem haver mistura entre o sangue arterial e o venoso graças ao septo interventricular.
+
+
+20:00
+Diferenciação e Dinâmica dos Vasos Sanguíneos
+As artérias são vasos calibrosos que suportam pressões muito altas decorrentes do bombeamento ventricular, enquanto as veias lidam com menor pressão. As veias contam com válvulas especiais que facilitam o retorno venoso e evitam o refluxo sanguíneo, impedindo a ocorrência de varizes.A aula apresenta uma análise detalhada sobre a fisiologia do sistema respiratório, abordando suas funções de oxigenação tecidual, excreção de gás carbônico e consequente regulação do pH sanguíneo. É detalhada a anatomia das vias aéreas, desde a filtragem do ar nas fossas nasais até a troca gasosa por difusão simples nos alvéolos, destacando a função mecânica de deglutição da epiglote e a ação tensioativa do surfactante pulmonar. Ao final, aborda-se o comportamento das hemácias no transporte de gases respiratórios, o risco de intoxicação por monóxido de carbono e os eventos físicos envolvidos na mecânica ventilatória de inspiração e expiração coordenados pelo diafragma e músculos intercostais.
+
+
+00:00
+Funções do Sistema e Caminho do Ar
+O sistema respiratório atua garantindo o fornecimento de oxigênio e a eliminação de dióxido de carbono gerado pelo metabolismo, prevenindo a acidose no sangue. O fluxo de ar se inicia nas cavidades nasais, passando sequencialmente por faringe, laringe, traqueia, brônquios, bronquíolos e alvéolos pulmonares.
+
+
+02:00
+Cavidades Nasais e Epiglote
+As cavidades nasais aquecem e filtram o ar por meio de capilares, pelos e muco, melhorando a velocidade de difusão dos gases. Na laringe, a epiglote funciona como uma válvula que impede o alimento de desviar para a via aérea durante a alimentação, agindo de forma diferente da glote.
+
+
+06:00
+Estrutura da Traqueia
+A traqueia transporta o ar e possui cílios capazes de repelir partículas externas, além de anéis de cartilagem que asseguram a integridade de sua abertura anatômica. Esses anéis impedem o colapso do tubo respiratório e possibilitam intervenções clínicas importantes em casos de obstrução.
+
+
+08:00
+Hematose Alveolar e Surfactante
+Nos alvéolos pulmonares ocorre a hematose, que consiste na troca gasosa por difusão simples em decorrência do gradiente de concentração. Para evitar o colapso alveolar causado pela tensão superficial de moléculas de água, os pneumócitos do tipo 2 sintetizam o fluido surfactante, agindo de forma similar a um detergente.
+
+
+18:00
+Transporte de Gases e Intoxicação por Monóxido
+O oxigênio e o gás carbônico são transportados no sangue em ligações instáveis com a hemoglobina ou dissolvidos no plasma. No entanto, o monóxido de carbono possui ligação estável e definitiva com a hemoglobina, bloqueando a fixação de outros gases vitais e representando risco de asfixia sob inalação.
+
+
+22:00
+Dinâmica Ventilatória Pulmonar
+A ventilação pulmonar é comandada pela atuação coordenada do diafragma e dos músculos intercostais. Na inspiração, há contração da musculatura para aumentar a cavidade torácica e reduzir a pressão interna auricular, ao passo que a expiração envolve o relaxamento dos músculos para expulsar o ar.Esta aula apresenta uma visão abrangente do sistema endócrino, detalhando a função dos hormônios como mensageiros químicos transportados pela corrente sanguínea e sua regulação exercida pelas glândulas endócrinas. O conteúdo aborda de forma aprofundada o papel da hipófise e sua interação com o hipotálamo, o ciclo menstrual e os mecanismos de contracepção química, a regulação glicêmica promovida pelo pâncreas, além das funções metabólicas e hidroeletrolíticas coordenadas pela tireoide, paratireoide e glândulas adrenais.
+
+
+00:00
+Introdução ao Sistema Endócrino
+O sistema endócrino é responsável pela produção e secreção de hormônios na corrente sanguínea, que atuam como mensageiros químicos direcionados a órgãos-alvo específicos. Diferente das glândulas exócrinas, que lançam suas secreções em cavidades ou superfícies corporais, as glândulas endócrinas liberam suas substâncias diretamente no sangue.
+
+
+02:00
+A Hipófise e a Relação com o Hipotálamo
+Conhecida como glândula mestra, a hipófise coordena a atividade de outras glândulas por meio de hormônios chamados trofinas. Ela se divide em adeno-hipófise (porção anterior que produz e secreta hormônios) e neuro-hipófise (porção posterior que apenas armazena e secreta hormônios produzidos pelo hipotálamo).
+
+
+06:00
+Hormônios Secretados pela Neuro-hipófise
+A neuro-hipófise libera o ADH (hormônio antidiurético), que promove a reabsorção de água nos rins e cuja escassez causa diabetes insípido, e a ocitocina, hormônio associado à contração uterina no parto, ejeção do leite materno e estabelecimento de vínculos afetivos.
+
+
+08:00
+Hormônios Produzidos pela Adeno-hipófise
+A adeno-hipófise sintetiza o hormônio do crescimento (GH), cuja disfunção causa gigantismo, nanismo ou acromegalia, e a prolactina, responsável pela produção do leite materno. Também produz as trofinas TSH, ACTH, FSH e LH, que regulam o funcionamento de outras glândulas do corpo.
+
+
+16:00
+Ciclo Menstrual e Contracepção
+Durante o ciclo menstrual, o FSH estimula a maturação folicular, enquanto o pico de LH promove a ovulação e a subsequente formação do corpo lúteo, que secreta estrogênio e progesterona. As pílulas anticoncepcionais usam esses hormônios sintéticos para gerar um feedback negativo que inibe o FSH e o LH, impedindo a ovulação.
+
+
+20:00
+Pâncreas e o Controle Glicêmico
+Como glândula mista, o pâncreas exerce função endócrina por meio das células das ilhotas de Langerhans. As células beta produzem a insulina para reduzir a glicemia pós-alimentação, enquanto as células alfa secretam o glucagon para liberar açúcar no sangue a partir do glicogênio nos períodos de jejum.
+
+
+24:00
+Tireoide e Paratireoide na Homeostase
+A tireoide produz os hormônios T3 e T4, essenciais para o controle do metabolismo energético, além da calcitonina, que estimula a fixação de cálcio nos ossos. Em contrapartida, as paratireoides secretam o paratormônio, que retira cálcio dos ossos para a corrente sanguínea, atuando como antagonista da calcitonina.
+
+
+28:00
+Glândulas Adrenais e Resposta ao Estresse
+As adrenais são divididas em córtex e medula. O córtex produz hormônios esteroides como o cortisol e a aldosterona, enquanto a medula secreta adrenalina e noradrenalina, hormônios vitais para as respostas de luta ou fuga, os quais aumentam a frequência cardíaca, o foco e a pressão arterial em situações de estresse.Esta aula aborda a fisiologia e o funcionamento do sistema excretor humano, com foco nas funções renais e na dinâmica do néfron. São discutidos o papel de filtração do sangue, regulação hidroeletrolítica, equilíbrio ácido-base e secreções hormonais dos rins, detalhando o trajeto do plasma sanguíneo pelas estruturas do néfron, desde a filtração glomerular até a formação final da urina no ducto coletor sob influência dos hormônios ADH e aldosterona.
+
+
+00:00
+Funções do Sistema Renal
+O sistema renal atua na filtração do sangue para eliminar metabólitos e substâncias tóxicas, além de regular o equilíbrio de água, os níveis de íons e o pH sanguíneo. Os rins também desempenham papel endócrino ao produzir renina e eritropoetina.
+
+
+04:00
+Anatomia do Néfron
+O néfron é a unidade funcional do rim, estruturado pela cápsula de Bowman, túbulo contorcido proximal, alça de Henle, túbulo contorcido distal e ducto coletor. O sangue entra sujo pela arteríola aferente e sai limpo pela eferente.
+
+
+06:00
+Filtração Glomerular e Reabsorção Proximal
+A filtração ocorre no glomérulo dentro da cápsula de Bowman devido à alta pressão sanguínea, impedindo a passagem de células e proteínas grandes. No túbulo proximal, ocorre a reabsorção ativa de 75% de substâncias úteis como glicose, aminoácidos e vitaminas.
+
+
+08:00
+Alça de Henle e Túbulo Distal
+A alça de Henle atua na reabsorção de água na porção descendente e de sais na porção ascendente. O túbulo distal serve como última oportunidade de reabsorção de nutrientes e local de secreção ativa de toxinas e íons excedentes.
+
+
+10:00
+Ducto Coletor e Processamento Final
+No ducto coletor, a urina recém-formada é reunida para envio à bexiga. Sob a ação de hormônios como ADH e aldosterona, ocorre a última reabsorção de água para evitar a desidratação corporal.Esta aula aborda o funcionamento do sistema imunológico humano, detalhando como o organismo se defende contra patógenos e neutraliza toxinas por meio de respostas imunes inatas e adaptativas. São explicados os conceitos essenciais de antígenos e anticorpos, o papel das barreiras físicas e químicas do corpo, além das funções específicas dos linfócitos T CD4, T CD8 e B. O conteúdo também examina a organização dos órgãos linfoides na produção, maturação e armazenamento de células de defesa, finalizando com uma análise sobre a diferença entre imunização ativa (vacinas) e passiva (soros) e o impacto protetivo da memória imunológica.
+
+
+00:00
+Introdução ao Sistema Imunológico, Antígenos e Anticorpos
+O sistema imunológico combate agentes invasores e neutraliza toxinas. O antígeno é a substância presente no patógeno ou toxina que desencadeia a resposta imune, enquanto os anticorpos atuam combatendo, marcando ou inativando esses antígenos.
+
+
+04:00
+Sistema Imunológico Inato
+O sistema inato atua de forma genérica e imediata contra qualquer invasor. Sua primeira linha de defesa consiste de barreiras físicas, como pele e mucosas, enquanto a segunda linha envolve defesas químicas, como o ácido estomacal, e células fagocitárias que englobam agentes estranhos.
+
+
+08:00
+Sistema Adaptativo e as Células de Defesa
+O sistema adaptativo é altamente específico e atua como uma terceira linha de defesa. Ele conta com linfócitos T CD4 (auxiliares), T CD8 (citotóxicos) e linfócitos B, os quais se transformam em plasmócitos quando ativos para produzir anticorpos.
+
+
+12:00
+Órgãos Linfoides Primários e Secundários
+Os órgãos linfoides primários, como a medula óssea e o timo, são responsáveis pela produção e maturação das células de defesa. Já os órgãos secundários, como linfonodos, tonsilas, baço e apêndice, armazenam essas células e servem como locais seguros para o combate aos invasores.
+
+
+20:00
+Dinâmica da Resposta Imune e Ação Celular
+O linfócito T CD4 funciona como o centro de comunicação do sistema imune, recrutando o linfócito B para produzir anticorpos que marcam ou neutralizam os invasores. Caso as células já estejam infectadas, o T CD4 recruta o linfócito T CD8, que destrói essas células infectadas por meio de toxinas.
+
+
+30:00
+Imunização Ativa, Passiva e Importância da Vacina
+A imunização ativa (vacinas ou contágio) estimula o próprio corpo a produzir anticorpos de forma preventiva e duradoura, enquanto a passiva (soros ou amamentação) fornece anticorpos prontos para ação terapêutica imediata. A vacinação garante que um segundo contato com o patógeno gere uma resposta imune muito mais rápida e intensa.Esta aula apresenta de forma detalhada a anatomia e a fisiologia do sistema nervoso, dividindo-o em central e periférico. São discutidos o papel protetor das meninges e do líquido cefalorraquidiano, as funções específicas de estruturas como cérebro, cerebelo, tronco encefálico e diencéfalo, e a atuação da medula espinal nos atos reflexos. Por fim, a aula aprofunda-se na estrutura dos neurônios, no papel otimizador da bainha de mielina e na dinâmica eletroquímica envolvida na geração e condução do impulso nervoso através de processos de polarização, despolarização e repolarização de membrana.
+
+
+00:00
+Organização do Sistema Nervoso
+Apresentação da divisão do sistema nervoso em central, composto por encéfalo e medula espinal, e periférico, formado por nervos e gânglios. É feito o esclarecimento de que o encéfalo é constituído pelo cérebro, cerebelo e tronco encefálico.
+
+
+06:00
+Proteções do Sistema Nervoso Central
+Explicação sobre as defesas físicas do encéfalo e da medula espinal, destacando a barreira óssea do crânio e das vértebras. Também são descritas as três meninges (dura-máter, aracnoide e pia-máter) e a função amortecedora e protetora do líquido cefalorraquidiano ou líquor.
+
+
+08:00
+Estrutura e Hemisférios do Cérebro
+Análise da organização interna do cérebro entre a massa cinzenta periférica (córtex) e a massa branca interna (região medular rica em mielina). O cérebro é dividido em lobos e hemisférios, nos quais o lado esquerdo é mais voltado para intuição e criatividade, e o lado direito é associado à escrita, lógica e raciocínio.
+
+
+14:00
+Cerebelo, Tronco Encefálico e Diencéfalo
+Estudo das funções motoras do cerebelo e das três porções do tronco encefálico (mesencéfalo, ponte e bulbo), com ênfase no papel respiratório e cardíaco do bulbo. Também é abordado o diencéfalo (tálamo e hipotálamo) como o centro termofisiológico e homeostático do organismo.
+
+
+20:00
+Medula Espinal e o Arco Reflexo
+Explicação da função da medula espinal na coordenação de reações involuntárias e rápidas de defesa. O reflexo ocorre através de neurônios aferentes (sensitivos) que levam o estímulo de dor até a medula e de neurônios eferentes (motores) que trazem a resposta mecânica de fuga.
+
+
+30:00
+Anatomia do Neurônio e Condução Saltatória
+Descrição anatômica da célula nervosa em dendritos, corpo celular e axônio. Destaca-se o papel isolante da bainha de mielina e como os nódulos de Ranvier aumentam a velocidade da transmissão elétrica através da condução saltatória.
+
+
+34:00
+Potencial de Ação e Impulso Nervoso
+Detalhamento das fases do impulso nervoso a partir das concentrações de sódio e potássio. O processo transita do repouso polarizado para a despolarização desencadeada pela rápida entrada de sódio na célula, finalizando com a repolarização que reestabelece a carga elétrica original.A aula apresenta uma análise detalhada dos sistemas reprodutores masculino e feminino, abrangendo suas estruturas anatômicas, funções fisiológicas e mecanismos de regulação hormonal. No sistema masculino, são discutidos a produção de sêmen, o papel dos testículos, epidídimos e glândulas acessórias, além do funcionamento hormonal mediado por LH e FSH. No feminino, foca-se na anatomia interna e externa da vulva, nas fases de desenvolvimento que culminam na ovulação, na importância do útero — com destaque para as camadas do endométrio e do miométrio — e nas dinâmicas de fertilização e menstruação.
+
+
+00:00
+Funções do Sistema Masculino e Composição do Sêmen
+O sistema reprodutor masculino atua na produção de espermatozoides e testosterona, além de viabilizar a cópula. O sêmen é composto por uma pequena porcentagem de espermatozoides e majoritariamente por secreções nutritivas e protetoras da vesícula seminal, próstata e glândulas bulbouretrais.
+
+
+02:00
+Anatomia e Glândulas Acessórias Masculinas
+Nos testículos, os túbulos seminíferos produzem os gametas e as células de Leydig produzem testosterona, sendo os espermatozoides maturados no epidídimo. Durante a condução pelos ductos deferentes, a vesícula seminal fornece frutose para nutrição, a próstata alcaliniza o meio contra a acidez vaginal e a glândula bulbouretral lubrifica a uretra.
+
+
+10:00
+Fisiologia Peniana e Regulação Hormonal
+O pênis possui corpos cavernosos e corpo esponjoso que recebem fluxo sanguíneo, sustentando a uretra por onde passam tanto a urina quanto o sêmen. A regulação dos testículos é coordenada pelo hipotálamo e pela hipófise através dos hormônios LH (regulando a testosterona) e FSH (regulando a espermatogênese nas células de Sertoli).
+
+
+14:00
+Funções Femininas e Anatomia Externa (Vulva)
+A genitália feminina externa é composta pelo clitóris, pequenos e grandes lábios, protegidos pelo monte púbico. Ao contrário do homem, a mulher possui trajetos separados com aberturas distintas para a uretra (excreção urinária) e para o canal vaginal (geração e reprodução).
+
+
+20:00
+Anatomia Interna, Fecundação e Ciclo Uterino
+O canal vaginal liga-se ao colo do útero, que produz o muco cervical e é monitorado por exames preventivos de HPV. A fecundação do ovócito ocorre na tuba uterina, originando o zigoto que se fixa como blástula no endométrio (camada interna do útero), cuja descamação periódica resulta na menstruação.A aula apresenta detalhadamente o processo de fecundação humana, explicando a estrutura anatômica e funcional dos gametas masculino e feminino, as barreiras celulares e glicoproteicas que envolvem o ovócito, o processo de penetração e fusão celular, os mecanismos bioquímicos para evitar a polispermia e, por fim, a cariogamia, que resulta na formação do zigoto.
+
+
+00:00
+A Estrutura do Espermatozoide
+O espermatozoide é analisado em suas principais partes: a cabeça dotada de núcleo e de acrossomo composto por enzimas como a hialuronidase, a peça intermediária rica em mitocôndrias para fornecimento de energia e o flagelo responsável pela natação.
+
+
+02:00
+Os Revestimentos do Ovócito Secundário
+O gameta feminino apresenta duas barreiras de revestimento cruciais: a corona radiata, cujas células são ligadas por ácido hialurônico, e a zona pelúcida, uma membrana de glicoproteínas que atua no reconhecimento específico de espermatozoides humanos.
+
+
+06:00
+As Etapas de Penetração e Meiose II
+O ovócito secundário encontra-se estacionado na metáfase II da meiose, completando sua divisão celular apenas após a fecundação. Durante o processo de penetração, somente o núcleo do espermatozoide é inserido no interior do gameta feminino.
+
+
+08:00
+Reação Cortical e Prevenção da Polispermia
+Após a fusão do núcleo, grânulos corticais desencadeiam uma reação que altera quimicamente a zona pelúcida do ovócito. Essa modificação elétrica e estrutural repele novos espermatozoides, impedindo a ocorrência de polispermia.
+
+
+10:00
+Cariogamia e Formação do Zigoto
+Diferenciando-se do termo conceitual de fecundação, a cariogamia é caracterizada pela fusão do pronúcleo masculino com o feminino. Esse encontro cromossômico restabelece a ploidia da espécie com a formação de um zigoto de 46 cromossomos.Esta aula apresenta um panorama completo sobre os métodos contraceptivos, dividindo-os em cinco grandes categorias: métodos naturais, de barreira, hormonais, cirúrgicos e o dispositivo intrauterino não hormonal. Além de detalhar o funcionamento biológico e a eficácia de cada método, como o mecanismo de feedback hormonal que impede a ovulação e a esterilização por cirurgias, a aula ressalta a prevenção de Infecções Sexualmente Transmissíveis e a importância de manter a saúde do pH vaginal.
+
+
+00:00
+Métodos Naturais
+Compreendem métodos comportamentais como a tabelinha, a observação do muco cervical e o coito interrompido. São considerados altamente falhos devido a irregularidades no ciclo menstrual e escapes de sêmen, além de não oferecerem proteção contra infecções sexualmente transmissíveis.
+
+
+02:00
+Métodos de Barreira
+Focam em impedir fisicamente o encontro entre o espermatozoide e o óvulo. Exemplos incluem os preservativos masculino e feminino, o diafragma, o capuz cervical e o uso de substâncias espermicidas, com destaque para a camisinha como principal aliada contra as ISTs.
+
+
+04:00
+Métodos Hormonais
+Atuam elevando os níveis de estrogênio e progesterona sintéticos para inibir a produção de FSH e LH pela hipófise, bloqueando o amadurecimento folicular e a ovulação. Abrangem pílulas, injeções, adesivos, anéis vaginais, o DIU hormonal e a pílula do dia seguinte.
+
+
+08:00
+Métodos Cirúrgicos
+São procedimentos definitivos de esterilização que cessam a capacidade reprodutiva. Na mulher, realiza-se a laqueadura para bloquear as tubas uterinas, enquanto no homem é feita a vasectomia, que corta os canais deferentes mantendo a ejaculação normal, porém livre de espermatozoides.
+
+
+10:00
+Dispositivos Intrauterinos e Saúde Vaginal
+O DIU de cobre atua de forma não hormonal, reduzindo a mobilidade dos espermatozoides e provocando uma inflamação local no endométrio. Ao final, a aula ressalta como o sêmen básico pode afetar o pH ácido da vagina, destacando a higiene e os métodos de barreira para prevenir infecções.

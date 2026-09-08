@@ -1,0 +1,271 @@
+Esta aula apresenta uma introdução estruturada à genética, detalhando os principais conceitos necessários para compreender a hereditariedade e a transmissão de características biológicas. São explicadas as definições de gene, locus gênico, cromossomos homólogos e alelos, além do funcionamento de relações de dominância, recessividade, homozigose e heterozigose. Por fim, o conteúdo diferencia os conceitos de genótipo e fenótipo (incluindo a plasticidade fenotípica) e esclarece a distinção entre genoma e código genético.
+
+
+00:00
+Introdução à Genética e Conceito de Gene
+A genética estuda os genes e a hereditariedade, que é o processo de transmissão de características, tendo Gregor Mendel como pioneiro. O gene é definido como um fragmento de DNA que, ao se expressar, codifica a produção de proteínas responsáveis por determinar nossas características físicas.
+
+
+02:00
+Locus Gênico e Cromossomos Homólogos
+O locus gênico representa o endereço físico específico de um gene dentro do cromossomo. Já os cromossomos homólogos são cromossomos correspondentes em par que possuem os mesmos genes organizados exatamente nos mesmos loci gênicos.
+
+
+06:00
+Genes Alelos, Homozigose e Heterozigose
+Alelos são diferentes variantes de um mesmo gene que ocupam o mesmo locus. Quando um indivíduo herda alelos idênticos nos cromossomos homólogos ele está em homozigose, enquanto a presença de alelos diferentes caracteriza a heterozigose.
+
+
+10:00
+Dominância e Recessividade
+O alelo dominante tem prioridade de expressão e se manifesta tanto em homozigose quanto em heterozigose, sendo representado por letras maiúsculas. Em contrapartida, o alelo recessivo é representado por letras minúsculas e só consegue se expressar em homozigose, na ausência de um alelo dominante.
+
+
+16:00
+Genótipo, Fenótipo e a Influência Ambiental
+O genótipo é o conjunto de alelos carregados por um organismo, enquanto o fenótipo é a expressão visível ou funcional dessas características. O fenótipo não depende apenas dos genes, mas também sofre influência direta do meio ambiente, um fenômeno conhecido como plasticidade fenotípica.
+
+
+22:00
+Diferença entre Genoma e Código Genético
+O genoma representa todo o material genético de um ser vivo, englobando regiões codificantes de proteínas (genes) e não codificantes. Já o código genético é a regra universal de tradução que estabelece a correspondência entre trincas de bases nitrogenadas (códons) e aminoácidos.Esta aula apresenta a resolução de duas questões do Enem para consolidar e diferenciar conceitos fundamentais da genética. Na primeira parte, é explicada a diferença crucial entre genoma, que engloba todo o DNA de um organismo (partes codificantes e não codificantes), e código genético, que se refere à correspondência de trincas de nucleotídeos com aminoácidos. Na segunda parte, discute-se a relação entre genótipo e fenótipo através de um experimento com clones de plantas, demonstrando como fatores ambientais, como a luz, influenciam a expressão física das características de organismos com o mesmo DNA.
+
+
+00:00
+Diferença entre Genoma e Código Genético
+A partir de uma questão sobre a cevada, esclarece-se que o genoma representa a totalidade do DNA de um organismo, incluindo genes e regiões não codificantes. Já o código genético não se refere à quantidade de genes, mas sim à regra de correspondência química para a síntese de proteínas.
+
+
+02:00
+Definição Científica de Código Genético
+O código genético é definido como a relação de trincas de nucleotídeos que determinam a sequência de aminoácidos em uma proteína. A análise das alternativas reforça que o conceito não se trata de localização de genes, mas sim da tradução dos códons, confirmando o gabarito na alternativa A.
+
+
+06:00
+Genótipo, Fenótipo e Interação com o Meio
+A segunda questão aborda plantas clonadas com genótipos idênticos que apresentaram fenótipos diferentes (folhas verdes ou amareladas) devido à presença ou ausência de luz solar. Conclui-se que o fenótipo é o resultado da interação do genótipo com o meio ambiente, validando a alternativa B.Esta aula apresenta a Primeira Lei de Mendel, também conhecida como lei da segregação dos fatores ou do monohibridismo, explicando como Gregor Mendel utilizou ervilhas de cheiro para desvendar os mecanismos básicos da hereditariedade. A partir dos cruzamentos entre linhagens puras que geraram as gerações parental, F1 e F2, são detalhados conceitos fundamentais como dominância, recessividade, genótipos, fenótipos e a proporção clássica de 3 para 1. Por fim, a aula aborda a aplicação prática por meio de problemas genéticos, do Quadro de Punnett e do cruzamento-teste para determinação de genótipos desconhecidos.
+
+
+00:00
+Introdução e a Escolha das Ervilhas
+Mendel estudou a transmissão de características de forma organizada e escolheu as ervilhas de cheiro devido ao cultivo fácil, ciclo de vida curto e características contrastantes muito bem definidas.
+
+
+04:00
+Geração Parental e F1
+Ao cruzar ervilhas puras amarelas com verdes (geração parental), Mendel observou uma geração F1 inteiramente amarela. Esse resultado provou que a cor amarela possui caráter dominante sobre a cor verde, que é recessiva.
+
+
+08:00
+A Geração F2 e a Proporção de 3 para 1
+Ao realizar o cruzamento entre as sementes amarelas da geração F1, a característica verde ressurgiu na geração F2. A proporção matemática obtida foi de 3 sementes amarelas para 1 verde, demonstrando que a característica recessiva estava apenas oculta.
+
+
+10:00
+A Lei da Segregação dos Fatores
+Mendel concluiu que cada característica é determinada por dois fatores que se separam pura e independentemente na formação dos gametas. Esses fatores, hoje chamados de alelos, voltam a se unir somente durante o processo de fecundação.
+
+
+18:00
+Resolução de Cruzamentos e Probabilidade
+Através do Quadro de Punnett ou da simples distributiva, é possível prever os resultados de cruzamentos genéticos. A aula demonstra, na prática, como encontrar as proporções dos genótipos e fenótipos e calcular probabilidades.
+
+
+24:00
+Cruzamento-Teste
+Método para descobrir se um indivíduo com fenótipo dominante é homozigoto ou heterozigoto. Para isso, realiza-se o cruzamento com um indivíduo recessivo de genótipo conhecido e analisa-se se a prole apresentará indivíduos com fenótipo recessivo.Esta aula aborda a análise de heredogramas, explicando como interpretar símbolos de árvores genealógicas e determinar genótipos de forma prática. O professor apresenta técnicas para identificar padrões de herança dominante e recessiva com base no cruzamento de pais iguais com filhos de características diferentes, consolidando o aprendizado por meio da resolução de exercícios sobre determinação de portadores e indivíduos com genótipos indefinidos.
+
+
+00:00
+Introdução e Simbologia dos Heredogramas
+O heredograma é apresentado como a representação gráfica de uma árvore genealógica. São explicados os símbolos padrão para indivíduos do sexo masculino, feminino, afetados por características genéticas e as relações de cruzamento.
+
+
+02:00
+A Regra de Ouro para Identificar Genótipos
+Explicação da principal regra de análise: pais com fenótipos idênticos que geram filhos com fenótipos diferentes são obrigatoriamente heterozigotos. Essa dica permite determinar rapidamente se a herança é de caráter dominante ou recessivo.
+
+
+04:00
+Aplicação Prática em Herança Dominante
+Resolução passo a passo de um heredograma com padrão de herança dominante. Demonstra-se como deduzir os genótipos dos pais e descendentes, eliminando possibilidades impossíveis de acordo com a herança dos alelos.
+
+
+08:00
+Resolução de Questões e Casos Indeterminados
+Análise de um heredograma de caráter recessivo para responder a questões sobre homozigose e portadores de patologias. É abordada a impossibilidade de determinar certos genótipos sem informações adicionais de descendentes.Esta aula aborda a aplicação de conceitos matemáticos de probabilidade na genética, explicando regras básicas como a multiplicação para eventos sucessivos (regra do 'e') e a soma para eventos excludentes (regra do 'ou'). Por meio de exercícios práticos sobre o albinismo e cruzamentos de coelhos, o professor demonstra como calcular a chance de determinadas características em descendentes, lidar com a definição de sexo biológico, interpretar casos com espaço amostral reduzido e aplicar a probabilidade para estimar proporções de fenótipos e genótipos em populações.
+
+
+00:00
+Princípios Básicos de Probabilidade
+Apresenta o conceito de probabilidade como o número de casos desejados dividido pelos casos possíveis. São explicadas as regras do 'E' (multiplicação de probabilidades para eventos sucessivos) e do 'OU' (soma de probabilidades para eventos alternativos).
+
+
+02:00
+Cruzamento Genético e Probabilidade de Sexo
+Utiliza um heredograma de pais heterozigotos para calcular a probabilidade de nascer uma filha (mulher) e com pigmentação de pele normal. Como os eventos são simultâneos, multiplica-se a chance do sexo (1/2) pela de normalidade (3/4), resultando em 3/8.
+
+
+06:00
+Independência de Eventos na Descendência
+Mostra que a ordem de nascimento não altera as chances de herança de um alelo, pois cada nascimento é um evento independente. Além disso, quando a questão pede a probabilidade de uma 'criança', não se deve multiplicar o resultado por 1/2.
+
+
+08:00
+Redução do Espaço Amostral
+Explica cenários de probabilidade condicional nos quais o descendente já nasceu com a característica dominante. Isso descarta a possibilidade de homozigose recessiva, reduzindo o espaço amostral total de quatro para três possibilidades.
+
+
+10:00
+Probabilidade Aplicada como Proporção
+Demonstra como estimar uma quantidade prevista de filhotes a partir da probabilidade de um cruzamento. Ao calcular a chance esperada de 50% de heterozigotos sobre uma ninhada de 360 coelhos, a resposta estimada é de 180 indivíduos.Esta aula se concentra na resolução de três questões aplicadas do Enem sobre a Primeira Lei de Mendel, abordando conceitos teóricos fundamentais através da prática. O professor analisa tópicos essenciais como heranças autossômicas recessivas, a dinâmica de cruzamentos híbridos que geram proporções fenotípicas de 3 para 1 na geração F2, e a interpretação de heredogramas. Um destaque importante da aula é o cálculo avançado de probabilidade genética com espaço amostral reduzido, ensinando os alunos a solucionar problemas onde a condição de nascimento de um indivíduo já é conhecida, além de alertar contra pegadinhas estruturais clássicas dos exames.
+
+
+00:00
+Resolução da Primeira Questão: Herança Recessiva
+Análise de uma questão do Enem sobre deficiência de lipase ácida liso-sômica. O professor explica que pais normais que têm um filho afetado são necessariamente portadores heterozigotos, caracterizando uma doença de caráter recessivo com probabilidade de um quarto de ocorrência.
+
+
+02:00
+Resolução da Segunda Questão: Os Fatores de Mendel
+Explicação sobre os mecanismos de herança das características lisas e rugosas em ervilhas. Demonstra-se que o cruzamento de plantas híbridas e heterozigotas da F1 é o que permite visualizar a herança recessiva oculta na geração F2.
+
+
+06:00
+Resolução da Terceira Questão: Análise de Heredograma
+Introdução a um problema genético focado no cálculo de probabilidade para um determinado indivíduo de um heredograma. O professor relembra o macete clássico de buscar pais iguais com filhos diferentes para identificar alelos dominantes e recessivos.
+
+
+08:00
+Probabilidade com Espaço Amostral Reduzido
+Demonstração de como calcular a probabilidade de um indivíduo ser portador quando ele já nasceu saudável. Ao descartar a possibilidade homozigota recessiva, o espaço amostral cai de quatro para três alternativas, resultando em uma chance de dois terços, ou 67 porcento.
+
+
+10:00
+Aprofundamento e Pegadinhas sobre Ser Portador
+Diferenciação clara entre não possuir a doença e não ser portador do gene recessivo. O professor mostra que a chance de o indivíduo normal não portar o alelo é de um terço (33 porcento), alertando para pegadinhas recorrentes de vestibulares.A aula aborda o conceito de alelos letais, uma importante exceção à Primeira Lei de Mendel descoberta por Lucien Cuénot ao estudar a pelagem de camundongos. É explicado de forma detalhada como a homozigose de determinados genes provoca a morte embrionária intrauterina, alterando a clássica proporção fenotípica mendeliana de 3:1 para 2:1, seguida pela resolução de exercícios práticos do ENEM e vestibulares que ensinam a ajustar o espaço amostral nos cálculos probabilísticos.
+
+
+00:00
+A Descoberta de Lucien Cuénot
+Apresentação do experimento do cientista francês com camundongos de pelagem amarela e cinza, que resultou em uma inesperada proporção de 2:1 nos cruzamentos, divergindo do padrão de Mendel.
+
+
+02:00
+O Conceito de Alelo Letal
+Explicação de que a homozigose dominante causa a morte do feto no ambiente intrauterino, reduzindo as possibilidades de nascimento e explicando a alteração da proporção fenotípica.
+
+
+04:00
+Resolução de Questão - ENEM
+Análise de uma questão sobre probabilidade de nascimento de uma fêmea amarela, evidenciando como desconsiderar os homozigotos dominantes mortos do denominador do cálculo.
+
+
+08:00
+Resolução de Questão - Cálculo de Proporção
+Aplicação prática para prever a quantidade de descendentes cinzas em um cruzamento de amarelos, reforçando o erro comum de utilizar quatro possibilidades em vez de três como espaço amostral.Esta aula apresenta de forma detalhada o sistema ABO de classificação sanguínea, explicando sua base genética a partir das interações entre os alelos do gene I. O conteúdo aborda a caracterização de cada tipo de sangue (A, B, AB e O) com base nos antígenos das hemácias e nos anticorpos do plasma, explica como é realizado o teste prático de tipagem por aglutinação, demonstra as regras de compatibilidade para transfusões e ilustra o uso desse conhecimento em testes de exclusão de paternidade.
+
+
+00:00
+Genética do Sistema ABO
+Explica que a tipagem sanguínea é determinada pelo gene I, o qual possui três alelos principais: Isão A, Isão B e Izinho. O vídeo detalha as relações de dominância completa entre os alelos dominantes e o recessivo, bem como o caso de codominância que gera o tipo AB.
+
+
+04:00
+Antígenos e Anticorpos
+Apresenta a diferença entre os antígenos presentes na superfície das hemácias e os anticorpos presentes no plasma sanguíneo. É explicado que o sistema imunológico produz anticorpos apenas contra as proteínas que ele não possui e reconhece como estranhas.
+
+
+10:00
+O Teste de Tipagem Sanguínea
+Demonstra o procedimento laboratorial de tipagem usando anticorpos anti-A e anti-B. A presença ou ausência de aglutinação ao reagir com os anticorpos revela quais antígenos o indivíduo possui nas hemácias.
+
+
+14:00
+Transfusões de Sangue e Compatibilidade
+Aborda a dinâmica de doações sanguíneas, evidenciando que o perigo de aglutinação ocorre quando o antígeno do doador encontra o anticorpo correspondente no receptor. Apresenta o tipo O como doador universal e o tipo AB como receptor universal.
+
+
+22:00
+Uso da Tipagem na Investigação de Paternidade
+Discute como os cruzamentos genéticos do sistema ABO podem ser aplicados para avaliar a possibilidade de paternidade. Por meio de exemplos práticos de genótipos de mães, filhos e supostos pais, é mostrado como excluir ou admitir uma compatibilidade.Esta aula aborda a genética e as implicações clínicas do fator Rh, explicando como a presença ou ausência da proteína D no sangue determina a compatibilidade em transfusões. São detalhados os genótipos do sistema (com dominância do alelo D sobre o d), a classificação do sangue AB positivo como receptor universal e do O negativo como doador universal. Por fim, a aula explora a fisiopatologia da eritroblastose fetal, destacando o processo de sensibilização de mães Rh- por fetos Rh+, além das condutas médicas de prevenção e tratamento.
+
+
+00:00
+O Fator Rh e sua Genética
+O fator Rh é determinado pela presença ou ausência da proteína D na superfície das hemácias, definindo o sangue como positivo ou negativo. Essa característica é controlada pelo gene D, onde o alelo dominante D determina a produção da proteína (genótipos DD e Dd) e o alelo recessivo d determina a sua ausência (genótipo dd).
+
+
+02:00
+Compatibilidade Sanguínea e Transfusão
+A transfusão inadequada de sangue Rh positivo para um receptor com sangue Rh negativo gera sensibilização e produção de anticorpos anti-Rh, causando a aglutinação das hemácias. A partir dessas regras de compatibilidade, estabelece-se o sangue AB positivo como receptor universal e o O negativo como doador universal.
+
+
+08:00
+Eritroblastose Fetal e Fisiopatologia
+Também conhecida como doença hemolítica do recém-nascido, a eritroblastose fetal acontece quando uma mãe de sangue Rh negativo gera um feto de sangue Rh positivo. Por conta da incompatibilidade, o sistema imunológico materno produz anticorpos para atacar e destruir as hemácias do feto.
+
+
+12:00
+Mecanismo de Sensibilização Gestacional
+Em uma primeira gestação saudável de mãe não sensibilizada, não ocorre mistura de sangue entre mãe e filho graças à barreira placentária. Contudo, no momento do parto, o contato com o sangue do bebê sensibiliza a mãe, o que coloca em risco uma segunda gestação de feto Rh positivo, que sofrerá o ataque dos anticorpos maternos.
+
+
+16:00
+Prevenção e Tratamento
+A prevenção é realizada aplicando anticorpos anti-Rh na mãe logo após o parto para destruir as hemácias do bebê antes que o sistema imune materno as reconheça. Para o recém-nascido afetado, o tratamento principal é a transfusão de sangue Rh negativo, que não é atacado pelos anticorpos residuais da mãe.Esta aula aborda os mecanismos das heranças genéticas sexuais, diferenciando cromossomos autossômicos de sexuais (X e Y). O professor explica as diferenças entre as regiões homólogas e não homólogas desses cromossomos, detalhando os padrões de herança restrita ao sexo (holândrica) e de herança ligada ao sexo (recessiva e dominante, ilustradas por daltonismo e raquitismo hipofosfatêmico). Por fim, o conteúdo ensina a analisar heredogramas e a calcular probabilidades genéticas específicas para cromossomos sexuais, demonstrando que não é necessário multiplicar o resultado pela metade para definir o sexo do descendente.
+
+
+00:00
+Introdução e Cromossomos Sexuais
+A aula inicia com uma revisão sobre os 46 cromossomos humanos, destacando a diferença entre os 44 autossômicos e os 2 sexuais (X e Y). É explicado que os cromossomos X e Y não são totalmente homólogos devido à diferença de tamanho e quantidade de genes.
+
+
+02:00
+Regiões Homólogas e Pseudo-autossômicas
+A região correspondente entre X e Y caracteriza a herança pseudo-autossômica, exemplificada pela xerodermia pigmentar. Já as regiões não homólogas contêm genes exclusivos cujo padrão de herança depende de estarem no X ou no Y.
+
+
+04:00
+Herança Restrita ao Sexo
+A herança restrita ao sexo ou holândrica ocorre na região não homóloga do Y e afeta apenas homens, como na hipertricose auricular. O professor aproveita para diferenciar esse caso da herança mitocondrial, que é de transmissão puramente materna.
+
+
+08:00
+Herança Ligada ao Sexo Recessiva
+Ocorre em genes da região exclusiva do cromossomo X, tendo como exemplos clássicos a hemofilia e o daltonismo. Em heranças recessivas ligadas ao X, uma mãe afetada sempre transmitirá a característica para todos os seus filhos homens.
+
+
+12:00
+Herança Ligada ao Sexo Dominante
+Nesse padrão, exemplificado pelo raquitismo hipofosfatêmico, a presença de um único alelo dominante no cromossomo X manifesta a condição. No heredograma, pais afetados necessariamente passam a característica para todas as suas filhas.
+
+
+24:00
+Cálculos de Probabilidade e Resolução de Questões
+O professor resolve exercícios práticos, incluindo uma questão do ENEM, demonstrando como analisar heredogramas. Ele explica que no cálculo de probabilidade para heranças sexuais não se multiplica por meio para definir o gênero, pois os cromossomos sexuais já estão explícitos no cruzamento.Esta aula aborda a genética da herança influenciada pelo sexo e o conceito de cromatina sexual (corpúsculo de Barr). O professor explica como a calvície se manifesta de forma diferente em homens e mulheres devido à dominância e recessividade influenciadas pelo sexo. Em seguida, trata da inativação aleatória de um dos cromossomos X nas fêmeas como compensação de dose, gerando o mosaicismo celular e influenciando a expressão de doenças ligadas ao cromossomo X, como o daltonismo e a distrofia muscular de Duchenne, o que é ilustrado por meio de uma questão do Enem sobre gêmeas monozigóticas.
+
+
+00:00
+Herança Influenciada pelo Sexo e Calvície
+Explicação de como certas características genéticas se manifestam de formas diferentes em homens e mulheres devido à influência do sexo. O exemplo principal é a calvície, que possui comportamento dominante no sexo masculino e recessivo no feminino.
+
+
+02:00
+Cromatina Sexual e Corpúsculo de Barr
+Apresentação da descoberta científica da cromatina sexual, que corresponde a um dos cromossomos X altamente condensado na forma de heterocromatina inativa nas células femininas.
+
+
+04:00
+Compensação de Dose e Mosaicismo
+Discussão sobre a hipótese de compensação de dose para equilibrar os genes entre machos e fêmeas. A inativação aleatória do cromossomo X paterno ou materno gera um padrão de mosaicismo no corpo feminino.
+
+
+06:00
+Inativação do X e Doenças Ligadas ao Sexo
+Análise de como a inativação aleatória altera a expressão de características em mulheres heterozigotas para heranças recessivas ligadas ao cromossomo X, como o daltonismo.
+
+
+08:00
+Resolução de Exercício: Gêmeas e a Distrofia de Duchenne
+Resolução de uma questão do Enem sobre gêmeas idênticas em que apenas uma manifesta distrofia muscular, evidenciando que a inativação aleatória do X ocorreu após a divisão do conjunto de células em dois embriões.

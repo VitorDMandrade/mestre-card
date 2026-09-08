@@ -1,0 +1,211 @@
+A aula apresenta as principais características e propriedades bioquímicas da água, iniciando com a diferenciação anatômica entre compostos orgânicos e inorgânicos. O professor detalha a estrutura fortemente polar e a geometria angular da molécula de H2O, bem como as vitais interações intermoleculares através de ligações de hidrogênio. É evidenciada a importância da água para os seres vivos, ressaltando seus papéis como solvente universal, meio reacional e de transporte, e sua essencial função termorreguladora devido aos elevados calores específico e latentes (solidificação e vaporização). Por fim, aprofunda-se em propriedades físicas (coesão, adesão, capilaridade e tensão superficial) e na relação vital da proporção de água com a idade, a taxa metabólica dos tecidos e as dinâmicas de reações químicas (hidrólise e síntese por desidratação).
+
+
+00:00
+Compostos Orgânicos vs. Inorgânicos
+A aula diferencia compostos inorgânicos (água e sais minerais) dos orgânicos, que constituem as principais biomoléculas dos seres vivos. Destaca-se que, para ser considerado orgânico, um composto precisa possuir cadeias de átomos de carbono ligadas a hidrogênios.
+
+
+02:00
+Estrutura e Polaridade da Água
+A molécula de água possui geometria angular e é altamente polar, com a concentração de elétrons no oxigênio formando um polo negativo e os hidrogênios, polos positivos. Essa configuração polar determina que a água interaja facilmente com outras substâncias de mesma polaridade (hidrofílicas).
+
+
+06:00
+Ligações Intermoleculares
+As moléculas de água se atraem por meio de ligações, ou pontes, de hidrogênio. Essa forte interação entre o polo positivo de uma dada molécula e o polo negativo de outra é o que garante as singulares propriedades características e vitais da água.
+
+
+08:00
+Solvente e Meio de Transporte
+Devido à sua polaridade molecular, a água é conhecida como o solvente universal metabólico. Ela facilita imensamente a ocorrência de reações químicas e atua como veículo de transporte para compostos diversos na natureza e no nosso corpo, como em sangues e seivas de plantas.
+
+
+12:00
+Regulação Térmica
+Com um elevado calor específico, a água é resistente a bruscas variações de temperatura, ajudando a manter a temperatura corporal estável. Complementarmente, seus altos calores latentes impedem tanto o congelamento súbito do citoplasma, que pode ser letal à célula, quanto a evaporação descontrolada.
+
+
+20:00
+Eliminação e Lubrificação
+Além de transporte e estabilização térmica, a água tem um papel excretor notável na composição da urina e reabsorção fecal. Atua fundamentalmente como agente de lubrificação protetora nos fluidos lacrimais, sinovial de articulações articulantes e o líquor neural.
+
+
+22:00
+Coesão, Adesão e Capilaridade
+A coesão une as moléculas de água entre si em uma forte atração contínua, enquanto a adesão permite que essas interajam e adiram a superfícies ricas em polares, como papéis e paredes de vasos. Juntas, viabilizam a capilaridade: a natural tendência que líquidos como água possuem de escalar superfícies estreitadas e verticais de forma espontânea.
+
+
+28:00
+Tensão Superficial
+Moléculas de água mais rentes à superfície do líquido sofrem intensa atração unilateral interior direcionada para o núcleo do recipiente, o que as aproxima coesivamente gerando uma cama ou película retenciosa sobre a água chamada tensão superficial, comumente demonstrada em manobras insetívoras e superfícies alagadas.
+
+
+32:00
+Metabolismo e Reações Químicas
+No organismo, o percentual aquoso diminui proporcionalmente com o envelhecimento natural do indivíduo e é sempre maior nas áreas corporais que exigem de altíssimo custo e atividade metabólica, como os tecidos neurais centrais. Bioquimicamente a molécula compõe papéis vitais sendo reagente catabólico ativo para a 'hidrólise' de substâncias ou formada na posição de produto em instâncias de uniões ditas por 'síntese por desidratação'.A aula aborda as funções e a importância biológica de diversos sais minerais fundamentais para o funcionamento dos organismos. O professor detalha as atuações do sódio e do potássio na condução de impulsos nervosos e no equilíbrio osmótico, além de explicar o papel estrutural, coagulante e contrátil do cálcio, destacando sua rigorosa regulação hormonal. Em seguida, explora-se a relevância celular do fósforo na composição de ácidos nucleicos e membranas, o papel do ferro no transporte de gases respiratórios, a ação do cloro na digestão e o impacto do iodo no metabolismo tireoidiano. Por fim, a aula correlaciona o magnésio à fotossíntese e elenca brevemente minerais secundários, como zinco, cobalto e nitrogênio, que atuam na imunidade, formação genética e como cofatores enzimáticos.
+
+
+00:00
+Sódio e Potássio
+Ambos são vitais para o equilíbrio osmótico e para a condução dos impulsos nervosos por meio da bomba de sódio e potássio. O sódio (íon extracelular) está fortemente ligado à regulação da pressão arterial, enquanto o potássio (íon intracelular) também atua no transporte de carboidratos e na abertura dos estômatos nas plantas.
+
+
+04:00
+Cálcio e Regulação Hormonal
+Mineral com função prioritária na estruturação de ossos e dentes, atuando de forma indispensável na contração muscular e na cascata de coagulação sanguínea. Seus níveis de depósito e retirada nos ossos são estritamente controlados por hormônios como a calcitonina e o paratormônio, com auxílio da vitamina D.
+
+
+10:00
+Fósforo e a Estrutura Celular
+Classificado como um dos minerais mais importantes do corpo, o fósforo compõe estruturas primárias da vida celular. Ele é a base do material genético (DNA e RNA), da principal molécula de energia orgânica (ATP) e dos fosfolipídios que formam a membrana plasmática.
+
+
+12:00
+Ferro e Transporte de Gases
+Encontrado em íons orgânicos, o ferro forma os agrupamentos das proteínas hemoglobina e mioglobina, sendo responsável pelo transporte de oxigênio e gás carbônico pelo corpo e nos músculos. A absorção do íon correto (Ferro 2+) no intestino é potencializada pela vitamina C.
+
+
+16:00
+Cloro e Iodo no Metabolismo
+O cloro tem funções associadas ao controle osmótico e compõe o ácido clorídrico estomacal, vital para a digestão. Já o iodo é a principal matéria-prima dos hormônios tireoidianos (T3 e T4), os quais são responsáveis por regular a velocidade geral do metabolismo do corpo a depender de suas concentrações.
+
+
+18:00
+Magnésio e Sais Complementares
+O magnésio atua como o núcleo da molécula de clorofila, comportando-se na fotossíntese de forma análoga ao ferro na respiração humana. A aula encerra listando rapidamente minerais como zinco, nitrogênio e cobalto, essenciais para a defesa imunológica, síntese proteica e ações de cofatores enzimáticos.Os carboidratos, também conhecidos como açúcares ou glicídios, são compostos orgânicos essenciais que desempenham funções vitais de fornecimento e armazenamento de energia, além de formarem estruturas celulares fundamentais em diversos seres vivos. A aula aborda a composição química desses compostos, que pode incluir até seis tipos de átomos, e aprofunda o estudo das funções energéticas e estruturais. O conteúdo classifica os carboidratos em monossacarídeos, oligossacarídeos e polissacarídeos, ilustrando-os com exemplos práticos como a glicose, as pentoses do material genético, a celulose, o amido e o glicogênio. Por fim, o professor detalha o mecanismo de união molecular entre os açúcares simples, conhecida como ligação glicosídica, que ocorre por meio de uma reação de desidratação.
+
+
+00:00
+Introdução e Funções Iniciais
+Uma visão geral sobre os carboidratos, compostos orgânicos fundamentais. É destacada a função estrutural inicial, como a formação do glicocálix para o reconhecimento celular e a presença essencial de pentoses na composição dos nucleotídeos de DNA e RNA.
+
+
+02:00
+Composição Química e Metabolismo Energético
+Os carboidratos podem conter nitrogênio, fósforo e enxofre, não apenas carbono e hidrogênio. O foco volta-se para a glicose, vital para a respiração celular, e para a frutose, que atua como fornecedora principal de energia para a mobilidade dos espermatozoides.
+
+
+06:00
+Carboidratos de Reserva e Estruturais
+Aborda os polissacarídeos de reserva, como o glicogênio (em animais e fungos) e o amido (em plantas e algas). Em seguida, detalha a celulose celulose nas paredes vegetais e a quitina nos fungos e exoesqueletos de artrópodes.
+
+
+10:00
+Classificação: Monossacarídeos
+Inicia a classificação das moléculas simples, destacando as pentoses (ribose e desoxirribose). Também detalha as hexoses essenciais (glicose, frutose e galactose), explicando que são isômeros com a mesma fórmula, porém com arranjos diferentes.
+
+
+14:00
+Polissacarídeos e Oligossacarídeos
+Apresenta os polímeros formados por monômeros e lista oligossacarídeos (dissacarídeos) famosos como a maltose, a sacarose e a lactose. O professor elucida o que ocorre na intolerância à lactose devido à falta da enzima lactase.
+
+
+18:00
+A Ligação Glicosídica
+Explica o mecanismo de união química entre monossacarídeos. A ligação ocorre mediante uma reação de desidratação, onde os carboidratos perdem a hidroxila e o hidrogênio, liberando uma molécula de água e conectando-se através do oxigênio restante.A aula aborda detalhadamente as características e funções dos lipídios, moléculas orgânicas apolares e hidrofóbicas fundamentais pelo seu papel de reserva de energia e formação estrutural de membranas biológicas e hormônios. O professor explora diferentes categorias moleculares, incluindo reações para formação de glicerídeos, diferenças e formatos entre gorduras saturadas, insaturadas e trans, e detalha também composições como cerídeos, pigmentos carotenoides e fosfolipídios de comportamento anfifílico. Por fim, explora-se a dinâmica sanguínea e de densidade impulsionada pelas lipoproteínas de distribuição e limpeza (LDL e HDL, popularmente vistos como colesterol ruim e bom), alertando os estudantes para complicações cardíacas resultantes do excesso causador da aterosclerose e reforçando propriedades ricas de proteção térmica natural e encape isolante elétrico de sistemas neurais corporais.
+
+
+00:00
+Conceitos Iniciais e Funções Primárias
+Os lipídios são caracterizados como moléculas hidrofóbicas com repulsão a misturas compostas por água. Funcionam no papel orgânico primordial como armazenamento extenso de estoques com alta reserva de energia corporais, como os triglicerídeos nas camadas profundas dermatológicas, além de atuar compondo estruturas chaves envoltórias como nos fosfolipídios.
+
+
+02:00
+Glicerídeos, Colesterol e Síntese de Interações
+Ainda no viés estrutural vital para células animais, o colesterol demonstra aplicações originando compostos biliares e hormônios massivos associados como a testosterona. Na sequência aprofunda-se a síntese dos glicerídeos montados atrelados à uniões moleculares de hidrocarbonetos e hidroxilas com consequente perda formal de moléculas hídricas gerando gorduras.
+
+
+06:00
+Tipos Carbônicos: Gordura Saturada, Insaturada e Trans
+Cadeias saturadas originam arranjos aglomerantes firmes promovendo sólidos gordurosos naturais como manteigas, sendo oponíveis visualmente a cadeias esparsadas ricas com insaturações moleculares formadoras de volumes em óleo líquido. Introduz-se processos trans para rompimento de matrizes forçando artifícios hidrogenados solidificantes presentes intensamente em margarinas.
+
+
+10:00
+Diferenciações e Tipagem Prática Visuais Cis Emuladas
+Abordam-se regras das posições e desvios nas pontes entre moléculas hidrogênicas revelando configurações espaciais tipo cis com distorções tortuosas similares a matrizes fluidas. O paralelismo com as composições trans explica os efeitos diretos onde arranjos químicos modificados simulam linearidade estrutural permitindo cópias duras imitando composições naturalmente aglutinadas.
+
+
+12:00
+Esteroides, Cerídeos Isolantes e Carotenoides
+Outros grupos amplos descrevem os esteroides abrigando qualquer derivado proveniente do colesterol, seguindo das propriedades dos cerídeos formadores primários de bloqueios que salvaguardam contra desidratações drásticas foliares vegetais ou proteções animais como revestimento na cera auricular. Detalham-se a existência dos vibrantes pigmentos carotenoides geradores emitentes lumínicos das tonalidades orgânicas.
+
+
+16:00
+Moléculas Anfifílicas e Transporte das Lipoproteínas
+Explorado caráter bivalente dos fosfolipídios portando seções solúveis hídricas atraídas combinadas com repulsivas caudas oleosas vitais na criação dos polos membranares. Sequencialmente demonstra-se operações transportadoras das proteínas LDL e HDL avaliadas de acordo com as presenças proporcionadas de composições hídricas e volumetrias menos densas adiposas nas entregas teciduais fisiológicas em excesso problemático ou descarte varrente hepático defensivo.
+
+
+24:00
+Complicações Obstrutivas e Isolamentos Adicionais
+Riscos médicos severos concentram-se no adoecimento por aterosclerose a partir do engavetamento grave em excesso das massas densas do colesterol atrelado LDL promovendo fechamentos arteriais bloqueadores perigosos do coração e encerra o conteúdo assinalando bônus vantajosos de revestimentos para controle térmicos vitais nas existências de embriões humanos somados a eficiências neurológicas dos nervos envolvidos com defesas condutoras das bainhas e impulsos elétricos de rápida mielina.A aula oferece um panorama completo sobre as vitaminas, substâncias orgânicas reguladoras essenciais para o metabolismo e funcionamento do corpo humano. O professor inicia desmistificando o termo 'vitamina', explica a diferença fundamental na absorção e armazenamento entre as vitaminas lipossolúveis (A, D, E, K) e hidrossolúveis (complexo B e C), e detalha cada uma delas. Para cada vitamina, são apresentadas suas principais funções biológicas — desde a manutenção da visão, coagulação sanguínea, construção óssea, até a síntese de DNA e metabolismo energético —, além das respectivas fontes de obtenção e os impactos gerados por suas deficiências (como cegueira noturna, raquitismo, escorbuto e variados tipos de anemias).
+
+
+00:00
+Introdução e Classificação
+Definição de vitaminas como substâncias reguladoras obtidas sobretudo pela alimentação. Apresenta a divisão entre lipossolúveis (A, D, E, K), que se acumulam no tecido adiposo, e hidrossolúveis (Complexo B, C), que requerem reposição diária.
+
+
+08:00
+Vitamina A (Retinol)
+Essencial para a formação da rodopsina, pigmento que permite a visão noturna. Possui forte ação antioxidante, fortalecendo imunidade e saúde da pele, e sua ausência pode causar cegueira noturna (nictalopia) e ressecamento ocular (xeroftalmia).
+
+
+16:00
+Vitamina D (Calciferol)
+Responsável por promover a absorção e a reabsorção de cálcio para a construção da matriz óssea. Formada a partir do colesterol com auxílio da luz solar, sua deficiência resulta em raquitismo na infância e osteomalácia em adultos.
+
+
+24:00
+Vitaminas E (Tocoferol) e K (Quinona)
+A vitamina E age como poderoso antioxidante biológico, protegendo membranas contra radicais livres e prevenindo a destruição de hemácias. A vitamina K atua diretamente no fígado auxiliando a síntese de proteínas de coagulação que impedem hemorragias.
+
+
+28:00
+Cobalamina (B12) e Ácido Fólico (B9)
+Vitaminas vitais para a síntese do material genético e multiplicação celular na medula óssea. Carências provocam quadros severos como anemia perniciosa e megaloblástica, além de malformações neurológicas em embriões.
+
+
+38:00
+Metabolismo Energético (Outras do Complexo B)
+Vitaminas como B1, B2, B3, B5 e B6 atuam como coenzimas durante a respiração celular. A ausência delas prejudica as reações de obtenção de energia, causando inflamações dos nervos e pele (beribéri, pelagra), e fadiga acentuada.
+
+
+48:00
+Vitamina C (Ácido Ascórbico)
+Sua principal função é a síntese do colágeno e a redução do ferro alimentar, tornando-o biologicamente ativo para absorção. A deficiência crônica causa o escorbuto (sangramentos profundos nas gengivas) e facilita quadros de anemia ferropriva.A biologia das proteínas e enzimas abrange desde a composição estrutural básica por aminoácidos até as intrincadas dobras tridimensionais que definem funções orgânicas indispensáveis, como a estruturação física, o transporte celular, a defesa imunológica e a regulação hormonal. As enzimas, sendo proteínas de função catalisadora, desempenham o papel vital de acelerar essas e outras reações biológicas ao diminuírem a energia de ativação, mas dependem fundamentalmente de condições ambientais ideais de temperatura e pH para não sofrerem desnaturação anatômica e não perderem sua conexão com os substratos reagentes.
+
+
+00:00
+Composição e natureza das proteínas
+As proteínas são grandes polímeros orgânicos formados pela união sucessiva de monômeros chamados aminoácidos, englobando elementos como carbono, oxigênio, nitrogênio e enxofre em sua matriz. O dobramento individual de cada molécula forma arranjos tridimensionais únicos que ditam diretamente suas funções exclusivas no organismo.
+
+
+04:00
+Funções biológicas das proteínas
+Desempenham múltiplos propósitos sistêmicos, desde suporte estrutural anatômico com o colágeno até as operações contráteis comandadas por actina e miosina musculares. Também executam o transporte seletivo de substâncias por meio de canais iônicos, defendem o corpo por intermédio de anticorpos e integram sinalizações usando hormônios proteicos, servindo como fonte de energia estritamente em último recurso emergencial.
+
+
+22:00
+Ação molecular das enzimas
+As enzimas atuam como catalisadores fisiológicos essenciais, antecipando e facilitando consideravelmente as reações químicas no corpo ao abaixar o patamar da energia de ativação necessária. Elas contam com alta especificidade, interagindo quimicamente através de componentes receptores limitados apenas aos seus substratos reativos competentes.
+
+
+30:00
+Sítio ativo e teorias de acoplamento
+O encaixe exato do reagente biológico acontece no chamado sítio ativo da enzima, cujos modelos explicativos são baseados na teoria morfológica de chave e fechadura ou pela interpretação contemporânea de encaixe induzido. Essa adesão orienta os choques moleculares para a produção máxima e direcionada de substâncias úteis.
+
+
+38:00
+Influência de condições perimétricas
+O alto frescor enzimático dita que os catalisadores exigem faixas bem calibradas de temperatura, pH e salinidade específicos para prosperar. Se o limite desses e de fatores como hidratação ou compostos por metais pesados forem severamente desregulados, a organização proteica sofre a nociva deformação da desnaturação biológica.
+
+
+54:00
+Limites de saturação e inibição das enzimas
+Uma vez que o acúmulo de reagentes preenche todos os sítios ativos simultaneamente, a velocidade de reação atinge um teto estabilizado conhecido como limiar de saturação. Agentes farmacológicos ou toxinas venenosas podem agir como inibidores reversíveis ou irreversíveis, suplantando os espaços químicos das proteínas e paralisando atividades metabólicas.
+
+
+01:04:00
+Ligações estruturais em escala proteica
+As proteínas adquirem porte unindo fisicamente diferentes aminoácidos através de elos peptídicos dependentes de desidratação aquosa. Esse processo molda níveis complexos lineares subjacentes em formatos robustos tridimensionais primários, que evoluem aglomerados para a capacidade quaternária superior unicamente em prol do suporte biológico completo.
