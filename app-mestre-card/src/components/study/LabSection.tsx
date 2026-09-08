@@ -883,18 +883,18 @@ export const LabSection = ({
           <div className="relative p-5 rounded-2xl bg-slate-950/85 border border-red-500/30 backdrop-blur-md">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-red-500/60 shadow-[0_0_20px_rgba(239,68,68,0.4)] relative flex-shrink-0 bg-slate-900">
+                <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-red-500/60 shadow-[0_0_20px_rgba(239,68,68,0.4)] relative flex-shrink-0 bg-slate-900 flex items-center justify-center">
+                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-red-950 via-slate-900 to-slate-950 text-red-400 font-bold text-2xl select-none">
+                    {combat.selectedIdentity.id === 'einstein' ? '🩺' : combat.selectedIdentity.id === 'enem' ? '🌐' : combat.selectedIdentity.id === 'unesp' ? '🏛️' : '⚖️'}
+                  </div>
                   <img
                     src={combat.selectedIdentity.avatarUrl}
                     alt={combat.selectedIdentity.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover relative z-10 transition-opacity duration-300"
                     onError={(e) => {
-                      (e.target as HTMLElement).style.display = 'none';
+                      (e.target as HTMLElement).style.opacity = '0';
                     }}
                   />
-                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-red-950 to-slate-950 text-red-400 font-bold -z-10 text-2xl">
-                    ⚖️
-                  </div>
                 </div>
 
                 <div>

@@ -4,9 +4,9 @@ dist/
 dist-ssr/
 *.log
 
-# Raw exam archives (large PDF binaries > 100MB rejected by GitHub)
-Provas Oficiais e Exercícios/
-*.pdf
+# Bloqueio obrigatório do GitHub (arquivos > 100MB são rejeitados pelo servidor do GitHub)
+# Este arquivo específico tem 103.67 MB:
+**/Questoes - Material Unico (1)_260907_084405.pdf
 
 # Editor & OS
 .DS_Store
