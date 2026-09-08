@@ -454,7 +454,7 @@ export const StructureSection: React.FC<StructureSectionProps> = ({
         <div 
           className={`relative rounded-3xl bg-slate-950/95 border border-cyan-500/40 p-6 md:p-8 backdrop-blur-2xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)] space-y-7 ${shakeScreen ? 'screen-shake-short' : ''}`}
           style={{
-            backgroundImage: 'radial-gradient(ellipse at 50% 10%, rgba(0, 245, 255, 0.12), transparent 75%), radial-gradient(circle at 80% 80%, rgba(255, 184, 0, 0.05), transparent 60%), url(/reactor/reactor_bg.jpg)',
+            backgroundImage: 'radial-gradient(ellipse at 50% 10%, rgba(0, 245, 255, 0.12), transparent 75%), radial-gradient(circle at 80% 80%, rgba(255, 184, 0, 0.05), transparent 60%), url(\'./reactor/reactor_bg.jpg\')',
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }}

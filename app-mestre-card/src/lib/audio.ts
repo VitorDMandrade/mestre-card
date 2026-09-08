@@ -891,9 +891,15 @@ export function startBossBattleMusic(enabled = true): void {
   if (!enabled) return;
   try {
     if (!bossBattleAudio) {
-      bossBattleAudio = new Audio('/audio/boss_battle_theme.mp3');
+      bossBattleAudio = new Audio('./audio/boss_battle_theme.mp3');
       bossBattleAudio.loop = true;
       bossBattleAudio.volume = 0.18;
+      bossBattleAudio.onerror = () => {
+        if (bossBattleAudio && !bossBattleAudio.src.includes('/assets/audio/')) {
+          bossBattleAudio.src = './assets/audio/boss_battle_theme.mp3';
+          bossBattleAudio.play().catch(() => {});
+        }
+      };
     }
     bossBattleAudio.currentTime = 0;
     const playPromise = bossBattleAudio.play();
@@ -929,8 +935,18 @@ export function playBossVictoryFanfareAudio(enabled = true): void {
   try {
     stopBossBattleMusic();
     if (!bossVictoryAudio) {
-      bossVictoryAudio = new Audio('/audio/boss_victory_fanfare.mp3');
+      bossVictoryAudio = new Audio('./audio/boss_victory_fanfare.mp3');
       bossVictoryAudio.volume = 0.35;
+      bossVictoryAudio.onerror = () => {
+        if (bossVictoryAudio && !bossVictoryAudio.src.includes('/assets/audio/')) {
+          bossVictoryAudio.src = './assets/audio/boss_victory_fanfare.mp3';
+          bossVictoryAudio.play().catch(() => {
+            playBossDefeatedFanfare(enabled);
+          });
+        } else {
+          playBossDefeatedFanfare(enabled);
+        }
+      };
     }
     bossVictoryAudio.currentTime = 0;
     const playPromise = bossVictoryAudio.play();

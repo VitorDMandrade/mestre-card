@@ -831,7 +831,7 @@ export const LabSection = ({
             combat.isPhaseTransition ? 'phase-transition-flash' : ''
           }`}
           style={{
-            backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.94), rgba(2, 6, 23, 0.97)), url('/assets/boss/arena_bg.jpg')`,
+            backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.94), rgba(2, 6, 23, 0.97)), url('./assets/boss/arena_bg.jpg')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }}
@@ -983,7 +983,7 @@ export const LabSection = ({
                   title="Elimina 1 alternativa falsa (distrator) do tabuleiro"
                 >
                   <img 
-                    src="/assets/boss/shield_icon.jpg" 
+                    src="./assets/boss/shield_icon.jpg" 
                     alt="Escudo" 
                     className="w-4 h-4 rounded-xs object-cover"
                     onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }} 

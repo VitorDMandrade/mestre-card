@@ -22,7 +22,7 @@ export const BOSS_IDENTITIES: Record<string, BossIdentity> = {
     name: 'Auditoria Médica Albert Einstein',
     title: 'Comissão Avaliadora de Medicina de Precisão',
     badge: 'MEDICINA EINSTEIN',
-    avatarUrl: '/assets/boss/einstein_crest.jpg',
+    avatarUrl: './assets/boss/einstein_crest.jpg',
     taunts: [
       '“Diagnóstico causal incorreto. O rigor fisiológico não admite aproximações levianas.”',
       '“Você confundiu a via metabólica primária. Anulação clínica imediata!”',
@@ -35,7 +35,7 @@ export const BOSS_IDENTITIES: Record<string, BossIdentity> = {
     name: 'Examinador Central do ENEM',
     title: 'Matriz de Referência e Habilidades Inep',
     badge: 'EXAME NACIONAL DO ENSINO MÉDIO',
-    avatarUrl: '/assets/boss/enem_crest.jpg',
+    avatarUrl: './assets/boss/enem_crest.jpg',
     taunts: [
       '“Você caiu no distrator contextual mais manjado da prova.”',
       '“Falta de domínio da competência de ciências da natureza. A TRI reduzirá sua pontuação!”',
@@ -48,7 +48,7 @@ export const BOSS_IDENTITIES: Record<string, BossIdentity> = {
     name: 'Tribunal Clássico UNESP',
     title: 'Conselho Examinador Fundação Vunesp',
     badge: 'VESTIBULAR UNESP',
-    avatarUrl: '/assets/boss/unesp_crest.jpg',
+    avatarUrl: './assets/boss/unesp_crest.jpg',
     taunts: [
       '“A dedução analítica falhou na premissa intermediária. Sem pontos na 2ª fase!”',
       '“Inversão clássica de causa e consequência. O gabarito oficial é inflexível.”',
@@ -61,7 +61,7 @@ export const BOSS_IDENTITIES: Record<string, BossIdentity> = {
     name: 'O Examinador Implacável',
     title: 'Juiz Supremo do Gabarito e Auditoria Epistêmica',
     badge: 'BANCA EXAMINADORA',
-    avatarUrl: '/assets/boss/examiner_avatar.jpg',
+    avatarUrl: './assets/boss/examiner_avatar.jpg',
     taunts: [
       '“Sofisma primário detectado. Sua resposta carece de sustentação mecânica.”',
       '“Contra-ataque deferido. O tribunal indefere seu argumento!”',
