@@ -434,20 +434,39 @@ export function updateConstellationPhysics(graph: ConstellationGraph, dt: number
   }
 }
 
-/** Detecta o nó sob a coordenada do mouse (Screen to World) */
+/** Detecta o nó sob a coordenada do mouse/toque (Screen to World) com calibração milimétrica */
 export function findNodeAtPosition(
   nodes: ConstellationNode[],
   worldX: number,
   worldY: number,
   zoom: number
 ): ConstellationNode | null {
-  const sorted = [...nodes].sort((a, b) => b.z - a.z);
+  // Ordena prioritariamente por profundidade Z, depois por nós ativos/maiores
+  const sorted = [...nodes].sort((a, b) => b.z - a.z || b.radius - a.radius);
 
   for (const node of sorted) {
-    const hitRadius = Math.max(node.radius, 16 / zoom);
+    // Raio calibrado milimetricamente para cliques de mouse e toques touch em mobile/tablet
+    const hitRadius = Math.max(node.radius + 16, 32 / zoom);
     const dx = worldX - node.x;
     const dy = worldY - node.y;
+
+    // 1. Acerto direto no corpo circular do nó (com padding de facilitação em 360°)
     if (dx * dx + dy * dy <= hitRadius * hitRadius) {
+      return node;
+    }
+
+    // 2. Acerto na aura superior / topo do nó (para quem posiciona o mouse logo acima do ícone)
+    const topPadding = Math.max(16, 24 / zoom);
+    if (Math.abs(dx) <= hitRadius && worldY >= node.y - node.radius - topPadding && worldY <= node.y) {
+      return node;
+    }
+
+    // 3. Acerto no rótulo de texto posicionado abaixo do nó
+    // O texto fica logo abaixo do nó (+5px) e se estende verticalmente
+    const labelHalfWidth = Math.max(node.radius + 45, 65 / zoom);
+    const labelTop = node.y + node.radius - 8; // leve sobreposição para não ter ponto cego
+    const labelBottom = node.y + node.radius + (38 / zoom);
+    if (Math.abs(dx) <= labelHalfWidth && worldY >= labelTop && worldY <= labelBottom) {
       return node;
     }
   }

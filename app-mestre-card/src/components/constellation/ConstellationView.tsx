@@ -53,10 +53,14 @@ export const ConstellationView: React.FC<ConstellationViewProps> = ({
   const [soundFx, setSoundFx] = useState(true);
   const [droneVolume, setDroneVolume] = useState(0.35);
 
-  // Dragging State
+  // Dragging & Touch Gestures State
+  const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(null);
   const isDraggingRef = useRef(false);
   const dragStartRef = useRef({ x: 0, y: 0 });
   const cameraStartRef = useRef({ x: 0, y: 0 });
+  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
+  const initialPinchDistRef = useRef<number | null>(null);
+  const initialZoomRef = useRef<number>(camera.zoom);
 
   // Graph Data
   const graphRef = useRef<ConstellationGraph>(buildConstellationGraph(cards, ACERVO_CATALOG, activeCardId));
@@ -414,29 +418,39 @@ export const ConstellationView: React.FC<ConstellationViewProps> = ({
     return () => cancelAnimationFrame(animId);
   }, [highlightedNodeIds, searchMatchedIds, selectedNode, filterType]);
 
-  // Resize Canvas
+  // Resize Canvas milimetricamente sincronizado com o bounding rect do DOM
   useEffect(() => {
     const handleResize = () => {
       const canvas = canvasRef.current;
       if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
-      canvas.width = window.innerWidth * dpr;
-      canvas.height = window.innerHeight * dpr;
+      const targetW = Math.round((rect.width || window.innerWidth) * dpr);
+      const targetH = Math.round((rect.height || window.innerHeight) * dpr);
+      if (canvas.width !== targetW || canvas.height !== targetH) {
+        canvas.width = targetW;
+        canvas.height = targetH;
+      }
     };
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Mouse to World coordinates
+  // Coordenadas Mouse/Touch para o Espaço Mundial Cósmico (Calibração Milimétrica)
   const screenToWorld = useCallback(
-    (screenX: number, screenY: number) => {
+    (clientX: number, clientY: number) => {
       const canvas = canvasRef.current;
       if (!canvas) return { x: 0, y: 0 };
+      const rect = canvas.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
       const width = canvas.width / dpr;
       const height = canvas.height / dpr;
       const { x: camX, y: camY, zoom } = cameraRef.current;
+
+      // Compensação exata de offset e resolução visual CSS
+      const screenX = (clientX - rect.left) * (width / (rect.width || 1));
+      const screenY = (clientY - rect.top) * (height / (rect.height || 1));
 
       const worldX = (screenX - width / 2) / zoom - camX;
       const worldY = (screenY - height / 2) / zoom - camY;
@@ -444,6 +458,24 @@ export const ConstellationView: React.FC<ConstellationViewProps> = ({
     },
     []
   );
+
+  // Wheel listener não-passivo anexado diretamente ao elemento canvas
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const handleWheelNative = (e: WheelEvent) => {
+      e.preventDefault();
+      const zoomFactor = e.deltaY < 0 ? 1.15 : 0.87;
+      setCamera(prev => ({
+        ...prev,
+        zoom: Math.max(0.25, Math.min(3.2, prev.zoom * zoomFactor))
+      }));
+    };
+
+    canvas.addEventListener('wheel', handleWheelNative, { passive: false });
+    return () => canvas.removeEventListener('wheel', handleWheelNative);
+  }, []);
 
   // Mouse Handlers
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -454,6 +486,8 @@ export const ConstellationView: React.FC<ConstellationViewProps> = ({
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
+    setMousePos({ x: e.clientX, y: e.clientY });
+
     if (isDraggingRef.current) {
       const dx = (e.clientX - dragStartRef.current.x) / camera.zoom;
       const dy = (e.clientY - dragStartRef.current.y) / camera.zoom;
@@ -465,7 +499,7 @@ export const ConstellationView: React.FC<ConstellationViewProps> = ({
       return;
     }
 
-    // Hover Detection
+    // Hover Detection Calibrado
     const { x: wx, y: wy } = screenToWorld(e.clientX, e.clientY);
     const node = findNodeAtPosition(graphRef.current.nodes, wx, wy, camera.zoom);
 
@@ -484,8 +518,8 @@ export const ConstellationView: React.FC<ConstellationViewProps> = ({
     );
     isDraggingRef.current = false;
 
-    // Se foi apenas um clique (não arraste)
-    if (wasDraggingDistance < 6) {
+    // Se foi clique direto no nó (tolerância de até 8px de micro-movimento)
+    if (wasDraggingDistance < 8) {
       const { x: wx, y: wy } = screenToWorld(e.clientX, e.clientY);
       const clicked = findNodeAtPosition(graphRef.current.nodes, wx, wy, camera.zoom);
       setSelectedNode(clicked);
@@ -495,11 +529,86 @@ export const ConstellationView: React.FC<ConstellationViewProps> = ({
     }
   };
 
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    const zoomFactor = e.deltaY < 0 ? 1.15 : 0.87;
-    const newZoom = Math.max(0.25, Math.min(3.2, camera.zoom * zoomFactor));
-    setCamera({ ...camera, zoom: newZoom });
+  const handleMouseLeave = () => {
+    setHoveredNode(null);
+    setMousePos(null);
+    isDraggingRef.current = false;
+  };
+
+  // Touch Handlers para Tablet e Celular (Pan 1 Dedo, Pinch-to-Zoom 2 Dedos, Tap Seleção)
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      const t = e.touches[0];
+      isDraggingRef.current = true;
+      touchStartRef.current = { x: t.clientX, y: t.clientY, time: Date.now() };
+      dragStartRef.current = { x: t.clientX, y: t.clientY };
+      cameraStartRef.current = { x: camera.x, y: camera.y };
+    } else if (e.touches.length === 2) {
+      // Início de Pinch Zoom
+      isDraggingRef.current = false;
+      const t1 = e.touches[0];
+      const t2 = e.touches[1];
+      initialPinchDistRef.current = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+      initialZoomRef.current = camera.zoom;
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 2 && initialPinchDistRef.current) {
+      // Execução de Pinch-to-Zoom
+      const t1 = e.touches[0];
+      const t2 = e.touches[1];
+      const currentDist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+      const pinchScale = currentDist / initialPinchDistRef.current;
+      const newZoom = Math.max(0.25, Math.min(3.2, initialZoomRef.current * pinchScale));
+      setCamera(prev => ({ ...prev, zoom: newZoom }));
+      return;
+    }
+
+    if (isDraggingRef.current && e.touches.length === 1) {
+      const t = e.touches[0];
+      const dx = (t.clientX - dragStartRef.current.x) / camera.zoom;
+      const dy = (t.clientY - dragStartRef.current.y) / camera.zoom;
+      setCamera({
+        ...camera,
+        x: cameraStartRef.current.x + dx,
+        y: cameraStartRef.current.y + dy
+      });
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (e.touches.length === 0) {
+      if (touchStartRef.current && isDraggingRef.current) {
+        const touchDuration = Date.now() - touchStartRef.current.time;
+        const moveDist = Math.hypot(
+          (e.changedTouches[0]?.clientX || dragStartRef.current.x) - touchStartRef.current.x,
+          (e.changedTouches[0]?.clientY || dragStartRef.current.y) - touchStartRef.current.y
+        );
+
+        // Detecção de Toque Rápido no Nó (Tap Inteligente)
+        if (moveDist < 14 && touchDuration < 380) {
+          const tapX = e.changedTouches[0]?.clientX || touchStartRef.current.x;
+          const tapY = e.changedTouches[0]?.clientY || touchStartRef.current.y;
+          const { x: wx, y: wy } = screenToWorld(tapX, tapY);
+          const tappedNode = findNodeAtPosition(graphRef.current.nodes, wx, wy, camera.zoom);
+          setSelectedNode(tappedNode);
+          if (tappedNode && soundFx) {
+            playConstellationSelectSound(true);
+          }
+        }
+      }
+      isDraggingRef.current = false;
+      touchStartRef.current = null;
+      initialPinchDistRef.current = null;
+    } else if (e.touches.length === 1) {
+      // Se soltou um dedo no pinch, continua o arrasto com o dedo remanescente
+      const t = e.touches[0];
+      isDraggingRef.current = true;
+      dragStartRef.current = { x: t.clientX, y: t.clientY };
+      cameraStartRef.current = { x: camera.x, y: camera.y };
+      initialPinchDistRef.current = null;
+    }
   };
 
   // Zoom Controls
@@ -530,33 +639,69 @@ export const ConstellationView: React.FC<ConstellationViewProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-[#020306] overflow-hidden select-none font-sans text-white">
-      {/* 1. CANVAS PRINCIPAL */}
+      {/* 1. CANVAS PRINCIPAL ULTRA-CALIBRADO COM SUPORTE TOUCH */}
       <canvas
         ref={canvasRef}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
-        onWheel={handleWheel}
-        className="w-full h-full cursor-grab active:cursor-grabbing block"
+        onMouseLeave={handleMouseLeave}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        className={`w-full h-full block touch-none select-none ${
+          hoveredNode ? 'cursor-pointer' : isDraggingRef.current ? 'cursor-grabbing' : 'cursor-grab'
+        }`}
       />
 
-      {/* 2. HUD SUPERIOR TÁTICO */}
-      <div className="absolute top-0 left-0 right-0 p-4 pointer-events-none flex flex-col gap-3">
-        <div className="flex flex-wrap items-center justify-between gap-3 max-w-7xl mx-auto w-full pointer-events-auto">
+      {/* 2. BADGE TÁTICO FLUTUANTE DE HOVER (Feedback Imediato ao passar o mouse) */}
+      {hoveredNode && !selectedNode && mousePos && (
+        <div
+          className="pointer-events-none fixed z-40 px-3.5 py-2 rounded-xl glass-card border shadow-2xl backdrop-blur-xl flex items-center gap-2.5 transition-all duration-75 text-xs font-mono hidden sm:flex animate-in fade-in zoom-in-95 duration-100"
+          style={{
+            left: `${Math.min(window.innerWidth - 300, Math.max(16, mousePos.x + 16))}px`,
+            top: `${Math.min(window.innerHeight - 70, Math.max(16, mousePos.y + 16))}px`,
+            borderColor: `${hoveredNode.color}99`,
+            boxShadow: `0 0 25px ${hoveredNode.color}33`,
+            backgroundColor: 'rgba(5, 8, 15, 0.94)'
+          }}>
+          <span className="text-base">{hoveredNode.icon}</span>
+          <div className="flex flex-col min-w-0 max-w-[240px]">
+            <span className="text-white font-bold truncate text-[11px]">
+              {hoveredNode.label}
+            </span>
+            <span
+              className="text-[9px] font-extrabold uppercase tracking-widest"
+              style={{ color: hoveredNode.color }}>
+              {hoveredNode.type === 'card'
+                ? '⭐ CARD MESTRE • CLIQUE PARA INSPECIONAR'
+                : hoveredNode.type === 'banca'
+                ? '🏛️ BANCA DE ELITE • VER PROVAS'
+                : hoveredNode.type === 'acervo'
+                ? '📄 CADERNO OFICIAL • VER PDF'
+                : '🪐 NÚCLEO DISCIPLINAR'}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* 3. HUD SUPERIOR TÁTICO (Responsivo para Celular e Tablet) */}
+      <div className="absolute top-0 left-0 right-0 p-2.5 sm:p-4 pointer-events-none flex flex-col gap-2 sm:gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3 max-w-7xl mx-auto w-full pointer-events-auto">
           {/* Título & Botão Voltar */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={() => {
                 stopConstellationDrone();
                 onClose();
               }}
-              className="bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 hover:border-cyan-500 text-slate-300 hover:text-cyan-400 px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-2 shadow-lg backdrop-blur-md cursor-pointer"
+              className="bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 hover:border-cyan-500 text-slate-300 hover:text-cyan-400 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-1.5 sm:gap-2 shadow-lg backdrop-blur-md cursor-pointer"
               title="Voltar ao Centro de Comando (ESC)">
               <span>←</span>
-              <span>VOLTAR [ESC]</span>
+              <span>VOLTAR <span className="hidden sm:inline">[ESC]</span></span>
             </button>
 
-            <div className="glass-card px-4 py-2 rounded-xl border border-slate-800/80 backdrop-blur-md hidden sm:flex items-center gap-2.5">
+            <div className="glass-card px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl border border-slate-800/80 backdrop-blur-md hidden md:flex items-center gap-2.5">
               <span className="text-cyan-400 animate-pulse text-sm">🌌</span>
               <div>
                 <h1 className="text-xs font-mono font-extrabold tracking-widest text-white uppercase">
@@ -570,13 +715,13 @@ export const ConstellationView: React.FC<ConstellationViewProps> = ({
           </div>
 
           {/* Busca Supernova em Tempo Real */}
-          <div className="relative min-w-[220px] sm:min-w-[280px]">
+          <div className="relative flex-1 sm:flex-initial min-w-[170px] sm:min-w-[260px] max-w-xs">
             <input
               type="text"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              placeholder="Localizar nós na galáxia..."
-              className="w-full bg-slate-950/80 border border-slate-700/80 focus:border-cyan-400 rounded-xl px-3.5 py-2 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-cyan-400/50 backdrop-blur-md shadow-inner transition-all"
+              placeholder="Localizar nós..."
+              className="w-full bg-slate-950/80 border border-slate-700/80 focus:border-cyan-400 rounded-xl pl-3 pr-7 py-1.5 sm:py-2 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-cyan-400/50 backdrop-blur-md shadow-inner transition-all"
             />
             {searchQuery && (
               <button
@@ -588,17 +733,17 @@ export const ConstellationView: React.FC<ConstellationViewProps> = ({
           </div>
 
           {/* Controles de Áudio do Nexus (Drone & Efeitos) */}
-          <div className="flex items-center gap-2 bg-slate-950/80 border border-slate-800/80 px-3 py-1.5 rounded-xl backdrop-blur-md">
+          <div className="flex items-center gap-1.5 sm:gap-2 bg-slate-950/80 border border-slate-800/80 px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl backdrop-blur-md shrink-0">
             <button
               onClick={toggleDrone}
-              className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`px-2 sm:px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-mono font-bold transition-all flex items-center gap-1 cursor-pointer ${
                 isDroneOn
                   ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/60 shadow-[0_0_10px_rgba(0,245,255,0.3)]'
                   : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
               }`}
               title="Ligar/Desligar o Drone de Foco Tático (Trilha Espacial)">
               <span>{isDroneOn ? '🔊' : '🔈'}</span>
-              <span>DRONE</span>
+              <span className="hidden xs:inline">DRONE</span>
             </button>
 
             {isDroneOn && (
@@ -609,24 +754,24 @@ export const ConstellationView: React.FC<ConstellationViewProps> = ({
                 step="0.05"
                 value={droneVolume}
                 onChange={handleVolumeChange}
-                className="w-16 accent-cyan-400 cursor-pointer h-1 bg-slate-800 rounded"
+                className="w-12 sm:w-16 accent-cyan-400 cursor-pointer h-1 bg-slate-800 rounded"
                 title={`Volume: ${Math.round(droneVolume * 100)}%`}
               />
             )}
 
             <button
               onClick={() => setSoundFx(!soundFx)}
-              className={`px-2 py-1 rounded-lg text-xs font-mono transition-all cursor-pointer ${
+              className={`px-1.5 sm:px-2 py-1 rounded-lg text-[11px] sm:text-xs font-mono transition-all cursor-pointer ${
                 soundFx ? 'text-amber-300 hover:text-amber-200' : 'text-slate-600 hover:text-slate-400'
               }`}
               title="Efeitos Sonoros de Laser e Seleção">
-              {soundFx ? '🔔 SFX' : '🔕 SFX'}
+              {soundFx ? '🔔' : '🔕'}
             </button>
           </div>
         </div>
 
-        {/* Barra de Filtros de Camada */}
-        <div className="flex flex-wrap items-center justify-center gap-1.5 max-w-4xl mx-auto w-full pointer-events-auto">
+        {/* Barra de Filtros de Camada (Scroll Horizontal Suave em Mobile/Tablet) */}
+        <div className="flex items-center sm:justify-center gap-1.5 max-w-4xl mx-auto w-full pointer-events-auto overflow-x-auto no-scrollbar py-1 px-1 flex-nowrap sm:flex-wrap">
           {[
             { id: 'all', label: 'TODOS OS NÓS', icon: '🌌' },
             { id: 'card', label: 'MESTRECARDS', icon: '⭐' },
@@ -637,10 +782,10 @@ export const ConstellationView: React.FC<ConstellationViewProps> = ({
             <button
               key={f.id}
               onClick={() => setFilterType(f.id as any)}
-              className={`px-3 py-1.5 rounded-lg text-[11px] font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer backdrop-blur-md ${
+              className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-[11px] font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer backdrop-blur-md shrink-0 ${
                 filterType === f.id
                   ? 'bg-cyan-500/25 border border-cyan-400 text-cyan-300 shadow-[0_0_12px_rgba(0,245,255,0.25)]'
-                  : 'bg-slate-900/70 border border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-850'
+                  : 'bg-slate-900/80 border border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-850'
               }`}>
               <span>{f.icon}</span>
               <span>{f.label}</span>
@@ -649,50 +794,55 @@ export const ConstellationView: React.FC<ConstellationViewProps> = ({
         </div>
       </div>
 
-      {/* 3. CONTROLES FLUTUANTES DE NAVEGAÇÃO (Canto Inferior Esquerdo) */}
-      <div className="absolute bottom-5 left-5 z-20 flex flex-col gap-2">
-        <div className="glass-card p-1.5 rounded-2xl border border-slate-800/80 backdrop-blur-md flex flex-col gap-1 shadow-2xl">
+      {/* 4. CONTROLES FLUTUANTES DE NAVEGAÇÃO (Canto Inferior Esquerdo) */}
+      <div className={`absolute bottom-4 sm:bottom-5 left-3 sm:left-5 z-20 flex flex-col gap-2 transition-all ${
+        selectedNode ? 'hidden sm:flex' : 'flex'
+      }`}>
+        <div className="glass-card p-1 sm:p-1.5 rounded-2xl border border-slate-800/80 backdrop-blur-md flex flex-col gap-1 shadow-2xl">
           <button
             onClick={handleZoomIn}
-            className="w-10 h-10 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/60 text-slate-200 hover:text-cyan-300 flex items-center justify-center text-lg font-bold transition-all cursor-pointer"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/60 text-slate-200 hover:text-cyan-300 flex items-center justify-center text-lg font-bold transition-all cursor-pointer"
             title="Aproximar Visão (Zoom In)">
             +
           </button>
           <button
             onClick={handleZoomOut}
-            className="w-10 h-10 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/60 text-slate-200 hover:text-cyan-300 flex items-center justify-center text-lg font-bold transition-all cursor-pointer"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/60 text-slate-200 hover:text-cyan-300 flex items-center justify-center text-lg font-bold transition-all cursor-pointer"
             title="Afastar Visão (Zoom Out)">
             -
           </button>
           <div className="w-full h-px bg-slate-800 my-0.5" />
           <button
             onClick={handleResetCamera}
-            className="w-10 h-10 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/60 text-slate-200 hover:text-amber-300 flex items-center justify-center text-sm font-bold transition-all cursor-pointer"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/60 text-slate-200 hover:text-amber-300 flex items-center justify-center text-sm font-bold transition-all cursor-pointer"
             title="Resetar Visão da Galáxia">
             ⌖
           </button>
           <button
             onClick={handleCenterActive}
-            className="w-10 h-10 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/60 text-slate-200 hover:text-cyan-400 flex items-center justify-center text-sm font-bold transition-all cursor-pointer"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/60 text-slate-200 hover:text-cyan-400 flex items-center justify-center text-sm font-bold transition-all cursor-pointer"
             title="Centralizar no Card Ativo">
             ⭐
           </button>
         </div>
 
-        <div className="bg-slate-950/80 border border-slate-800/80 px-3 py-1.5 rounded-xl backdrop-blur-md text-[10px] font-mono text-slate-400 text-center">
+        <div className="bg-slate-950/80 border border-slate-800/80 px-2.5 py-1 rounded-xl backdrop-blur-md text-[10px] font-mono text-slate-400 text-center">
           ZOOM: {Math.round(camera.zoom * 100)}%
         </div>
       </div>
 
-      {/* 4. MINI-DOSSIÊ LATERAL DE TELEMETRIA (Drawer Retrátil Direito) */}
+      {/* 5. MINI-DOSSIÊ LATERAL / BOTTOM SHEET (Drawer Retrátil Direito no Desktop, Bottom Sheet no Mobile) */}
       {selectedNode && (
-        <div className="absolute top-20 right-5 bottom-6 w-84 sm:w-96 glass-card rounded-2xl border border-cyan-500/40 p-5 shadow-[0_0_35px_rgba(0,245,255,0.2)] backdrop-blur-xl z-30 flex flex-col justify-between animate-in fade-in slide-in-from-right-4 duration-200">
-          <div className="flex flex-col gap-4 overflow-y-auto pr-1">
+        <div className="fixed inset-x-2 bottom-2 sm:inset-x-auto sm:top-20 sm:right-5 sm:bottom-6 sm:w-96 max-h-[78vh] sm:max-h-none glass-card rounded-2xl border border-cyan-500/40 p-4 sm:p-5 shadow-[0_0_35px_rgba(0,245,255,0.25)] backdrop-blur-xl z-30 flex flex-col justify-between animate-in fade-in slide-in-from-bottom-4 sm:slide-in-from-right-4 duration-200">
+          {/* Indicador de puxador para Mobile */}
+          <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto mb-2 sm:hidden shrink-0" />
+
+          <div className="flex flex-col gap-3 sm:gap-4 overflow-y-auto pr-1">
             {/* Cabeçalho do Nó Selecionado */}
             <div className="flex items-start justify-between gap-3 border-b border-slate-800 pb-3">
               <div className="flex items-center gap-3">
                 <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl border"
+                  className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-2xl border shrink-0"
                   style={{
                     backgroundColor: `${selectedNode.color}15`,
                     borderColor: `${selectedNode.color}66`,
@@ -700,9 +850,9 @@ export const ConstellationView: React.FC<ConstellationViewProps> = ({
                   }}>
                   {selectedNode.icon}
                 </div>
-                <div>
+                <div className="min-w-0">
                   <span
-                    className="text-[10px] font-mono uppercase font-bold tracking-widest px-2 py-0.5 rounded border"
+                    className="text-[9px] sm:text-[10px] font-mono uppercase font-bold tracking-widest px-2 py-0.5 rounded border inline-block"
                     style={{
                       color: selectedNode.color,
                       backgroundColor: `${selectedNode.color}15`,
@@ -710,14 +860,14 @@ export const ConstellationView: React.FC<ConstellationViewProps> = ({
                     }}>
                     {selectedNode.type}
                   </span>
-                  <h2 className="text-sm font-extrabold text-white mt-1 leading-snug">
+                  <h2 className="text-xs sm:text-sm font-extrabold text-white mt-1 leading-snug break-words">
                     {selectedNode.label}
                   </h2>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedNode(null)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors text-sm"
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors text-sm shrink-0"
                 title="Fechar Inspeção">
                 ✕
               </button>
@@ -732,26 +882,26 @@ export const ConstellationView: React.FC<ConstellationViewProps> = ({
 
             {/* Sumário do Nó */}
             {selectedNode.metadata.summary && (
-              <div className="bg-slate-950/70 border border-slate-800 p-3.5 rounded-xl text-xs text-slate-300 leading-relaxed font-sans">
+              <div className="bg-slate-950/70 border border-slate-800 p-3 sm:p-3.5 rounded-xl text-xs text-slate-300 leading-relaxed font-sans max-h-36 sm:max-h-48 overflow-y-auto">
                 {selectedNode.metadata.summary}
               </div>
             )}
 
             {/* Metadados Específicos por Tipo */}
             {selectedNode.type === 'card' && selectedNode.metadata.thematicAxes && (
-              <div className="flex flex-col gap-2">
-                <p className="text-[11px] font-mono text-slate-400 uppercase font-bold tracking-wider">
+              <div className="flex flex-col gap-1.5 sm:gap-2">
+                <p className="text-[10px] sm:text-[11px] font-mono text-slate-400 uppercase font-bold tracking-wider">
                   Eixos Temáticos Fundamentais:
                 </p>
                 <div className="flex flex-col gap-1.5">
                   {selectedNode.metadata.thematicAxes.map((axis, i) => (
                     <div
                       key={i}
-                      className="text-xs bg-slate-900/90 border border-slate-800 px-3 py-2 rounded-lg text-slate-300 flex items-start gap-2">
+                      className="text-xs bg-slate-900/90 border border-slate-800 px-3 py-1.5 sm:py-2 rounded-lg text-slate-300 flex items-start gap-2">
                       <span className="text-cyan-400 font-mono font-bold text-[10px]">
                         0{i + 1}.
                       </span>
-                      <span>{axis}</span>
+                      <span className="text-[11px] sm:text-xs">{axis}</span>
                     </div>
                   ))}
                 </div>
@@ -760,7 +910,7 @@ export const ConstellationView: React.FC<ConstellationViewProps> = ({
 
             {selectedNode.type === 'banca' && (
               <div className="flex flex-col gap-2.5">
-                <div className="bg-slate-900/80 border border-slate-800 p-3 rounded-xl flex items-center justify-between">
+                <div className="bg-slate-900/80 border border-slate-800 p-2.5 sm:p-3 rounded-xl flex items-center justify-between">
                   <span className="text-xs font-mono text-slate-400">PROVAS NO ACERVO:</span>
                   <span className="text-sm font-mono font-extrabold text-cyan-400">
                     {selectedNode.metadata.examCount} Cadernos
@@ -783,15 +933,15 @@ export const ConstellationView: React.FC<ConstellationViewProps> = ({
             {selectedNode.type === 'acervo' && selectedNode.metadata.acervoItem && (
               <div className="flex flex-col gap-2.5">
                 <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                  <div className="bg-slate-900/80 border border-slate-800 p-2.5 rounded-xl">
+                  <div className="bg-slate-900/80 border border-slate-800 p-2 sm:p-2.5 rounded-xl">
                     <span className="text-[10px] text-slate-500 block">TAMANHO:</span>
                     <span className="text-slate-200 font-bold">
                       {selectedNode.metadata.acervoItem.sizeFormatted}
                     </span>
                   </div>
-                  <div className="bg-slate-900/80 border border-slate-800 p-2.5 rounded-xl">
+                  <div className="bg-slate-900/80 border border-slate-800 p-2 sm:p-2.5 rounded-xl">
                     <span className="text-[10px] text-slate-500 block">DISCIPLINA:</span>
-                    <span className="text-slate-200 font-bold uppercase">
+                    <span className="text-slate-200 font-bold uppercase truncate block">
                       {selectedNode.metadata.acervoItem.discipline}
                     </span>
                   </div>
@@ -811,14 +961,14 @@ export const ConstellationView: React.FC<ConstellationViewProps> = ({
 
           {/* Botão de Ação Primária para Cards */}
           {selectedNode.type === 'card' && selectedNode.metadata.cardId && (
-            <div className="pt-3 border-t border-slate-800 mt-2">
+            <div className="pt-3 border-t border-slate-800 mt-2 shrink-0">
               <button
                 onClick={() => {
                   if (soundFx) playConstellationWarpSound(true);
                   stopConstellationDrone();
                   onSelectCard(selectedNode.metadata.cardId!);
                 }}
-                className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-mono font-black text-xs py-3 rounded-xl shadow-[0_0_20px_rgba(0,245,255,0.4)] transition-all flex items-center justify-center gap-2 cursor-pointer uppercase tracking-wider">
+                className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-mono font-black text-xs py-2.5 sm:py-3 rounded-xl shadow-[0_0_20px_rgba(0,245,255,0.4)] transition-all flex items-center justify-center gap-2 cursor-pointer uppercase tracking-wider">
                 <span>🚀</span>
                 <span>ENTRAR NO DOSSIÊ DESTE CARD</span>
               </button>

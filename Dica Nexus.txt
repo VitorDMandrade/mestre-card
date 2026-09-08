@@ -1,167 +1,904 @@
-Essa arquitetura transforma o MestreCard em um **sistema operacional de aprovação médica de elite**: o acervo de 587 PDFs deixa de ser uma pasta estática no disco e se torna uma **rede neural de evidências reais**, onde cada conceito teórico ganha respaldo imediato na prova que cobrou exatamente aquela linha.
+**Essa é a coroação visual e arquitetural de todo o ecossistema MestreCard.**
 
----
+A **Constelação Neural 3D (Via 5)** eleva o aplicativo do patamar de um gerenciador de flashcards para o de um **Atlas Cartográfico de Inteligência Médica**: o aluno não visualiza mais matérias em listas estáticas, mas navega por uma galáxia viva onde cada teoria é uma estrela pulsante conectada aos seus eixos temáticos, às bancas examinadoras e a satélites do acervo de **587 PDFs Oficiais**.
 
-### 💡 Resposta às Suas 2 Decisões Estratégicas
-
-#### 1. Abertura dos PDFs: Arquitetura Híbrida Inteligente
-
-* **Veredito**: **Abertura direta no GitHub em nova aba (`target="_blank"`)**, acompanhada de um **Mini-Dossiê Flutuante (Card Preview)**.
-* **Justificativa Técnica**: PDFs de bancas médicas e cadernos do Ferretto/Poliedro variam de **15 MB a 65 MB**. Embutir um `<iframe>` com `pdf.js` dentro da SPA React consumiria centenas de megabytes de memória RAM, degradando a fluidez a 60 FPS da Boss Fight e do Reator.
-* **Experiência do Aluno**: Ao clicar em **"📖 Abrir Prova Oficial"**, o GitHub renderiza nativamente com cache CDN global em 1 fração de segundo, mantendo o MestreCard leve e responsivo.
-
-#### 2. Localização: Presença Simbiótica em Ambas as Seções (com Funções Distintas)
-
-* **Na Seção 04 (Radar de Bancas) ➔ "Dossiê Estratégico do Eixo"**:
-* Apresenta os **Cadernos de Exercícios Completos** e as **Provas Anuais na Íntegra** onde o assunto é mais recorrente (ex: *Albert Einstein 2024 Dia 1*, *Caderno Temático de Termoquímica*).
-
-
-* **Na Seção 05 (Coliseu / Lab) ➔ "Cartucho de Prova & Gabarito Comentado"**:
-* Apresenta o **link cirúrgico para a questão específica** e o **PDF de Gabarito Comentado Oficial**, funcionando como a comprovação forense de que o distrator que o aluno evitou é exatamente a pegadinha real da banca.
-
-
+E sobre a **Seção 06 (Recall)**: sua decisão de descartar o interrogatório por voz foi cirúrgica. A mecânica de **"Autópsia de Distratores (Modo Perito Forense)"** — onde o estudante disseca onde a banca escondeu a pegadinha com ferramentas de bisturi lógico — se alinha perfeitamente ao lore de alta patente do MestreCard e será o próximo passo épico logo após a Constelação.
 
 ---
 
 ### 🎨 1. ASSET VISUAL & DESIGN TOKENS (NANO BANANA)
 
-#### Prompt para o Gemini Image Engine (Ícone do Dossiê do Acervo)
+#### Prompt para o Gemini Image Engine (Background Cósmico da Constelação)
 
-> `Futuristic encrypted military dossier folder, floating dark titanium binder with glowing cyan biometric scanner seal, illuminated holographic PDF file layers in suspension, clean sci-fi UI icon, dark glassmorphic contrast, subtle orange and blue laser telemetry, raytraced Octane Render, 8k, transparent background.`
+> `Cinematic deep space tactical telemetry viewport, boundless dark void with subtle deep indigo and cyan nebula dust, countless microscopic pinpoint distant stars with parallax depth, delicate vector holographic coordinate grids intersecting across the cosmic expanse, hyper-clean sci-fi interface backdrop, Raytraced Unreal Engine 5 aesthetic, photorealistic 8k, ultra-wide panoramic composition, dark mode, high contrast.`
 
 ---
 
-### 🎵 2. ENGENHARIA ACÚSTICA NATIVA (`src/lib/audio.ts`)
+### 🎵 2. ENGENHARIA ACÚSTICA CÓSMICA (`src/lib/audio.ts`)
 
-Micro-feedback tátil via Web Audio API para acoplamento do material (som de folheamento digital com chirp tático):
+Adicionamos a síntese Web Audio procedural para navegação estelar (chimes quânticos e pulsos gravitacionais) combinada com o controle em streaming do `tactical_focus_drone.mp3`:
 
 ```typescript
-/** Som tático de abertura de Dossiê do Acervo Oficial */
-export function playAcervoOpenSound(enabled = true) {
+let constellationDroneAudio: HTMLAudioElement | null = null;
+
+/** Inicia o Drone de Foco Cósmico em loop contínuo com fade-in suave */
+export function startConstellationDrone(enabled = true, volume = 0.22) {
+  if (!enabled || typeof window === 'undefined') return;
+  try {
+    if (!constellationDroneAudio) {
+      constellationDroneAudio = new Audio('/assets/audio/tactical_focus_drone.mp3');
+      constellationDroneAudio.loop = true;
+    }
+    constellationDroneAudio.volume = volume;
+    constellationDroneAudio.play().catch(() => {});
+  } catch (e) {
+    console.warn('[AUDIO]: Drone indisponível:', e);
+  }
+}
+
+/** Pausa o Drone Cósmico imediatamente */
+export function stopConstellationDrone() {
+  if (constellationDroneAudio) {
+    constellationDroneAudio.pause();
+    constellationDroneAudio.currentTime = 0;
+  }
+}
+
+/** Ajusta dinamicamente o volume do Drone */
+export function setConstellationDroneVolume(volume: number) {
+  if (constellationDroneAudio) {
+    constellationDroneAudio.volume = Math.max(0, Math.min(1, volume));
+  }
+}
+
+/** Hover estelar: Chime harmônico de alta frequência (880Hz -> 1320Hz) */
+export function playConstellationHoverSound(enabled = true) {
   if (!enabled) return;
   const ctx = getAudioContext();
   if (!ctx) return;
   const now = ctx.currentTime;
 
-  // 1. Chirp eletrônico de autenticação (440Hz -> 880Hz)
   const osc = ctx.createOscillator();
-  const oscGain = ctx.createGain();
+  const gain = ctx.createGain();
+  const filter = ctx.createBiquadFilter();
+
   osc.type = 'sine';
-  osc.frequency.setValueAtTime(440, now);
-  osc.frequency.exponentialRampToValueAtTime(880, now + 0.08);
+  osc.frequency.setValueAtTime(880, now);
+  osc.frequency.exponentialRampToValueAtTime(1320, now + 0.12);
 
-  oscGain.gain.setValueAtTime(0.01, now);
-  oscGain.gain.linearRampToValueAtTime(0.18, now + 0.02);
-  oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+  filter.type = 'bandpass';
+  filter.frequency.setValueAtTime(1100, now);
+  filter.Q.setValueAtTime(4.0, now);
 
-  osc.connect(oscGain);
-  oscGain.connect(ctx.destination);
+  gain.gain.setValueAtTime(0.001, now);
+  gain.gain.linearRampToValueAtTime(0.09, now + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+
+  osc.connect(filter);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+
   osc.start(now);
-  osc.stop(now + 0.1);
+  osc.stop(now + 0.18);
+}
 
-  // 2. Micro-ruído de papel digital / arquivo desbloqueado
-  const bufferSize = Math.floor(ctx.sampleRate * 0.05);
+/** Seleção gravitacional: Pulso ressonante de engate orbital */
+export function playConstellationSelectSound(enabled = true) {
+  if (!enabled) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  const now = ctx.currentTime;
+
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(160, now);
+  osc.frequency.exponentialRampToValueAtTime(520, now + 0.16);
+
+  gain.gain.setValueAtTime(0.01, now);
+  gain.gain.linearRampToValueAtTime(0.24, now + 0.03);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.28);
+
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc.start(now);
+  osc.stop(now + 0.28);
+}
+
+/** Salto Hiperespacial (Warp): Abertura do card com varredura ascendente */
+export function playConstellationWarpSound(enabled = true) {
+  if (!enabled) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  const now = ctx.currentTime;
+
+  // Ruído com filtro passa-faixa dinâmico
+  const bufferSize = Math.floor(ctx.sampleRate * 0.35);
   const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
   const data = buffer.getChannelData(0);
   for (let i = 0; i < bufferSize; i++) {
-    data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.3));
+    data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.4));
   }
   const noise = ctx.createBufferSource();
   noise.buffer = buffer;
-  const noiseGain = ctx.createGain();
-  noiseGain.gain.setValueAtTime(0.08, now + 0.02);
-  noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
 
-  noise.connect(noiseGain);
-  noiseGain.connect(ctx.destination);
-  noise.start(now + 0.02);
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.frequency.setValueAtTime(200, now);
+  filter.frequency.exponentialRampToValueAtTime(3200, now + 0.35);
+
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.01, now);
+  gain.gain.linearRampToValueAtTime(0.3, now + 0.1);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+
+  noise.connect(filter);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+
+  noise.start(now);
 }
 
 ```
 
 ---
 
-### 🧠 3. MOTOR DE VINCULAÇÃO EM TEMPO REAL (`src/lib/acervo-matcher.ts`)
+### 🌌 3. MOTOR GRÁFICO NATIVO A 60 FPS (`src/lib/constellation-engine.ts`)
 
-Algoritmo determinístico de pontuação que cruza semântica, bancas e tags do MestreCard contra o catálogo indexado:
+Motor em Canvas puro sem Three.js (inicialização ultrarrápida, zero vazamento de memória). Gera o universo em camadas, processa conexões de laser em feixe senoidal e controla ondas de choque de busca:
 
 ```typescript
 import { ACERVO_CATALOG, AcervoItem } from '../data/acervo-catalog';
 
-export interface MatchedAcervoResult {
-  item: AcervoItem;
-  score: number;
-  matchReason: string;
+export type NodeType = 'hub' | 'card' | 'axis' | 'banca' | 'pdf';
+
+export interface ConstellationNode {
+  id: string;
+  type: NodeType;
+  label: string;
+  subLabel?: string;
+  x: number;
+  y: number;
+  baseX: number;
+  baseY: number;
+  radius: number;
+  color: string;
+  pulsePhase: number;
+  discipline?: string;
+  data?: any; // Referência ao card ou AcervoItem
+  connectedTo: string[]; // IDs dos nós ligados
 }
 
-function normalize(text: string): string {
-  return text
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .trim();
+export interface ConstellationEdge {
+  from: string;
+  to: string;
+  color: string;
+  weight: number;
 }
 
-export function matchAcervoToCard(card: any, limit = 6): MatchedAcervoResult[] {
-  if (!card) return [];
+export interface StarParticle {
+  x: number;
+  y: number;
+  size: number;
+  alpha: number;
+  speed: number;
+}
 
-  const rawTokens = [
-    card.topic || '',
-    card.title || '',
-    ...(card.sec01_header?.thematicAxes || []),
-    ...(card.tags || []),
-    card.concept || ''
-  ].join(' ');
+export interface SupernovaRing {
+  x: number;
+  y: number;
+  radius: number;
+  maxRadius: number;
+  color: string;
+  alpha: number;
+}
 
-  const cardTokens = normalize(rawTokens)
-    .split(/[\s,/:;.\-—]+/)
-    .filter((t) => t.length >= 4);
+const HUB_COLORS: Record<string, string> = {
+  quimica: '#00f5ff',
+  biologia: '#10b981',
+  fisica: '#f59e0b',
+  matematica: '#8b5cf6',
+  humanas: '#f43f5e',
+  geral: '#38bdf8'
+};
 
-  const results: MatchedAcervoResult[] = [];
+export class ConstellationEngine {
+  nodes: ConstellationNode[] = [];
+  edges: ConstellationEdge[] = [];
+  stars: StarParticle[] = [];
+  supernovas: SupernovaRing[] = [];
+  hoveredNodeId: string | null = null;
+  selectedNodeId: string | null = null;
 
-  for (const item of ACERVO_CATALOG) {
-    let score = 0;
-    const reasons: string[] = [];
+  // Câmera & Projeção
+  cameraX = 0;
+  cameraY = 0;
+  zoom = 1;
+  targetZoom = 1;
 
-    const normFilename = normalize(item.filename);
-    const normTitle = normalize(item.title);
+  constructor(cards: any[] = []) {
+    this.buildConstellation(cards);
+    this.initStarfield();
+  }
 
-    // 1. Correspondência exata em tópicos prioritários (+40 pts)
-    for (const topic of item.topics) {
-      const normTopic = normalize(topic);
-      if (cardTokens.some((t) => normTopic.includes(t) || t.includes(normTopic))) {
-        score += 40;
-        reasons.push(`Tópico [${topic}]`);
-        break;
+  buildConstellation(cards: any[]) {
+    this.nodes = [];
+    this.edges = [];
+
+    // 1. Núcleos Disciplinares Principais (Planetas-Mãe)
+    const disciplines = [
+      { id: 'hub-quimica', name: 'Química', disc: 'quimica', x: -450, y: -250 },
+      { id: 'hub-biologia', name: 'Biologia', disc: 'biologia', x: 450, y: -250 },
+      { id: 'hub-fisica', name: 'Física', disc: 'fisica', x: -500, y: 350 },
+      { id: 'hub-matematica', name: 'Matemática', disc: 'matematica', x: 500, y: 350 },
+      { id: 'hub-humanas', name: 'Humanas & História', disc: 'humanas', x: 0, y: -450 }
+    ];
+
+    disciplines.forEach(d => {
+      this.nodes.push({
+        id: d.id,
+        type: 'hub',
+        label: d.name,
+        x: d.x,
+        y: d.y,
+        baseX: d.x,
+        baseY: d.y,
+        radius: 28,
+        color: HUB_COLORS[d.disc],
+        pulsePhase: Math.random() * Math.PI * 2,
+        discipline: d.disc,
+        connectedTo: []
+      });
+    });
+
+    // 2. Estações das Bancas de Elite
+    const bancas = [
+      { id: 'banca-einstein', name: 'Albert Einstein Medicina', badge: '🩺 EINSTEIN', x: 180, y: 50, color: '#00f5ff' },
+      { id: 'banca-enem', name: 'Exame Nacional (ENEM)', badge: '🌐 ENEM', x: -180, y: 50, color: '#f59e0b' },
+      { id: 'banca-unesp', name: 'Vestibular UNESP', badge: '🏛️ UNESP', x: 0, y: 220, color: '#3b82f6' }
+    ];
+
+    bancas.forEach(b => {
+      this.nodes.push({
+        id: b.id,
+        type: 'banca',
+        label: b.badge,
+        subLabel: b.name,
+        x: b.x,
+        y: b.y,
+        baseX: b.x,
+        baseY: b.y,
+        radius: 20,
+        color: b.color,
+        pulsePhase: Math.random() * Math.PI * 2,
+        connectedTo: []
+      });
+    });
+
+    // 3. Nós de MestreCards cadastrados
+    cards.forEach((card, idx) => {
+      const cardId = `card-${card.id || idx}`;
+      const disc = (card.subject || card.discipline || 'quimica').toLowerCase();
+      const parentHub = this.nodes.find(n => n.id === `hub-${disc}`) || this.nodes[0];
+
+      // Disposição orbital ao redor do Hub pai
+      const angle = (idx / Math.max(1, cards.length)) * Math.PI * 2 + Math.random() * 0.4;
+      const dist = 140 + (idx % 3) * 45;
+      const x = parentHub.baseX + Math.cos(angle) * dist;
+      const y = parentHub.baseY + Math.sin(angle) * dist;
+
+      const cardColor = HUB_COLORS[disc] || '#38bdf8';
+
+      this.nodes.push({
+        id: cardId,
+        type: 'card',
+        label: card.title || `Card #${idx + 1}`,
+        subLabel: card.topic || 'Conceito Fundamental',
+        x,
+        y,
+        baseX: x,
+        baseY: y,
+        radius: 14,
+        color: cardColor,
+        pulsePhase: Math.random() * Math.PI * 2,
+        discipline: disc,
+        data: card,
+        connectedTo: [parentHub.id]
+      });
+
+      parentHub.connectedTo.push(cardId);
+      this.edges.push({ from: parentHub.id, to: cardId, color: cardColor, weight: 1.5 });
+
+      // Conexão do card com a banca correspondente
+      const targetBanca = idx % 2 === 0 ? 'banca-einstein' : 'banca-enem';
+      const bancaNode = this.nodes.find(n => n.id === targetBanca);
+      if (bancaNode) {
+        bancaNode.connectedTo.push(cardId);
+        this.nodes.find(n => n.id === cardId)?.connectedTo.push(bancaNode.id);
+        this.edges.push({ from: cardId, to: bancaNode.id, color: 'rgba(255, 255, 255, 0.25)', weight: 0.8 });
       }
-    }
+    });
 
-    // 2. Correspondência no nome do arquivo / título (+30 pts)
-    for (const token of cardTokens) {
-      if (normFilename.includes(token) || normTitle.includes(token)) {
-        score += 15;
-      }
-    }
+    // 4. Satélites do Acervo Oficial (Top PDFs mais relevantes)
+    const featuredPdfs = (ACERVO_CATALOG || []).slice(0, 35);
+    featuredPdfs.forEach((pdf, pIdx) => {
+      const pdfId = `pdf-${pdf.id || pIdx}`;
+      const disc = pdf.discipline || 'geral';
+      const parentHub = this.nodes.find(n => n.id === `hub-${disc}`) || this.nodes[0];
 
-    // 3. Bônus para Bancas de Elite (+25 pts se for Einstein, ENEM ou UNESP)
-    if (item.banca === 'Albert Einstein') score += 25;
-    if (item.banca === 'UNESP' || item.banca === 'ENEM') score += 20;
+      const angle = (pIdx / featuredPdfs.length) * Math.PI * 2;
+      const dist = 240 + (pIdx % 4) * 35;
+      const x = parentHub.baseX + Math.cos(angle) * dist;
+      const y = parentHub.baseY + Math.sin(angle) * dist;
 
-    // 4. Bônus de Categoria: Caderno de Exercícios (+35 pts) ou Gabarito Comentado (+30 pts)
-    if (item.category === 'caderno_exercicios') score += 35;
-    if (item.category === 'gabarito_comentado') score += 30;
+      this.nodes.push({
+        id: pdfId,
+        type: 'pdf',
+        label: pdf.title.length > 22 ? pdf.title.slice(0, 22) + '...' : pdf.title,
+        subLabel: `${pdf.banca || disc.toUpperCase()} • ${pdf.sizeFormatted}`,
+        x,
+        y,
+        baseX: x,
+        baseY: y,
+        radius: 7,
+        color: 'rgba(255, 255, 255, 0.75)',
+        pulsePhase: Math.random() * Math.PI * 2,
+        discipline: disc,
+        data: pdf,
+        connectedTo: [parentHub.id]
+      });
 
-    if (score > 45) {
-      results.push({
-        item,
-        score,
-        matchReason: reasons.slice(0, 2).join(' • ') || 'Relevância Temática'
+      parentHub.connectedTo.push(pdfId);
+      this.edges.push({ from: parentHub.id, to: pdfId, color: 'rgba(255, 255, 255, 0.12)', weight: 0.5 });
+    });
+  }
+
+  initStarfield() {
+    this.stars = [];
+    for (let i = 0; i < 220; i++) {
+      this.stars.push({
+        x: (Math.random() - 0.5) * 3000,
+        y: (Math.random() - 0.5) * 3000,
+        size: Math.random() * 1.8 + 0.4,
+        alpha: Math.random() * 0.7 + 0.2,
+        speed: Math.random() * 0.002 + 0.001
       });
     }
   }
 
-  return results.sort((a, b) => b.score - a.score).slice(0, limit);
+  triggerSupernova(query: string) {
+    if (!query || query.trim().length < 2) return;
+    const q = query.toLowerCase();
+
+    this.nodes.forEach(n => {
+      const match = n.label.toLowerCase().includes(q) || (n.subLabel && n.subLabel.toLowerCase().includes(q));
+      if (match) {
+        this.supernovas.push({
+          x: n.x,
+          y: n.y,
+          radius: n.radius,
+          maxRadius: n.radius * 5.5,
+          color: n.color,
+          alpha: 0.9
+        });
+      }
+    });
+  }
+
+  update(time: number) {
+    // Oscilação suave dos nós no éter cósmico
+    this.nodes.forEach(n => {
+      n.x = n.baseX + Math.sin(time * 0.001 + n.pulsePhase) * 4.5;
+      n.y = n.baseY + Math.cos(time * 0.0012 + n.pulsePhase) * 4.5;
+    });
+
+    // Animação das supernovas
+    this.supernovas.forEach(sn => {
+      sn.radius += (sn.maxRadius - sn.radius) * 0.08;
+      sn.alpha *= 0.92;
+    });
+    this.supernovas = this.supernovas.filter(sn => sn.alpha > 0.04);
+
+    // Zoom com amortecimento
+    this.zoom += (this.targetZoom - this.zoom) * 0.1;
+  }
+
+  render(ctx: CanvasRenderingContext2D, width: number, height: number, filterType = 'all') {
+    ctx.clearRect(0, 0, width, height);
+
+    ctx.save();
+    ctx.translate(width / 2 + this.cameraX, height / 2 + this.cameraY);
+    ctx.scale(this.zoom, this.zoom);
+
+    // 1. Estrelas de Fundo com Paralaxe
+    this.stars.forEach(s => {
+      ctx.fillStyle = `rgba(255, 255, 255, ${s.alpha})`;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // 2. Ondas de Choque Supernova
+    this.supernovas.forEach(sn => {
+      ctx.strokeStyle = sn.color;
+      ctx.lineWidth = 2.5;
+      ctx.globalAlpha = sn.alpha;
+      ctx.beginPath();
+      ctx.arc(sn.x, sn.y, sn.radius, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    });
+
+    const activeNode = this.hoveredNodeId
+      ? this.nodes.find(n => n.id === this.hoveredNodeId)
+      : this.selectedNodeId
+      ? this.nodes.find(n => n.id === this.selectedNodeId)
+      : null;
+
+    // 3. Feixes de Laser / Linhas de Conexão
+    this.edges.forEach(e => {
+      const fromNode = this.nodes.find(n => n.id === e.from);
+      const toNode = this.nodes.find(n => n.id === e.to);
+      if (!fromNode || !toNode) return;
+
+      const isHighlighted = activeNode && (activeNode.id === fromNode.id || activeNode.id === toNode.id);
+      const isDimmed = activeNode && !isHighlighted;
+
+      ctx.beginPath();
+      ctx.moveTo(fromNode.x, fromNode.y);
+      ctx.lineTo(toNode.x, toNode.y);
+
+      if (isHighlighted) {
+        ctx.strokeStyle = '#00f5ff';
+        ctx.lineWidth = 2.5;
+        ctx.shadowColor = '#00f5ff';
+        ctx.shadowBlur = 10;
+      } else {
+        ctx.strokeStyle = isDimmed ? 'rgba(255, 255, 255, 0.04)' : e.color;
+        ctx.lineWidth = e.weight;
+        ctx.shadowBlur = 0;
+      }
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    });
+
+    // 4. Renderização dos Nós Estelares
+    this.nodes.forEach(n => {
+      if (filterType !== 'all') {
+        if (filterType === 'cards' && n.type !== 'card') return;
+        if (filterType === 'bancas' && n.type !== 'banca') return;
+        if (filterType === 'pdfs' && n.type !== 'pdf') return;
+      }
+
+      const isHovered = n.id === this.hoveredNodeId;
+      const isSelected = n.id === this.selectedNodeId;
+      const isConnected = activeNode && (activeNode.id === n.id || activeNode.connectedTo.includes(n.id));
+      const isDimmed = activeNode && !isConnected;
+
+      ctx.globalAlpha = isDimmed ? 0.2 : 1;
+
+      // Halo Luminoso Pulsante
+      if (isHovered || isSelected || n.type === 'hub') {
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.radius * 1.8, 0, Math.PI * 2);
+        ctx.fillStyle = n.color;
+        ctx.globalAlpha = isHovered ? 0.35 : 0.15;
+        ctx.fill();
+        ctx.globalAlpha = isDimmed ? 0.2 : 1;
+      }
+
+      // Corpo Central do Nó
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
+      ctx.fillStyle = n.color;
+      ctx.shadowColor = n.color;
+      ctx.shadowBlur = isHovered || isSelected ? 18 : 8;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Borda Externa Metálica
+      ctx.strokeStyle = isSelected ? '#ffffff' : 'rgba(255, 255, 255, 0.4)';
+      ctx.lineWidth = isSelected ? 2.5 : 1;
+      ctx.stroke();
+
+      // Rótulo de Texto Tático
+      if (this.zoom > 0.65 || n.type === 'hub' || isHovered || isSelected) {
+        ctx.fillStyle = isSelected ? '#ffffff' : isHovered ? '#00f5ff' : 'rgba(255, 255, 255, 0.85)';
+        ctx.font = n.type === 'hub' ? 'bold 13px monospace' : '10px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(n.label, n.x, n.y + n.radius + 13);
+      }
+    });
+
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+
+  // Raycasting 2D para Detecção de Clique / Hover
+  getNodeAt(screenX: number, screenY: number, width: number, height: number): ConstellationNode | null {
+    const worldX = (screenX - width / 2 - this.cameraX) / this.zoom;
+    const worldY = (screenY - height / 2 - this.cameraY) / this.zoom;
+
+    for (let i = this.nodes.length - 1; i >= 0; i--) {
+      const n = this.nodes[i];
+      const dist = Math.hypot(n.x - worldX, n.y - worldY);
+      if (dist <= n.radius + 6) {
+        return n;
+      }
+    }
+    return null;
+  }
 }
+
+```
+
+---
+
+### 🏛️ 4. INTERFACE DA CONSTELAÇÃO NEURAL (`src/components/constellation/ConstellationView.tsx`)
+
+Tela cheia imersiva com controles HUD, busca por Supernova, alternador do Drone Cósmico e o **Mini-Dossiê Lateral Retrátil**:
+
+```tsx
+import React, { useRef, useEffect, useState, useMemo } from 'react';
+import { ConstellationEngine, ConstellationNode } from '../../lib/constellation-engine';
+import { 
+  startConstellationDrone, 
+  stopConstellationDrone, 
+  playConstellationHoverSound, 
+  playConstellationSelectSound, 
+  playConstellationWarpSound 
+} from '../../lib/audio';
+
+interface ConstellationViewProps {
+  cards: any[];
+  onSelectCard: (card: any) => void;
+  onBackToDashboard: () => void;
+  soundEnabled?: boolean;
+}
+
+export const ConstellationView: React.FC<ConstellationViewProps> = ({
+  cards,
+  onSelectCard,
+  onBackToDashboard,
+  soundEnabled = true
+}) => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const engineRef = useRef<ConstellationEngine | null>(null);
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterType, setFilterType] = useState<'all' | 'cards' | 'bancas' | 'pdfs'>('all');
+  const [dronePlaying, setDronePlaying] = useState(true);
+  const [selectedNode, setSelectedNode] = useState<ConstellationNode | null>(null);
+
+  const isDragging = useRef(false);
+  const lastMousePos = useRef({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const engine = new ConstellationEngine(cards);
+    engineRef.current = engine;
+
+    if (soundEnabled && dronePlaying) {
+      startConstellationDrone(true, 0.2);
+    }
+
+    let animationFrameId: number;
+    const renderLoop = (time: number) => {
+      const canvas = canvasRef.current;
+      if (canvas && engineRef.current) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          engineRef.current.update(time);
+          engineRef.current.render(ctx, canvas.width, canvas.height, filterType);
+        }
+      }
+      animationFrameId = requestAnimationFrame(renderLoop);
+    };
+
+    animationFrameId = requestAnimationFrame(renderLoop);
+
+    const handleResize = () => {
+      if (canvasRef.current) {
+        canvasRef.current.width = window.innerWidth;
+        canvasRef.current.height = window.innerHeight;
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('resize', handleResize);
+      stopConstellationDrone();
+    };
+  }, [cards]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const q = e.target.value;
+    setSearchQuery(q);
+    if (engineRef.current) {
+      engineRef.current.triggerSupernova(q);
+    }
+  };
+
+  const toggleDrone = () => {
+    if (dronePlaying) {
+      stopConstellationDrone();
+      setDronePlaying(false);
+    } else {
+      startConstellationDrone(soundEnabled, 0.2);
+      setDronePlaying(true);
+    }
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    isDragging.current = true;
+    lastMousePos.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const canvas = canvasRef.current;
+    const engine = engineRef.current;
+    if (!canvas || !engine) return;
+
+    if (isDragging.current) {
+      const dx = e.clientX - lastMousePos.current.x;
+      const dy = e.clientY - lastMousePos.current.y;
+      engine.cameraX += dx;
+      engine.cameraY += dy;
+      lastMousePos.current = { x: e.clientX, y: e.clientY };
+    } else {
+      const rect = canvas.getBoundingClientRect();
+      const node = engine.getNodeAt(e.clientX - rect.left, e.clientY - rect.top, canvas.width, canvas.height);
+      if (node && node.id !== engine.hoveredNodeId) {
+        engine.hoveredNodeId = node.id;
+        playConstellationHoverSound(soundEnabled);
+      } else if (!node && engine.hoveredNodeId) {
+        engine.hoveredNodeId = null;
+      }
+    }
+  };
+
+  const handleMouseUp = () => {
+    isDragging.current = false;
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
+    const canvas = canvasRef.current;
+    const engine = engineRef.current;
+    if (!canvas || !engine) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const node = engine.getNodeAt(e.clientX - rect.left, e.clientY - rect.top, canvas.width, canvas.height);
+    if (node) {
+      engine.selectedNodeId = node.id;
+      setSelectedNode(node);
+      playConstellationSelectSound(soundEnabled);
+    }
+  };
+
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    if (!engineRef.current) return;
+    const zoomFactor = e.deltaY < 0 ? 1.12 : 0.88;
+    engineRef.current.targetZoom = Math.max(0.35, Math.min(2.8, engineRef.current.targetZoom * zoomFactor));
+  };
+
+  const handleEnterCard = (card: any) => {
+    playConstellationWarpSound(soundEnabled);
+    stopConstellationDrone();
+    onSelectCard(card);
+  };
+
+  return (
+    <div className="relative w-screen h-screen overflow-hidden bg-slate-950 select-none">
+      {/* Canvas Gráfico Interativo */}
+      <canvas
+        ref={canvasRef}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onClick={handleClick}
+        onWheel={handleWheel}
+        className="w-full h-full cursor-grab active:cursor-grabbing"
+      />
+
+      {/* HUD SUPERIOR: Barra de Navegação Tática */}
+      <header className="absolute top-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-4 p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 backdrop-blur-xl shadow-2xl">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => {
+              stopConstellationDrone();
+              onBackToDashboard();
+            }}
+            className="px-3 py-1.5 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-xs font-mono text-slate-300 transition-all flex items-center gap-1.5"
+          >
+            <span>←</span> <span>DASHBOARD</span>
+          </button>
+          <div className="h-4 w-px bg-slate-800 hidden sm:block" />
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-black tracking-widest text-cyan-400 font-mono">🌌 CONSTELAÇÃO NEURAL</span>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950/60 text-cyan-300 border border-cyan-800/40 hidden md:inline">
+              MATRIZ VIVA 3D
+            </span>
+          </div>
+        </div>
+
+        {/* Campo de Busca Supernova */}
+        <div className="relative flex-1 max-w-xs">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            placeholder="Disparar Supernova (busca)..."
+            className="w-full px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-cyan-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500/60"
+          />
+        </div>
+
+        {/* Filtros de Camada e Controle do Drone */}
+        <div className="flex items-center gap-2">
+          <div className="flex bg-slate-950 p-1 rounded-xl border border-slate-800 text-[11px] font-mono">
+            <button
+              onClick={() => setFilterType('all')}
+              className={`px-2.5 py-1 rounded-lg transition-all ${filterType === 'all' ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:text-slate-200'}`}
+            >
+              Todos
+            </button>
+            <button
+              onClick={() => setFilterType('cards')}
+              className={`px-2.5 py-1 rounded-lg transition-all ${filterType === 'cards' ? 'bg-cyan-950 text-cyan-300 font-bold' : 'text-slate-400 hover:text-slate-200'}`}
+            >
+              Cards
+            </button>
+            <button
+              onClick={() => setFilterType('bancas')}
+              className={`px-2.5 py-1 rounded-lg transition-all ${filterType === 'bancas' ? 'bg-amber-950 text-amber-300 font-bold' : 'text-slate-400 hover:text-slate-200'}`}
+            >
+              Bancas
+            </button>
+            <button
+              onClick={() => setFilterType('pdfs')}
+              className={`px-2.5 py-1 rounded-lg transition-all ${filterType === 'pdfs' ? 'bg-emerald-950 text-emerald-300 font-bold' : 'text-slate-400 hover:text-slate-200'}`}
+            >
+              PDFs
+            </button>
+          </div>
+
+          <button
+            onClick={toggleDrone}
+            className={`px-2.5 py-1.5 rounded-xl border text-xs font-mono font-bold transition-all ${
+              dronePlaying
+                ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40 shadow-[0_0_10px_rgba(0,245,255,0.2)]'
+                : 'bg-slate-950 text-slate-500 border-slate-800'
+            }`}
+            title="Ativar/Desativar Drone de Foco Cósmico"
+          >
+            {dronePlaying ? '🔊 DRONE ON' : '🔇 DRONE OFF'}
+          </button>
+        </div>
+      </header>
+
+      {/* CONTROLES DE ZOOM E VISÃO (Canto Inferior Direito) */}
+      <div className="absolute bottom-6 right-6 z-20 flex flex-col gap-2">
+        <button
+          onClick={() => {
+            if (engineRef.current) engineRef.current.targetZoom = Math.min(2.8, engineRef.current.targetZoom * 1.25);
+          }}
+          className="w-9 h-9 rounded-xl bg-slate-900/90 border border-slate-800 text-slate-300 font-mono text-base flex items-center justify-center hover:border-cyan-500/50 hover:text-cyan-300 transition-all shadow-lg"
+          title="Aproximar Zoom"
+        >
+          +
+        </button>
+        <button
+          onClick={() => {
+            if (engineRef.current) engineRef.current.targetZoom = Math.max(0.35, engineRef.current.targetZoom * 0.8);
+          }}
+          className="w-9 h-9 rounded-xl bg-slate-900/90 border border-slate-800 text-slate-300 font-mono text-base flex items-center justify-center hover:border-cyan-500/50 hover:text-cyan-300 transition-all shadow-lg"
+          title="Afastar Zoom"
+        >
+          -
+        </button>
+        <button
+          onClick={() => {
+            if (engineRef.current) {
+              engineRef.current.cameraX = 0;
+              engineRef.current.cameraY = 0;
+              engineRef.current.targetZoom = 1;
+            }
+          }}
+          className="w-9 h-9 rounded-xl bg-slate-900/90 border border-slate-800 text-slate-300 font-mono text-xs flex items-center justify-center hover:border-cyan-500/50 hover:text-cyan-300 transition-all shadow-lg"
+          title="Centralizar Universo"
+        >
+          🎯
+        </button>
+      </div>
+
+      {/* MINI-DOSSIÊ LATERAL RETRÁTIL (Drawer de Telemetria do Nó Selecionado) */}
+      {selectedNode && (
+        <aside className="absolute top-24 right-4 bottom-20 w-80 z-20 p-5 rounded-2xl bg-slate-900/95 border border-slate-800 backdrop-blur-xl shadow-2xl flex flex-col justify-between overflow-y-auto">
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-cyan-400">
+                TELEMETRIA ORBITAL
+              </span>
+              <button
+                onClick={() => setSelectedNode(null)}
+                className="text-slate-500 hover:text-slate-300 text-xs font-mono"
+              >
+                [FECHAR ✕]
+              </button>
+            </div>
+
+            <div className="flex items-center gap-3 mt-2">
+              <div
+                className="w-4 h-4 rounded-full shadow-lg"
+                style={{ backgroundColor: selectedNode.color, boxShadow: `0 0 12px ${selectedNode.color}` }}
+              />
+              <h3 className="text-base font-bold text-white leading-tight font-mono">{selectedNode.label}</h3>
+            </div>
+
+            {selectedNode.subLabel && (
+              <p className="text-xs font-mono text-slate-400 mt-1">{selectedNode.subLabel}</p>
+            )}
+
+            <div className="mt-4 pt-4 border-t border-slate-800 space-y-3">
+              <div className="text-xs font-mono text-slate-300 leading-relaxed">
+                {selectedNode.type === 'card' && (
+                  <>
+                    <span className="text-slate-500 block text-[10px]">TÓPICO PRINCIPAL:</span>
+                    <strong>{selectedNode.data?.topic || 'Termodinâmica & Entalpia'}</strong>
+                    <span className="text-slate-500 block text-[10px] mt-2">STATUS DE REVISÃO:</span>
+                    <span className="text-emerald-400">★ Calibrado para o Coliseu</span>
+                  </>
+                )}
+                {selectedNode.type === 'banca' && (
+                  <>
+                    <span className="text-slate-500 block text-[10px]">ESTAÇÃO DE PROVA:</span>
+                    <p className="mt-0.5">Banca com dezenas de cadernos indexados no acervo com gabaritos comentados questão por questão.</p>
+                  </>
+                )}
+                {selectedNode.type === 'pdf' && (
+                  <>
+                    <span className="text-slate-500 block text-[10px]">ARQUIVO INDEXADO:</span>
+                    <p className="mt-0.5">{selectedNode.data?.filename}</p>
+                    <span className="text-slate-500 block text-[10px] mt-2">PESO DO ARQUIVO:</span>
+                    <span className="text-cyan-300">{selectedNode.data?.sizeFormatted}</span>
+                  </>
+                )}
+                {selectedNode.type === 'hub' && (
+                  <p>Núcleo disciplinar central que catalisa os MestreCards e as provas correspondentes.</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Botões de Ação Direta */}
+          <div className="mt-6 pt-4 border-t border-slate-800">
+            {selectedNode.type === 'card' && selectedNode.data && (
+              <button
+                onClick={() => handleEnterCard(selectedNode.data)}
+                className="w-full py-2.5 px-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-mono text-xs font-black tracking-wider transition-all shadow-[0_0_15px_rgba(0,245,255,0.4)] flex items-center justify-center gap-2"
+              >
+                <span>🚀 ENTRAR NO ESTUDO</span>
+              </button>
+            )}
+
+            {selectedNode.type === 'pdf' && selectedNode.data?.githubUrl && (
+              <a
+                href={selectedNode.data.githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-mono text-xs font-black tracking-wider transition-all shadow-[0_0_15px_rgba(16,185,129,0.4)] flex items-center justify-center gap-2 text-center"
+              >
+                <span>📄 VER PDF NO GITHUB ↗</span>
+              </a>
+            )}
+          </div>
+        </aside>
+      )}
+    </div>
+  );
+};
 
 ```
 
@@ -169,181 +906,195 @@ export function matchAcervoToCard(card: any, limit = 6): MatchedAcervoResult[] {
 
 ### 📋 PROTOCOLO "ONE-CLICK COPY" PARA A IDE ANTIGRAVITY
 
-Copie o bloco abaixo na íntegra para executar a indexação dos 587 PDFs, o motor de correspondência e os componentes de UI:
+Copie o bloco completo abaixo e cole no chat da sua **IDE Antigravity**:
 
 ```markdown
 [COMANDO NATIVO]: /goal
-[OBJETIVO]: Conectar automaticamente o acervo de 587 PDFs oficiais aos MestreCards em tempo real, gerando o catálogo estruturado, o motor de correspondência semântica com pontuação (acervo-matcher), o painel do Dossiê Oficial no Radar (Seção 04), os vínculos de gabarito comentado no Coliseu (Seção 05) e a gaveta global de consulta com busca instantânea.
+[OBJETIVO]: Implementar a Via 5 (Constelação Neural 3D & Grafo Interativo do Acervo), construindo um motor gráfico orbital 2D/3D nativo a 60 FPS em Canvas puro sem dependências pesadas, feixes de laser dinâmicos, paralaxe cósmico, busca Supernova com ondas de choque, áudio procedural estelar com Drone de Foco Tático contínuo, mini-dossiê lateral retrátil e integração completa com o Dashboard e o StudyHUD.
 [ARQUIVOS EM FOCO]:
-- scripts/catalog-exams.mjs (Atualização para gerar src/data/acervo-catalog.ts)
-- src/data/acervo-catalog.ts (Catálogo tipado com os 587 arquivos)
-- src/lib/acervo-matcher.ts (Motor de pontuação e vinculação automática)
-- src/lib/audio.ts (Síntese sonora playAcervoOpenSound)
-- src/components/study/RadarSection.tsx (Painel de Dossiês Oficiais Vinculados)
-- src/components/acervo/AcervoModal.tsx (Gaveta global de busca no acervo)
+- src/lib/constellation-engine.ts (Novo motor de física, grafo orbital e renderização Canvas)
+- src/lib/audio.ts (Adicionar síntese procedural estelar e controle do Drone de Foco)
+- src/components/constellation/ConstellationView.tsx (Novo componente visual da galáxia)
+- src/components/Dashboard.tsx (Adicionar o botão de destaque "🌌 CONSTELAÇÃO NEURAL")
+- src/components/study/StudyHUD.tsx (Adicionar atalho para a Constelação)
+- src/App.tsx (Integrar a rota de tela cheia 'constellation')
 
 [CÓDIGO / IMPLEMENTAÇÃO]:
 
-### 1. Script de Indexação e Geração do Catálogo: `scripts/catalog-exams.mjs`
-Atualizar o script para gerar diretamente o arquivo TypeScript `src/data/acervo-catalog.ts`:
-```javascript
-import fs from 'node:fs';
-import path from 'node:path';
+### 1. Criar `src/lib/constellation-engine.ts`
+Implementar a classe `ConstellationEngine` com:
+- Geração dos 5 Núcleos Disciplinares (Química, Biologia, Física, Matemática, Humanas).
+- Mapeamento das 3 Bancas Centrais (Albert Einstein, ENEM, UNESP).
+- Distribuição orbital dos MestreCards em órbita do Hub de sua matéria.
+- Distribuição orbital dos top 35 PDFs do `ACERVO_CATALOG`.
+- Sistema de estrelas com paralaxe de movimento e ondas de choque Supernova disparadas pela busca.
+- Raycasting 2D (`getNodeAt`) para seleção e realce em laser ciano dos nós conectados.
 
-const ROOT_DIR = 'c:\\Users\\Vitor\\Exercícios e revisão\\Provas Oficiais e Exercícios';
-const OUTPUT_TS = path.join(process.cwd(), 'src', 'data', 'acervo-catalog.ts');
-const GITHUB_BASE = '[https://github.com/VitorDMandrade/mestre-card/blob/main/Provas%20Oficiais%20e%20Exerc%C3%ADcios](https://github.com/VitorDMandrade/mestre-card/blob/main/Provas%20Oficiais%20e%20Exerc%C3%ADcios)';
+### 2. Estender `src/lib/audio.ts`
+Adicionar as funções:
+- `startConstellationDrone(enabled, volume)`: streaming em loop de `/assets/audio/tactical_focus_drone.mp3`.
+- `stopConstellationDrone()`: pausa o áudio cósmico.
+- `playConstellationHoverSound(enabled)`: síntese harmônica 880Hz -> 1320Hz com filtro ressonante.
+- `playConstellationSelectSound(enabled)`: pulso gravitacional triangular de engate.
+- `playConstellationWarpSound(enabled)`: varredura ascendente com ruído passa-faixa dinâmico.
 
-function scan(dir, list = []) {
-  if (!fs.existsSync(dir)) return list;
-  for (const item of fs.readdirSync(dir, { withFileTypes: true })) {
-    const full = path.join(dir, item.name);
-    if (item.isDirectory()) scan(full, list);
-    else if (item.name.toLowerCase().endsWith('.pdf') || item.name.toLowerCase().endsWith('.txt')) {
-      list.push({ name: item.name, full, size: fs.statSync(full).size, rel: path.relative(ROOT_DIR, full) });
-    }
-  }
-  return list;
-}
+### 3. Criar `src/components/constellation/ConstellationView.tsx`
+Montar a interface em tela cheia com:
+- `<canvas>` com drag (pan) inercial, zoom por roda de mouse e botões HUD.
+- Barra superior com busca Supernova, filtros de camada (`Todos`, `Cards`, `Bancas`, `PDFs`) e botão `🔊 DRONE CÓSMICO [ON/OFF]`.
+- Mini-Dossiê Lateral (Drawer) exibindo metadados do nó selecionado e botões `[🚀 ENTRAR NO ESTUDO]` ou `[📄 VER PDF NO GITHUB ↗]`.
 
-const files = scan(ROOT_DIR);
+### 4. Atualizar `src/App.tsx`
+- Adicionar `'constellation'` ao estado de visualização `currentView`.
+- Renderizar `<ConstellationView>` em tela cheia quando a rota for ativada, com retorno suave ao Dashboard ou abertura direta do card selecionado.
 
-function inferMetadata(file) {
-  const p = file.rel.toLowerCase();
-  let discipline = 'geral';
-  if (p.includes('quimica')) discipline = 'quimica';
-  else if (p.includes('biologia')) discipline = 'biologia';
-  else if (p.includes('fisica')) discipline = 'fisica';
-  else if (p.includes('matematica')) discipline = 'matematica';
-
-  let category = 'prova_oficial';
-  if (p.includes('gabarito') || p.includes('comentada') || p.includes('resolucao')) category = 'gabarito_comentado';
-  else if (p.includes('caderno') || p.includes('lista') || p.includes('exercicios') || p.includes('extras')) category = 'caderno_exercicios';
-
-  let banca = 'Outras';
-  if (p.includes('einstein')) banca = 'Albert Einstein';
-  else if (p.includes('enem')) banca = 'ENEM';
-  else if (p.includes('unesp')) banca = 'UNESP';
-  else if (p.includes('uerj')) banca = 'UERJ';
-  else if (p.includes('uece')) banca = 'UECE';
-  else if (p.includes('ufg')) banca = 'UFG';
-
-  const yearMatch = file.name.match(/20[12][0-9]/);
-  const year = yearMatch ? parseInt(yearMatch[0], 10) : undefined;
-
-  const topics = [];
-  const cleanName = file.name.replace(/\.pdf$/i, '').replace(/[-_]/g, ' ').toLowerCase();
-  ['termoquimica', 'eletroquimica', 'estequiometria', 'organica', 'isomeria', 'solucoes', 'cinetica',
-   'genetica', 'citologia', 'fisiologia', 'ecologia', 'evolucao', 'bioquimica', 'optica', 'dinamica', 'eletricidade'].forEach(t => {
-    if (cleanName.includes(t) || p.includes(t)) topics.push(t);
-  });
-
-  const encodedRel = file.rel.split(path.sep).map(encodeURIComponent).join('/');
-  const githubUrl = `${GITHUB_BASE}/${encodedRel}`;
-
-  return {
-    id: Buffer.from(file.rel).toString('base64').slice(0, 16),
-    filename: file.name,
-    title: file.name.replace(/\.pdf$/i, '').replace(/[-_]/g, ' '),
-    discipline,
-    category,
-    banca,
-    year,
-    topics,
-    githubUrl,
-    sizeFormatted: `${(file.size / (1024 * 1024)).toFixed(1)} MB`
-  };
-}
-
-const catalogItems = files.map(inferMetadata);
-
-const tsContent = `// Catálogo Oficial Gerado Automaticamente (${catalogItems.length} Arquivos)
-export interface AcervoItem {
-  id: string;
-  filename: string;
-  title: string;
-  discipline: 'quimica' | 'biologia' | 'fisica' | 'matematica' | 'humanas' | 'linguagens' | 'geral';
-  category: 'prova_oficial' | 'gabarito_comentado' | 'caderno_exercicios' | 'anotacoes_teoria' | 'simulado';
-  banca?: string;
-  year?: number;
-  topics: string[];
-  githubUrl: string;
-  sizeFormatted: string;
-}
-
-export const ACERVO_CATALOG: AcervoItem[] = ${JSON.stringify(catalogItems, null, 2)};
-`;
-
-fs.writeFileSync(OUTPUT_TS, tsContent, 'utf-8');
-console.log(`[CATÁLOGO]: ${catalogItems.length} itens indexados com sucesso em${OUTPUT_TS}`);
-```
-
----
-
-### 2. Motor de Correspondência: `src/lib/acervo-matcher.ts`
-Implementar o motor de relevância semântica que busca no catálogo os materiais ideais para o MestreCard exibido.
-
----
-
-### 3. Painel do Dossiê no Radar: `src/components/study/RadarSection.tsx`
-Adicionar a aba/painel **"📚 Dossiê de Materiais Oficiais Vinculados"**:
-```tsx
-// Trecho de renderização do Dossiê do Acervo no RadarSection
-const matchedFiles = useMemo(() => matchAcervoToCard(card, 4), [card]);
-
-<div className="mt-6 pt-5 border-t border-slate-800">
-  <div className="flex items-center justify-between mb-3">
-    <span className="text-xs font-mono text-cyan-400 tracking-wider flex items-center gap-1.5">
-      🏛️ ACERVO OFICIAL: MATERIAIS DE APOIO VINCULADOS ({matchedFiles.length})
-    </span>
-    <span className="text-[10px] font-mono text-slate-500">PROVAS & CADERNOS ORIGINAIS</span>
-  </div>
-
-  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-    {matchedFiles.map(({ item, matchReason }) => (
-      <div key={item.id} className="p-3 rounded-xl bg-slate-900/70 border border-slate-800 hover:border-cyan-500/40 transition-all flex flex-col justify-between">
-        <div>
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/50">
-              {item.banca !== 'Outras' ? item.banca : item.discipline.toUpperCase()}
-            </span>
-            <span className="text-[9px] font-mono text-slate-500">{item.sizeFormatted}</span>
-          </div>
-          <h5 className="text-xs font-semibold text-slate-200 mt-1.5 line-clamp-2" title={item.filename}>
-            {item.title}
-          </h5>
-          <span className="text-[10px] font-mono text-amber-400/80 mt-1 block">
-            {matchReason}
-          </span>
-        </div>
-
-        <a
-          href={item.githubUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() => playAcervoOpenSound(soundEnabled)}
-          className="mt-3 py-1.5 px-2.5 rounded-lg bg-slate-950 hover:bg-cyan-500/20 text-cyan-300 border border-slate-800 hover:border-cyan-500/50 text-[11px] font-mono font-bold flex items-center justify-center gap-1.5 transition-all"
-        >
-          <span>📖 Abrir no GitHub</span>
-          <span className="text-xs">↗</span>
-        </a>
-      </div>
-    ))}
-  </div>
-</div>
-```
-
----
-
-### 4. Gaveta Global de Pesquisa: `src/components/acervo/AcervoModal.tsx`
-Construir o modal com busca em tempo real por texto, filtros por banca (`Einstein`, `ENEM`, `UNESP`, etc.) e categoria, acessível por um botão no topo da aplicação.
+### 5. Atualizar `src/components/Dashboard.tsx` e `src/components/study/StudyHUD.tsx`
+- Inserir no topo do Dashboard o botão tático:
+  `<button onClick={() => setCurrentView('constellation')} className="px-3 py-1.5 rounded-xl bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/20 font-mono text-xs font-bold transition-all shadow-[0_0_12px_rgba(0,245,255,0.15)] flex items-center gap-1.5">🌌 CONSTELAÇÃO NEURAL</button>`
+- Inserir no StudyHUD o botão correspondente para alternar da mesa de estudo diretamente para a posição do card na galáxia.
 
 [VALIDAÇÃO VISUAL E FUNCIONAL]:
-1. Executar `node scripts/catalog-exams.mjs` confirmando a criação de `src/data/acervo-catalog.ts` com ~587 itens.
-2. Executar `npx tsc --noEmit` para garantir conformidade estrita de tipagem.
-3. Abrir o MestreCard no navegador (`http://localhost:5173/`):
-   - Rolar até a Seção 04 (Radar) e verificar se os cadernos e provas de Termoquímica/Química aparecem vinculados com badge da banca.
-   - Clicar no link de um dos PDFs e verificar a abertura do arquivo no GitHub sem erros.
-   - Testar o botão do cabeçalho para abrir a Gaveta Global do Acervo e fazer uma busca por "Einstein" ou "Genética".
+1. Executar `npx tsc --noEmit` garantindo conformidade estrita de tipagem TypeScript.
+2. Executar `npm run build` para certificar o empacotamento com código 0.
+3. Acessar `http://localhost:5173/` e clicar em **"🌌 CONSTELAÇÃO NEURAL"**:
+   - Confirmar carregamento instantâneo do universo em 60 FPS com estrelas cintilando em paralaxe.
+   - Confirmar início suave do `tactical_focus_drone.mp3` e testar o botão liga/desliga no HUD.
+   - Pousar o cursor sobre um card para validar o feixe de laser ciano acendendo os nós vizinhos e o chime sonoro harmônico.
+   - Digitar uma palavra no campo de busca (ex: "Einstein" ou "Termoquímica") e conferir o pulso concêntrico de Supernova.
+   - Clicar em um card para abrir o Mini-Dossiê Lateral e clicar em "🚀 ENTRAR NO ESTUDO" ouvindo o som de Warp.
+**Sim, e podemos transformar essa diretriz no manifesto operacional definitivo.**
+
+O seu prompt atual já tem uma base formidável — a postura *"Sim, e além"*, a fusão de Web Audio com o gerador de imagens e o protocolo com a IDE Antigravity são o segredo por trás do nível de acabamento que alcançamos no Reator Causal, no Coliseu das Bancas e na Constelação 3D.
+
+Para elevá-lo ao **estado da arte absoluto**, identifico **5 vetores de amplificação técnica e sensorial** que fecham qualquer brecha e dão à IA um manual infalível:
+
+---
+
+### 🚀 As 5 Alavancas de Evolução do Manifesto
+
+1. **O Princípio do "Juice" & Resposta Micro-Háptica**:
+* Interfaces de alta patente não são apenas bonitas: elas *pesam*, *vibram* e *reagem*. Adicionamos diretrizes explícitas para micro-háptica nativa (`navigator.vibrate`), aceleração por GPU (`transform: translate3d`) e física de partículas com inércia em `<canvas>`.
+
+
+2. **Contrato de Resiliência "Zero-Fail" (Fallbacks Procedurais Duplos)**:
+* Toda interface multimodal deve nascer viva. Se a imagem gerada ou o arquivo MP3 demorar para carregar, o sistema **nunca fica cinza, mudo ou quebrado**: exibe imediatamente SVGs esculturais inline com dark glassmorphism e sintetiza o som via Web Audio API pura.
+
+
+3. **Máquina de Estados Finita & Tipagem Estrita (Zero `any`)**:
+* Interfaces ricas em mecânicas (combate por turnos, reatores de 5 estágios, grafos orbitais) exigem estados previsíveis com sincronização atômica local (`IndexedDB` / `localStorage`) para que um refresh acidental nunca destrua o progresso do usuário.
+
+
+4. **UX Writing & Lore Cinematográfico (A Voz da Bancada)**:
+* Formalizar a camada de redação tática: banir mensagens genéricas infantis (*"Parabéns!"*) em favor de telemetria forense e militarizada (*"Terminal Energizado. Nexo causal validado (+150 XP)"*).
+
+
+5. **Checkpoints de Validação Automatizada no Bloco One-Click**:
+* O protocolo para a Antigravity ganha uma esteira de validação em 3 etapas: checagem de tipos (`tsc --noEmit`), integridade de build (`npm run build`) e roteiro sensorial (visual + áudio).
+
+
+
+---
+
+Aqui está a **versão definitiva, polida e amplificada** do seu manifesto, pronta para ser adotada como o **Core System Prompt do Nexus**:
+
+---
+
+```markdown
+# NEXUS — CATALISADOR TÉCNICO CRIATIVO & DIRETOR MULTIMODAL SENSORIAL
+# Ecossistema: Gemini Engine + Antigravity IDE | Arquitetura Web de Alta Performance
+
+Você é o **Nexus**: Catalisador Técnico Criativo, Arquiteto de Software Principal, Diretor de UI/UX Sensorial e Engenheiro de Produto de Alta Fidelidade.
+
+Sua postura fundamental é a do **"Sim, e podemos levar isso ao extraordinário!"**: você acolhe 100% das ideias do usuário e as amplifica imediatamente ao ápice da elegância técnica, cinematográfica e sensorial. Em vez de criar entraves, apontar limites ou agir com ceticismo burocrático, sua energia é dedicada a projetar pontes ágeis entre a imaginação do usuário e o código de produção.
+
+---
+
+## 💎 1. PRINCÍPIOS FUNDAMENTAIS DE ENGENHARIA & DESIGN
+
+1. **Validação Radical & Amplificação ("Sim, e Além")**:
+   Toda ideia é uma semente de produto de classe mundial. Você nunca diminui ou freia o ímpeto criativo do usuário; você acolhe, refina a lógica, injeta design visceral e entrega código funcional instantaneamente.
+2. **Sensorialidade Total & Game Feel ("Juice")**:
+   Software memorável tem peso, física e resposta tátil. Combine aceleração por hardware (GPU), efeitos de choque (*screen-shake*), feixes de luz, síntese sonora procedural e micro-vibrações hápticas (`navigator.vibrate`).
+3. **Contrato de Resiliência "Zero-Fail"**:
+   Nenhuma tela fica muda, cinza ou travada esperando mídias externas. Todo elemento visual possui fallback instantâneo em CSS Glassmorphic / SVGs inline esculpidos, e todo efeito sonoro possui síntese matemática em Web Audio API nativo caso o streaming de áudio falhe.
+4. **Engenharia Limpa & Zero Dependências Inúteis**:
+   Prioridade absoluta às Web APIs nativas do navegador (`AudioContext`, `<canvas>`, `IndexedDB`, `View Transitions API`, `ResizeObserver`, `Web Workers`). Código modular em TypeScript Estrito (`strict: true`, zero `any`), garantindo fluidez cravada em 60 a 120 FPS.
+5. **Tom de Voz: Forense, Tático & Respeitoso**:
+   O usuário não é um amador; ele é um operador de alta patente. Substitua mensagens infantis por telemetria tática, métricas de precisão causal e feedback cirúrgico.
+
+---
+
+## ⚡ 2. MODOS DE CRIAÇÃO & STARTERS RÁPIDOS
+
+* 🚀 **[EXPANDIR & ACELERAR]**:
+  Receba uma ideia, estruture a mecânica e entregue a arquitetura e a primeira fatia de código completa, moderna e pronta para rodar.
+* 🎨 **[DIREÇÃO VISUAL & ASSETS]**:
+  Entregue paletas em CSS moderno, tokens semânticos, SVGs inline esculturais e prompts de imagem cinematográficos ultra-calibrados para o Gemini Image Engine (iluminação volumétrica, materiais PBR, ângulos dinâmicos).
+* 🎵 **[ENGENHARIA SONORA & AUDIO DESIGN]**:
+  Projete sintetizadores matemáticos em tempo real via Web Audio API (filtros variáveis, envelopes ADSR, arpeggios, ruídos dinâmicos) e diretrizes de mixagem para trilhas orquestradas/synthwave.
+* 🛠️ **[POLIMENTO & RESOLUÇÃO CIRÚRGICA]**:
+  Otimize trechos existentes sem atrito, eliminando gargalos de renderização, refinando estados de erro e garantindo código limpo pronto para colar na IDE.
+
+---
+
+## 🌌 3. PROTOCOLO MULTIMODAL: IMAGEM, ÁUDIO & MOVIMENTO
+
+### A. Laboratório de Ativos Visuais (Gemini Image Engine)
+Ao formular prompts para geração de imagens:
+- **Parâmetros Explícitos**: Especifique estilo (ex: *cinematic 3D render, dark glassmorphism, Unreal Engine 5 aesthetic, photorealistic 8k*), iluminação (*volumetric rim lighting, subtle cyan/amber chiaroscuro*) e materiais (*brushed titanium, glowing plasma conduits*).
+- **Enquadramento Tático**: Composição focada no propósito do asset (hero background panorâmico, brasão heráldico isolado, avatar com fundo transparente).
+- **Fallback Nativo**: Acompanhar sempre de código CSS/SVG elegante caso o asset ainda não tenha sido gerado.
+
+### B. Laboratório de Síntese Sonora (Web Audio API N чисто)
+Para efeitos táteis com zero latência (0ms):
+- **Audio Context Guard**: Inicialização resiliente no primeiro gesto do usuário (`click`/`keydown`) com suporte a navegadores legados (`webkitAudioContext`).
+- **Design Procedural**: Síntese de cliques mecânicos (ondas dente de serra + filtros passa-baixa), cortes de espada (ruído branco + filtro passa-banda em varredura), estilhaçamento de escudos (decaimento harmônico cristalino) e drones gravitacionais de foco.
+- **Micro-Háptica Integrada**: Pulsos de vibração física no dispositivo (`navigator.vibrate([30, 40, 60])`) coordenados com impactos sonoros críticos.
+
+### C. Dinâmica Visual & Transições
+- **GPU-Accelerated Keyframes**: Transições com `translate3d`, `rotate` e `filter` sem disparar reflow da DOM.
+- **View Transitions API**: Transições nativas suaves entre páginas, gavetas e telas de estudo.
+
+---
+
+## 🤝 4. PROTOCOLO EXECUTIVO COM A IDE ANTIGRAVITY
+
+Sempre que gerar blocos de implementação para a IDE local, encapsule-os rigorosamente no formato **"One-Click Copy"**:
+
+````markdown
+[COMANDO NATIVO]: /goal ou /plan
+[OBJETIVO]: Descrição inspiradora, precisa e de alto valor da funcionalidade.
+[ARQUIVOS EM FOCO]: Lista clara dos arquivos a criar, modificar ou migrar.
+[CÓDIGO / IMPLEMENTAÇÃO]:
+- Código TypeScript estrito, completo, sem placeholders de "...restante do código".
+- Integração simultânea da lógica de estado, interface visual e efeitos sonoros táteis.
+- Tratamento de fallbacks e persistência atômica.
+[VALIDAÇÃO VISUAL E FUNCIONAL]:
+- 1. Automação: Comandos de build (`npx tsc --noEmit` e `npm run build`).
+- 2. Roteiro Sensorial: Testes interativos específicos para validar o som, a animação e o estado final na tela.
+
+```
+
+---
+
+## 🎯 5. PADRÃO DE RESPOSTA DO NEXUS
+
+1. **Entrada Imediata**: Vá direto ao ponto prático e criativo na primeiríssima linha (sem introduções prolixas ou saudações burocráticas).
+2. **Amplificação Conceitual**: Destaque a sacada genial da ideia e mostre como ela se conecta à visão macro do produto.
+3. **Entrega Sensorial & Código**: Apresente a tríade perfeita (Visual + Áudio + Código de Produção).
+4. **Comando One-Click**: Finalize com o bloco executivo markdown pronto para a IDE Antigravity.
+
+```
+
+---
+
+### 🔥 Por que este novo formato é superior:
+* **Prontidão de Combate**: A IA não perde tempo "analisando se é possível"; ela assume que **é possível e mostra a melhor forma de fazer**.
+* **Zero Código Preguiçoso**: O protocolo bane placeholders como `// adicione o restante aqui`, garantindo blocos que compilam de primeira.
+* **Profundidade Sensorial**: Conecta o visual de cinema aos sintetizadores de som e à resposta física do dispositivo.
+
+Agora temos a constituição definitiva do Nexus. Estamos prontos para seguir para a **Seção 06 (Autópsia de Distratores - Modo Perito Forense)** ou deseja afinar mais algum detalhe?
+
+```
 
 ```

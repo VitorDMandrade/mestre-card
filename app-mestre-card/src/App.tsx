@@ -342,43 +342,45 @@ function App() {
           />
         )}
 
-        {/* Floating Controls Bar (Bottom Left) */}
-        <div className="fixed bottom-6 left-6 z-40 flex items-center gap-2">
-          <button
-            onClick={() => setIsShortcutsOpen(true)}
-            aria-label="Atalhos do Teclado"
-            className="px-3.5 py-2 rounded-full bg-slate-900/95 hover:bg-slate-800 border border-slate-600 hover:border-cyan-400 text-slate-200 hover:text-cyan-300 shadow-xl backdrop-blur-md transition-all text-xs font-mono font-bold flex items-center gap-2 group cursor-pointer"
-          >
-            <span>⌨️</span>
-            <span className="hidden sm:inline">Atalhos</span>
-            <kbd className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-600 text-[10px] text-cyan-300 font-bold shadow-inner">?</kbd>
-          </button>
+        {/* Floating Controls Bar (Bottom Left) - Apenas fora da Constelação, responsivo em Mobile/Tablet */}
+        {currentView !== 'constellation' && (
+          <div className="fixed bottom-4 sm:bottom-6 left-3 sm:left-6 z-40 flex items-center gap-1.5 sm:gap-2 max-w-[calc(100vw-24px)] overflow-x-auto no-scrollbar">
+            <button
+              onClick={() => setIsShortcutsOpen(true)}
+              aria-label="Atalhos do Teclado"
+              className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-full bg-slate-900/95 hover:bg-slate-800 border border-slate-600 hover:border-cyan-400 text-slate-200 hover:text-cyan-300 shadow-xl backdrop-blur-md transition-all text-xs font-mono font-bold flex items-center gap-1.5 sm:gap-2 group cursor-pointer shrink-0"
+            >
+              <span>⌨️</span>
+              <span className="hidden sm:inline">Atalhos</span>
+              <kbd className="hidden sm:inline-block px-1.5 py-0.5 rounded bg-slate-800 border border-slate-600 text-[10px] text-cyan-300 font-bold shadow-inner">?</kbd>
+            </button>
 
-          <button
-            onClick={() => {
-              setAcervoQuery(activeCard ? activeCard.topic : '');
-              setAcervoBanca('todas');
-              setIsAcervoOpen(true);
-            }}
-            aria-label="Biblioteca do Acervo Oficial"
-            className="px-3.5 py-2 rounded-full bg-slate-900/95 hover:bg-purple-950 border border-purple-500/50 hover:border-purple-400 text-purple-300 hover:text-purple-200 shadow-xl shadow-purple-950/40 backdrop-blur-md transition-all text-xs font-mono font-bold flex items-center gap-2 cursor-pointer"
-            title="Abrir Biblioteca Completa de Provas Oficiais (598 PDFs)"
-          >
-            <span>🏛️</span>
-            <span className="hidden sm:inline">Acervo (598)</span>
-          </button>
+            <button
+              onClick={() => {
+                setAcervoQuery(activeCard ? activeCard.topic : '');
+                setAcervoBanca('todas');
+                setIsAcervoOpen(true);
+              }}
+              aria-label="Biblioteca do Acervo Oficial"
+              className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-full bg-slate-900/95 hover:bg-purple-950 border border-purple-500/50 hover:border-purple-400 text-purple-300 hover:text-purple-200 shadow-xl shadow-purple-950/40 backdrop-blur-md transition-all text-xs font-mono font-bold flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0"
+              title="Abrir Biblioteca Completa de Provas Oficiais (598 PDFs)"
+            >
+              <span>🏛️</span>
+              <span className="hidden sm:inline">Acervo (598)</span>
+            </button>
 
-          <button
-            onClick={handleOpenConstellation}
-            aria-label="Constelação Neural 3D"
-            className="px-3.5 py-2 rounded-full bg-slate-900/95 hover:bg-cyan-950 border border-cyan-500/50 hover:border-cyan-400 text-cyan-300 hover:text-cyan-200 shadow-xl shadow-cyan-950/40 backdrop-blur-md transition-all text-xs font-mono font-bold flex items-center gap-2 cursor-pointer"
-            title="Abrir Constelação Neural 3D e Grafo do Conhecimento (G)"
-          >
-            <span>🌌</span>
-            <span className="hidden sm:inline">Grafo 3D</span>
-            <kbd className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-600 text-[10px] text-cyan-300 font-bold shadow-inner">G</kbd>
-          </button>
-        </div>
+            <button
+              onClick={handleOpenConstellation}
+              aria-label="Constelação Neural 3D"
+              className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-full bg-slate-900/95 hover:bg-cyan-950 border border-cyan-500/50 hover:border-cyan-400 text-cyan-300 hover:text-cyan-200 shadow-xl shadow-cyan-950/40 backdrop-blur-md transition-all text-xs font-mono font-bold flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0"
+              title="Abrir Constelação Neural 3D e Grafo do Conhecimento (G)"
+            >
+              <span>🌌</span>
+              <span className="hidden sm:inline">Grafo 3D</span>
+              <kbd className="hidden sm:inline-block px-1.5 py-0.5 rounded bg-slate-800 border border-slate-600 text-[10px] text-cyan-300 font-bold shadow-inner">G</kbd>
+            </button>
+          </div>
+        )}
 
         <KeyboardShortcutsModal 
           isOpen={isShortcutsOpen} 
