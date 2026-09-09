@@ -22,6 +22,8 @@ export function sanitizeForSpeech(rawText: string): string {
     .trim();
 }
 
+export type StudyStage = 'teoria' | 'radar' | 'combate' | 'arcade' | 'todos';
+
 interface StudyHUDProps {
   hp: number;
   isHardcore: boolean;
@@ -39,6 +41,8 @@ interface StudyHUDProps {
   onToggleOledMode?: () => void;
   onOpenAcervoModal?: () => void;
   onOpenConstellation?: () => void;
+  activeStage?: StudyStage;
+  onSelectStage?: (stage: StudyStage) => void;
 }
 
 export const StudyHUD = ({ 
@@ -57,7 +61,9 @@ export const StudyHUD = ({
   isOledMode = false,
   onToggleOledMode,
   onOpenAcervoModal,
-  onOpenConstellation
+  onOpenConstellation,
+  activeStage = 'teoria',
+  onSelectStage
 }: StudyHUDProps) => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeHash, setActiveHash] = useState('sec-01');
@@ -367,29 +373,83 @@ export const StudyHUD = ({
             </div>
           </div>
 
-          {/* Navegação Rápida com ScrollSpy */}
-          <div className="flex overflow-x-auto gap-1 pb-2 hide-scrollbar">
-            {[
-              { id: 'sec-01', label: '01. Teoria' },
-              { id: 'sec-03', label: '03. Estrutura' },
-              { id: 'sec-04', label: '04. Radar' },
-              { id: 'sec-05', label: '05. Laboratório' },
-              { id: 'sec-06', label: '06. Recall' },
-              { id: 'sec-arcade', label: '07. Arcade' }
-            ].map(anchor => (
+          {/* Navegação Tática: 4 Estágios Focados vs. Modo Contínuo */}
+          <div className="flex items-center justify-between overflow-x-auto gap-2 pb-2 hide-scrollbar">
+            <div className="flex items-center gap-1.5 flex-nowrap">
+              {[
+                { id: 'teoria', label: '01. Teoria & Estrutura', icon: '📘' },
+                { id: 'radar', label: '02. Radar de Prova', icon: '🎯' },
+                { id: 'combate', label: '03. Combate & Provas', icon: '⚔️' },
+                { id: 'arcade', label: '04. Fixação & Arcade', icon: '🕹️' }
+              ].map(stage => {
+                const isActive = activeStage === stage.id;
+                return (
+                  <button
+                    key={stage.id}
+                    onClick={() => {
+                      playClickSound(soundEnabled);
+                      if (onSelectStage) {
+                        onSelectStage(stage.id as StudyStage);
+                      } else {
+                        scrollTo(stage.id === 'teoria' ? 'sec-01' : stage.id === 'radar' ? 'sec-04' : stage.id === 'combate' ? 'sec-05' : 'sec-arcade');
+                      }
+                    }}
+                    className={`whitespace-nowrap px-3.5 py-1.5 text-xs font-mono font-bold uppercase tracking-wider transition-all duration-200 rounded-lg border cursor-pointer flex items-center gap-1.5 ${
+                      isActive
+                        ? 'border-cyan-400 text-cyan-300 bg-cyan-950/70 shadow-[0_0_12px_rgba(34,211,238,0.25)]'
+                        : 'border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-900 hover:border-slate-700'
+                    }`}
+                  >
+                    <span>{stage.icon}</span>
+                    <span>{stage.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {onSelectStage && (
               <button
-                key={anchor.id}
-                onClick={() => scrollTo(anchor.id)}
-                className={`whitespace-nowrap px-4 py-2 text-xs font-mono font-bold uppercase tracking-wider transition-all duration-200 rounded-t-lg border-b-2 cursor-pointer ${
-                  activeHash === anchor.id
-                    ? 'border-cyan-400 text-cyan-300 bg-cyan-950/40 shadow-[0_2px_10px_rgba(34,211,238,0.15)]'
-                    : 'border-transparent text-slate-300 hover:text-white hover:bg-slate-850 hover:border-slate-600'
+                onClick={() => {
+                  playClickSound(soundEnabled);
+                  onSelectStage(activeStage === 'todos' ? 'teoria' : 'todos');
+                }}
+                className={`whitespace-nowrap px-3 py-1.5 text-xs font-mono font-bold rounded-lg border transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                  activeStage === 'todos'
+                    ? 'bg-amber-950/70 border-amber-500 text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.25)]'
+                    : 'bg-slate-900 border-slate-700/80 text-slate-400 hover:text-slate-200 hover:border-slate-600'
                 }`}
+                title={activeStage === 'todos' ? 'Retornar ao modo focado em 4 estágios' : 'Exibir todas as 6 seções em uma única página longa'}
               >
-                {anchor.label}
+                <span>{activeStage === 'todos' ? '🎯 Modo Focado' : '📜 Ver Tudo'}</span>
               </button>
-            ))}
+            )}
           </div>
+
+          {/* Sub-âncoras de Seções com ScrollSpy (Apenas no Modo Contínuo) */}
+          {activeStage === 'todos' && (
+            <div className="flex overflow-x-auto gap-1 pt-1 pb-1.5 hide-scrollbar border-t border-slate-800/60">
+              {[
+                { id: 'sec-01', label: '01. Teoria' },
+                { id: 'sec-03', label: '03. Estrutura' },
+                { id: 'sec-04', label: '04. Radar' },
+                { id: 'sec-05', label: '05. Laboratório' },
+                { id: 'sec-06', label: '06. Recall' },
+                { id: 'sec-arcade', label: '07. Arcade' }
+              ].map(anchor => (
+                <button
+                  key={anchor.id}
+                  onClick={() => scrollTo(anchor.id)}
+                  className={`whitespace-nowrap px-2.5 py-0.5 text-[11px] font-mono transition-all rounded cursor-pointer ${
+                    activeHash === anchor.id
+                      ? 'text-cyan-300 bg-cyan-950/60 font-bold border-b border-cyan-400'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  {anchor.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         
         {/* Scroll Progress Bar */}

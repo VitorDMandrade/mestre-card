@@ -309,43 +309,36 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   return (
     <div className="max-w-7xl mx-auto flex flex-col gap-6">
-      {/* Header HUD */}
-      <div className="glass-card p-6 rounded-2xl border border-slate-700/50 flex flex-col md:flex-row justify-between items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight">
-            Centro de Comando HUD
-          </h1>
-          <p className="text-slate-400 text-sm font-mono mt-1">
-            STATUS: <span className="text-emerald-400 glow-emerald font-bold">ONLINE</span>
-          </p>
-        </div>
-
-        <div className="flex gap-4">
-          <div className="bg-slate-900/80 border border-slate-800 rounded-lg p-3 text-center min-w-[100px]">
-            <p className="text-xs text-slate-400 font-mono font-bold mb-1">TOTAL CARDS</p>
-            <p className="text-xl font-bold text-cyan-400 glow-cyan">{cards.length}</p>
+      {/* Header Zen - Centro de Comando Limpo & Tranquilo */}
+      <div className="glass-card p-5 rounded-2xl border border-slate-700/50 flex flex-col lg:flex-row justify-between items-center gap-4">
+        {/* Identidade & Status */}
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-500/40 flex items-center justify-center text-xl shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+            ⚡
           </div>
-          <div className="bg-slate-900/80 border border-slate-800 rounded-lg p-3 text-center min-w-[100px]">
-            <p className="text-xs text-slate-400 font-mono font-bold mb-1">TÓPICOS</p>
-            <p className="text-xl font-bold text-amber-400 glow-amber">{uniqueTopics}</p>
+          <div>
+            <h1 className="text-xl font-black text-white tracking-tight flex items-center gap-2">
+              <span>MestreCard</span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-500/30 text-cyan-300 font-bold">
+                QG COGNITIVO
+              </span>
+            </h1>
+            <p className="text-slate-400 text-xs font-mono">
+              {cards.length} {cards.length === 1 ? 'dossiê cadastrado' : 'dossiês cadastrados'} • {uniqueTopics} {uniqueTopics === 1 ? 'tópico' : 'tópicos'}
+            </p>
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2 justify-end">
-          <button 
-            onClick={() => setIsGlobalErrorModalOpen(true)}
-            className={historicErrors.length > 0 
-              ? "bg-red-500/15 hover:bg-red-500/25 border border-red-500/60 text-red-300 px-3.5 py-2 rounded-lg text-xs font-mono font-bold transition-all uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_15px_rgba(239,68,68,0.25)] animate-pulse hover:animate-none cursor-pointer"
-              : "bg-slate-900 hover:bg-slate-850 border border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white px-3.5 py-2 rounded-lg text-xs font-mono font-bold transition-all uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-sm"
-            }
-            title="Abrir Caderno de Erros Global de sessões anteriores">
-            <span>{historicErrors.length > 0 ? '🚨' : '🛡️'}</span>
-            <span>{historicErrors.length > 0 ? `REPESCAGEM: ${historicErrors.length} ${historicErrors.length === 1 ? 'ERRO' : 'ERROS'}` : 'CADERNO DE ERROS (0)'}</span>
-          </button>
+        {/* Portais Centrais de Navegação */}
+        <div className="flex items-center gap-2 bg-slate-950/70 p-1.5 rounded-xl border border-slate-800 shadow-inner flex-wrap justify-center">
+          <div className="px-3.5 py-1.5 rounded-lg bg-cyan-950/60 border border-cyan-500/40 text-cyan-300 text-xs font-mono font-bold flex items-center gap-2 shadow-sm">
+            <span>🗂️</span>
+            <span>DOSSIÊS ({cards.length})</span>
+          </div>
 
           <button 
             onClick={() => onOpenAcervoModal ? onOpenAcervoModal() : null}
-            className="bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/50 text-purple-300 px-3.5 py-2 rounded-lg text-xs font-mono font-bold transition-all uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_12px_rgba(168,85,247,0.2)] cursor-pointer"
+            className="px-3.5 py-1.5 rounded-lg bg-slate-900 hover:bg-purple-950/50 border border-slate-800 hover:border-purple-500/50 text-slate-300 hover:text-purple-200 text-xs font-mono font-bold transition-all flex items-center gap-2 cursor-pointer shadow-sm"
             title="Abrir Biblioteca Completa do Acervo Oficial (598 PDFs de provas e cadernos)">
             <span>🏛️</span>
             <span>ACERVO OFICIAL (598)</span>
@@ -353,151 +346,141 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
           <button 
             onClick={() => onOpenConstellation ? onOpenConstellation() : null}
-            className="bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/50 text-cyan-300 px-3.5 py-2 rounded-lg text-xs font-mono font-bold transition-all uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,245,255,0.2)] cursor-pointer"
+            className="px-3.5 py-1.5 rounded-lg bg-slate-900 hover:bg-cyan-950/50 border border-slate-800 hover:border-cyan-500/50 text-slate-300 hover:text-cyan-200 text-xs font-mono font-bold transition-all flex items-center gap-2 cursor-pointer shadow-sm"
             title="Abrir Constelação Neural 3D e Grafo Interativo de Conexões">
             <span>🌌</span>
-            <span>CONSTELAÇÃO NEURAL</span>
+            <span>CONSTELAÇÃO 3D</span>
           </button>
+        </div>
+
+        {/* Ações Táticas & Ferramentas */}
+        <div className="flex items-center gap-2 flex-wrap justify-end">
+          {historicErrors.length > 0 && (
+            <button 
+              onClick={() => setIsGlobalErrorModalOpen(true)}
+              className="bg-red-500/15 hover:bg-red-500/25 border border-red-500/50 text-red-300 px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+              title="Abrir Caderno de Erros Global de sessões anteriores">
+              <span>🚨</span>
+              <span>REPESCAGEM ({historicErrors.length})</span>
+            </button>
+          )}
 
           <button 
             onClick={() => setIsTerminalOpen(!isTerminalOpen)}
-            className="bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 px-4 py-2 rounded-lg text-xs font-mono font-bold transition-colors uppercase tracking-widest">
-            {isTerminalOpen ? 'FECHAR TERMINAL' : 'INGESTÃO JSON'}
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer border ${
+              isTerminalOpen 
+                ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.2)]'
+                : 'bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border-slate-700'
+            }`}
+            title="Gerenciar ingestão JSON, upload de arquivos e backups gerais">
+            <span>⚙️</span>
+            <span>{isTerminalOpen ? 'FECHAR FERRAMENTAS' : 'FERRAMENTAS & DADOS'}</span>
           </button>
-          {selectedCategory !== 'TODOS' ? (
-            <div className="flex gap-2">
-              <button 
-                onClick={() => onExportFiltered ? onExportFiltered(filteredCards, selectedCategory) : onExportBackup()}
-                className="bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/60 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.25)] px-3.5 py-2 rounded-lg text-xs font-mono font-bold transition-all uppercase tracking-wider flex items-center gap-1.5"
-                title={`Exportar backup dos ${filteredCards.length} cards de ${selectedCategory}`}>
-                <span>💾</span>
-                <span>EXPORTAR {selectedCategory} ({filteredCards.length})</span>
-              </button>
-              <button 
-                onClick={onExportBackup}
-                className="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 px-2.5 py-2 rounded-lg text-xs font-mono font-bold transition-colors uppercase"
-                title="Exportar backup completo de todos os cards">
-                GERAL
-              </button>
-            </div>
-          ) : (
-            <button 
-              onClick={onExportBackup}
-              className="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 px-4 py-2 rounded-lg text-xs font-mono font-bold transition-colors uppercase tracking-widest flex items-center gap-1.5">
-              <span>💾</span>
-              <span>EXPORTAR BACKUP GERAL</span>
-            </button>
-          )}
         </div>
       </div>
 
-      {/* Banner Tático de Vulnerabilidade Cognitiva / Caderno de Erros Ativo */}
+      {/* Faixa Tática Suave de Repescagem */}
       {historicErrors.length > 0 && (
-        <div className="p-4 rounded-2xl border border-red-500/50 bg-gradient-to-r from-red-950/40 via-slate-900/90 to-amber-950/30 shadow-[0_0_25px_rgba(239,68,68,0.15)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-fade-in">
-          <div className="flex items-start sm:items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-red-500/20 border border-red-500/40 flex items-center justify-center text-xl shrink-0 animate-pulse">
-              🚨
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-sm font-black text-white font-mono tracking-tight uppercase">
-                  Caderno de Erros Ativo // Fila de Repescagem
-                </h2>
-                <span className="px-2 py-0.5 rounded-full bg-red-500/20 border border-red-500/40 text-red-300 font-mono text-[10px] font-bold">
-                  {historicErrors.length} {historicErrors.length === 1 ? 'FALHA' : 'FALHAS'}
-                </span>
-              </div>
-              <p className="text-xs text-slate-300 font-sans mt-0.5 leading-relaxed">
-                Foram registradas falhas conceituais no Laboratório e Arcade. Realize o auto-teste de repescagem para fixar as lacunas antes do simulado.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 w-full sm:w-auto shrink-0 justify-end">
-            <button
-              onClick={() => setIsGlobalErrorModalOpen(true)}
-              className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-mono text-xs font-bold transition-all shadow-[0_0_15px_rgba(239,68,68,0.4)] flex items-center gap-1.5 cursor-pointer w-full sm:w-auto justify-center"
-            >
-              <span>🎯</span>
-              <span>RETESTAR FALHAS AGORA</span>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Terminal Retrátil de Ingestão & Sincronização */}
-      {isTerminalOpen && (
-        <div className="glass-card p-6 rounded-2xl border border-cyan-500/30 bg-cyan-950/20 animate-fade-in space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-cyan-500/20 pb-4">
-            <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-400 font-mono text-[10px] font-bold">TERMINAL ATIVO</span>
-              <p className="text-white text-sm font-bold font-mono">INGESTÃO & SINCRONIZAÇÃO TÁTICA</p>
-            </div>
-            <span className="text-[11px] font-mono text-cyan-400/90 bg-cyan-950/60 px-2.5 py-1 rounded border border-cyan-500/30">
-              SMART MERGE ATIVO // NÃO-DESTRUTIVO
+        <div className="px-5 py-3 rounded-xl border border-red-500/30 bg-red-950/20 flex flex-col sm:flex-row items-center justify-between gap-3 animate-fade-in">
+          <div className="flex items-center gap-2.5">
+            <span className="text-red-400 text-base">🚨</span>
+            <span className="text-xs text-slate-300 font-medium">
+              Você possui <strong className="text-red-300 font-bold font-mono">{historicErrors.length} {historicErrors.length === 1 ? 'questão incorreta' : 'questões incorretas'}</strong> catalogadas no Caderno de Erros.
             </span>
           </div>
+          <button
+            onClick={() => setIsGlobalErrorModalOpen(true)}
+            className="px-3.5 py-1 rounded-lg bg-red-600 hover:bg-red-500 text-white font-mono text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm shrink-0"
+          >
+            <span>🎯</span>
+            <span>RETESTAR FALHAS AGORA</span>
+          </button>
+        </div>
+      )}
 
-          {/* Opção 1 (Primária / Mobile): Upload Direto de Arquivo .JSON */}
-          <div className="p-5 rounded-xl bg-slate-900/90 border-2 border-dashed border-cyan-500/40 hover:border-cyan-400/70 transition-all flex flex-col items-center justify-center text-center gap-3">
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              accept=".json,application/json" 
-              onChange={handleFileSelect} 
-              className="hidden" 
-            />
-            <div className="w-12 h-12 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-2xl">
-              📁
+      {/* Painel Retrátil de Ferramentas & Ingestão */}
+      {isTerminalOpen && (
+        <div className="glass-card p-6 rounded-2xl border border-cyan-500/30 bg-slate-950/90 animate-fade-in space-y-6 shadow-2xl">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-400 font-mono text-[10px] font-bold">GERENCIADOR TÁTICO</span>
+              <h3 className="text-white text-sm font-bold font-mono">INGESTÃO, SINCRONIZAÇÃO & BACKUPS</h3>
             </div>
-            <div>
-              <h3 className="text-sm font-bold text-white font-mono uppercase tracking-wider">
-                Upload Direto de Arquivo de Backup (.JSON)
-              </h3>
-              <p className="text-xs text-slate-400 font-mono mt-1 max-w-md">
-                Solução nativa para mobile e backups completos. Sem risco de travamento ou truncamento de área de transferência.
-              </p>
-            </div>
-            <button
-              disabled={isProcessingFile}
-              onClick={() => fileInputRef.current?.click()}
-              className="mt-1 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs font-mono shadow-lg shadow-cyan-500/25 transition-all uppercase tracking-wider flex items-center gap-2 cursor-pointer disabled:opacity-50"
-            >
-              {isProcessingFile ? (
-                <>
-                  <span className="animate-spin">⏳</span>
-                  <span>PROCESSANDO ARQUIVO...</span>
-                </>
-              ) : (
-                <>
-                  <span>⚡</span>
-                  <span>SUBIR ARQUIVO (.JSON)</span>
-                </>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={onExportBackup}
+                className="px-3 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold transition-colors flex items-center gap-1.5"
+                title="Exportar backup completo de todos os cards"
+              >
+                <span>💾</span>
+                <span>BACKUP GERAL ({cards.length})</span>
+              </button>
+              {selectedCategory !== 'TODOS' && onExportFiltered && (
+                <button
+                  onClick={() => onExportFiltered(filteredCards, selectedCategory)}
+                  className="px-3 py-1 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/50 text-cyan-300 text-xs font-mono font-bold transition-colors flex items-center gap-1.5"
+                >
+                  <span>💾</span>
+                  <span>EXPORTAR {selectedCategory} ({filteredCards.length})</span>
+                </button>
               )}
-            </button>
+            </div>
           </div>
 
-          {/* Opção 2 (Secundária): Colar Payload Manualmente */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
-              <span className="h-px flex-1 bg-slate-800"></span>
-              <span>OU COLE O TEXTO/JSON MANUALMENTE</span>
-              <span className="h-px flex-1 bg-slate-800"></span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Opção 1: Upload Direto de Arquivo .JSON */}
+            <div className="p-5 rounded-xl bg-slate-900/60 border-2 border-dashed border-cyan-500/40 hover:border-cyan-400 transition-all flex flex-col items-center justify-center text-center gap-3">
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                accept=".json,application/json" 
+                onChange={handleFileSelect} 
+                className="hidden" 
+              />
+              <div className="w-10 h-10 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-xl">
+                📁
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-white font-mono uppercase tracking-wider">
+                  Subir Arquivo de Card (.JSON)
+                </h4>
+                <p className="text-[11px] text-slate-400 font-mono mt-0.5">
+                  Suporta cards individuais ou backups completos.
+                </p>
+              </div>
+              <button
+                disabled={isProcessingFile}
+                onClick={() => fileInputRef.current?.click()}
+                className="px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs font-mono shadow-md transition-all uppercase tracking-wider flex items-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                {isProcessingFile ? 'PROCESSANDO...' : 'SELECIONAR ARQUIVO .JSON'}
+              </button>
             </div>
-            <textarea 
-              className="w-full h-28 bg-slate-950/80 border border-slate-800 rounded-xl p-4 font-mono text-xs text-emerald-400/90 focus:outline-none focus:border-cyan-500/50 resize-none"
-              placeholder={'{\n  "title": "Nova Matéria..."\n}'}
-              value={jsonInput}
-              onChange={(e) => setJsonInput(e.target.value)}
-            />
-            <button 
-              onClick={handleImport}
-              disabled={!jsonInput.trim()}
-              className="w-full bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed text-cyan-300 border border-slate-700 px-4 py-2.5 rounded-xl font-bold text-xs font-mono transition-colors tracking-widest uppercase">
-              PROCESSAR TEXTO COLADO
-            </button>
+
+            {/* Opção 2: Colar Payload Manualmente */}
+            <div className="space-y-2 flex flex-col justify-between">
+              <div>
+                <span className="text-xs font-mono text-slate-400 block mb-1.5 font-bold">
+                  OU COLE O BLOCO JSON DIRETAMENTE:
+                </span>
+                <textarea 
+                  className="w-full h-24 bg-slate-900 border border-slate-800 rounded-xl p-3 font-mono text-xs text-emerald-400/90 focus:outline-none focus:border-cyan-500/50 resize-none"
+                  placeholder={'{\n  "title": "Cole o JSON gerado pelo Gemini..."\n}'}
+                  value={jsonInput}
+                  onChange={(e) => setJsonInput(e.target.value)}
+                />
+              </div>
+              <button 
+                onClick={handleImport}
+                disabled={!jsonInput.trim()}
+                className="w-full bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed text-cyan-300 border border-slate-700 px-4 py-2 rounded-xl font-bold text-xs font-mono transition-colors tracking-wider uppercase">
+                PROCESSAR TEXTO COLADO
+              </button>
+            </div>
           </div>
         </div>
       )}
+
 
       {/* Search & Subject Category Filter HUD */}
       <div className="glass-card p-4 rounded-2xl border border-slate-700/50 flex flex-col gap-4">

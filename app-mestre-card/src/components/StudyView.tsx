@@ -3,7 +3,7 @@ import type { FC } from 'react';
 import type { MestreCardData, StudySessionRecord } from '../types/mestre-card';
 import { db } from '../lib/db';
 
-import { StudyHUD } from './study/StudyHUD';
+import { StudyHUD, type StudyStage } from './study/StudyHUD';
 import { TheorySection } from './study/TheorySection';
 import { StructureSection } from './study/StructureSection';
 import { RadarSection } from './study/RadarSection';
@@ -86,6 +86,12 @@ export const StudyView: FC<StudyViewProps> = ({ card, onBack, queueInfo, onNextQ
 
   const [isZenMode, setIsZenMode] = useState(false);
   const [isOledMode, setIsOledMode] = useState(false);
+  const [activeStage, setActiveStage] = useState<StudyStage>('teoria');
+
+  const handleSelectStage = (stage: StudyStage) => {
+    setActiveStage(stage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <GameProvider>
@@ -124,7 +130,7 @@ export const StudyView: FC<StudyViewProps> = ({ card, onBack, queueInfo, onNextQ
           </div>
         </div>
 
-        {/* HUD Tático (Fixo no topo da área de estudo) */}
+        {/* HUD Tático (Fixo no topo da área de estudo com navegação de estágios) */}
         <StudyHUD 
           hp={hp}
           isHardcore={isHardcore}
@@ -142,53 +148,166 @@ export const StudyView: FC<StudyViewProps> = ({ card, onBack, queueInfo, onNextQ
           onToggleOledMode={() => setIsOledMode(!isOledMode)}
           onOpenAcervoModal={onOpenAcervoModal ? () => onOpenAcervoModal(card.topic) : undefined}
           onOpenConstellation={onOpenConstellation}
+          activeStage={activeStage}
+          onSelectStage={handleSelectStage}
         />
 
-        <div className={`max-w-6xl mx-auto px-4 pb-20 space-y-12 transition-all duration-300 study-font-${textSize} ${isZenMode ? 'zen-focus-active' : ''}`}>
-          <ErrorBoundary fallbackTitle="Erro na Seção de Teoria">
-            <TheorySection card={card} textSize={textSize} />
-          </ErrorBoundary>
+        <div className={`max-w-6xl mx-auto px-4 pb-24 space-y-10 transition-all duration-300 study-font-${textSize} ${isZenMode ? 'zen-focus-active' : ''}`}>
           
-          <ErrorBoundary fallbackTitle="Erro na Seção de Estrutura">
-            <StructureSection card={card} soundEnabled={soundEnabled} />
-          </ErrorBoundary>
-          
-          <ErrorBoundary fallbackTitle="Erro na Seção de Radar">
-            <RadarSection card={card} soundEnabled={soundEnabled} onOpenAcervoModal={onOpenAcervoModal} />
-          </ErrorBoundary>
-          
-          <ErrorBoundary fallbackTitle="Erro no Laboratório Tático">
-            <LabSection 
-              cardId={card.id}
-              cardTitle={card.title}
-              card={card}
-              questions={card.sec05_lab?.questions || []}
-              hardcoreQuestions={card.sec05_lab?.hardcoreQuestions}
-              bossFight={card.sec05_lab?.bossFight}
-              isHardcore={isHardcore}
-              soundEnabled={soundEnabled}
-              onApplyDamage={handleDamage}
-              onOpenAcervoModal={onOpenAcervoModal}
-            />
-          </ErrorBoundary>
-          
-          <ErrorBoundary fallbackTitle="Erro na Matriz de Recall">
-            <RecallSection card={card} />
-          </ErrorBoundary>
+          {/* ESTÁGIO 1: Teoria & Estrutura */}
+          {(activeStage === 'teoria' || activeStage === 'todos') && (
+            <div className="space-y-12 animate-fade-in">
+              <ErrorBoundary fallbackTitle="Erro na Seção de Teoria">
+                <TheorySection card={card} textSize={textSize} />
+              </ErrorBoundary>
+              
+              <ErrorBoundary fallbackTitle="Erro na Seção de Estrutura">
+                <StructureSection card={card} soundEnabled={soundEnabled} />
+              </ErrorBoundary>
 
-          {/* Arcade Sub-engine */}
-          <ErrorBoundary fallbackTitle="Erro no Arcade Revisional">
-            <ArcadeEngine 
-              card={card} 
-              onSessionSaved={loadTelemetry}
-              isHardcore={isHardcore}
-              hp={hp}
-              soundEnabled={soundEnabled}
-              onToggleSound={() => setSoundEnabled(!soundEnabled)}
-              onToggleHardcore={toggleHardcore}
-              onApplyDamage={handleDamage}
-            />
-          </ErrorBoundary>
+              {activeStage === 'teoria' && (
+                <div className="p-6 rounded-2xl bg-gradient-to-r from-blue-950/40 via-slate-900 to-indigo-950/40 border border-blue-500/30 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-xl">
+                      📘
+                    </div>
+                    <div>
+                      <p className="text-white font-bold font-mono text-xs uppercase tracking-wider">Etapa 01 Concluída</p>
+                      <p className="text-slate-400 text-xs font-sans">Fundamentação teórica e câmara de fórmulas assimiladas.</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleSelectStage('radar')}
+                    className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-mono text-xs font-bold tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-cyan-600/30 hover:scale-[1.02] active:scale-98"
+                  >
+                    <span>AVANÇAR PARA RADAR DE PROVA</span>
+                    <span>➔</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ESTÁGIO 2: Radar de Prova (Macetes & Armadilhas) */}
+          {(activeStage === 'radar' || activeStage === 'todos') && (
+            <div className="space-y-12 animate-fade-in">
+              <ErrorBoundary fallbackTitle="Erro na Seção de Radar">
+                <RadarSection card={card} soundEnabled={soundEnabled} onOpenAcervoModal={onOpenAcervoModal} />
+              </ErrorBoundary>
+
+              {activeStage === 'radar' && (
+                <div className="p-6 rounded-2xl bg-gradient-to-r from-amber-950/40 via-slate-900 to-orange-950/40 border border-amber-500/30 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+                  <button
+                    onClick={() => handleSelectStage('teoria')}
+                    className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-xs font-bold tracking-wider transition-all flex items-center gap-2 cursor-pointer border border-slate-700"
+                  >
+                    <span>←</span>
+                    <span>VOLTAR: TEORIA</span>
+                  </button>
+                  <div className="text-center sm:text-left">
+                    <p className="text-white font-bold font-mono text-xs uppercase tracking-wider">Etapa 02 Concluída</p>
+                    <p className="text-slate-400 text-xs font-sans">Mnemônicos e pontos cegos mapeados.</p>
+                  </div>
+                  <button
+                    onClick={() => handleSelectStage('combate')}
+                    className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-mono text-xs font-black tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-amber-500/30 hover:scale-[1.02] active:scale-98"
+                  >
+                    <span>AVANÇAR PARA COMBATE & PROVAS</span>
+                    <span>➔</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ESTÁGIO 3: Arena de Combate & Provas Oficiais */}
+          {(activeStage === 'combate' || activeStage === 'todos') && (
+            <div className="space-y-12 animate-fade-in">
+              <ErrorBoundary fallbackTitle="Erro no Laboratório Tático">
+                <LabSection 
+                  cardId={card.id}
+                  cardTitle={card.title}
+                  card={card}
+                  questions={card.sec05_lab?.questions || []}
+                  hardcoreQuestions={card.sec05_lab?.hardcoreQuestions}
+                  bossFight={card.sec05_lab?.bossFight}
+                  isHardcore={isHardcore}
+                  soundEnabled={soundEnabled}
+                  onApplyDamage={handleDamage}
+                  onOpenAcervoModal={onOpenAcervoModal}
+                />
+              </ErrorBoundary>
+
+              {activeStage === 'combate' && (
+                <div className="p-6 rounded-2xl bg-gradient-to-r from-red-950/40 via-slate-900 to-rose-950/40 border border-red-500/30 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+                  <button
+                    onClick={() => handleSelectStage('radar')}
+                    className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-xs font-bold tracking-wider transition-all flex items-center gap-2 cursor-pointer border border-slate-700"
+                  >
+                    <span>←</span>
+                    <span>VOLTAR: RADAR</span>
+                  </button>
+                  <div className="text-center sm:text-left">
+                    <p className="text-white font-bold font-mono text-xs uppercase tracking-wider">Etapa 03 Concluída</p>
+                    <p className="text-slate-400 text-xs font-sans">Batalha de bancas e questões resolvidas.</p>
+                  </div>
+                  <button
+                    onClick={() => handleSelectStage('arcade')}
+                    className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-mono text-xs font-bold tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-emerald-600/30 hover:scale-[1.02] active:scale-98"
+                  >
+                    <span>AVANÇAR PARA FIXAÇÃO & ARCADE</span>
+                    <span>➔</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ESTÁGIO 4: Fixação & Arcade Revisional */}
+          {(activeStage === 'arcade' || activeStage === 'todos') && (
+            <div className="space-y-12 animate-fade-in">
+              <ErrorBoundary fallbackTitle="Erro na Matriz de Recall">
+                <RecallSection card={card} />
+              </ErrorBoundary>
+
+              <ErrorBoundary fallbackTitle="Erro no Arcade Revisional">
+                <ArcadeEngine 
+                  card={card} 
+                  onSessionSaved={loadTelemetry}
+                  isHardcore={isHardcore}
+                  hp={hp}
+                  soundEnabled={soundEnabled}
+                  onToggleSound={() => setSoundEnabled(!soundEnabled)}
+                  onToggleHardcore={toggleHardcore}
+                  onApplyDamage={handleDamage}
+                />
+              </ErrorBoundary>
+
+              {activeStage === 'arcade' && (
+                <div className="p-6 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-slate-900 to-cyan-950/40 border border-emerald-500/30 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+                  <button
+                    onClick={() => handleSelectStage('combate')}
+                    className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-xs font-bold tracking-wider transition-all flex items-center gap-2 cursor-pointer border border-slate-700"
+                  >
+                    <span>←</span>
+                    <span>VOLTAR: COMBATE</span>
+                  </button>
+                  <div className="text-center sm:text-left">
+                    <p className="text-emerald-400 font-bold font-mono text-xs uppercase tracking-wider">🎉 Dossiê 100% Finalizado!</p>
+                    <p className="text-slate-300 text-xs font-sans">Você completou todas as 4 etapas deste card de elite.</p>
+                  </div>
+                  <button
+                    onClick={onBack}
+                    className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-mono text-xs font-black tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-emerald-500/30 hover:scale-[1.02] active:scale-98"
+                  >
+                    <span>🏆 CONCLUIR E RETORNAR AO QG</span>
+                    <span>➔</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
         </div>
       </div>
       </ReadingProvider>
