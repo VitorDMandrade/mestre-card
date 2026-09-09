@@ -271,3 +271,102 @@ Para garantir que versões novas do aplicativo leiam dados legados sem quebrar:
 3. **Tipagem Estrita com Uniões Discriminadas**:
    - No TypeScript, utilize uniões discriminadas (`kind: 'card' | 'quest' | 'radar'`) para garantir checagem estrita de tipos em tempo de compilação com exaustividade em instruções `switch/case`.
 
+---
+
+# 19. ARQUITETURA MODULAR EM CAMADAS (DATA / ENGINE / HOOK / UI)
+
+Para evitar componentes monolíticos inavegáveis (arquivos de 1.000 a 2.000 linhas) e acoplamento desordenado:
+
+1. **Separação Rígida em 4 Camadas**:
+   - **Camada de Dados (`/lib/db`, `/types`)**: Contratos de dados TypeScript imutáveis, funções puras de acesso ao IndexedDB/armazenamento e migrations de schema.
+   - **Camada de Motores Puros (`/lib/engines`)**: Funções e classes contendo exclusivamente lógica matemática e de domínio (cálculo de XP, repetição espaçada, motor de TRI, indexadores de busca). **Terminantemente proibido importar React, hooks ou JSX nesta camada.** Devem ser 100% testáveis via `node --test` em milissegundos.
+   - **Camada de Orquestração / Hooks (`/hooks`, `/context`)**: Hooks customizados leves (`useDossier`, `useArcadeGame`, `useAudioFeedback`) que coordenam o estado reativo e conectam os motores à UI.
+   - **Camada de Apresentação (`/components`)**: Componentes dedicados estritamente à renderização e ergonomia visual.
+2. **Teto de Complexidade por Componente (Regra das 300 Linhas)**:
+   - Nenhum componente de UI deve ultrapassar **300 linhas de código**.
+   - Se um componente crescer além desse teto, o agente deve **obrigatoriamente** decompor o arquivo em subcomponentes atômicos e especializados (ex: `Header`, `Controls`, `CardList`, `ModalOverlay`).
+
+---
+
+# 20. DESIGN SYSTEM DE TOKENS & CSS SEMÂNTICO (ZERO HARDCODED HEX)
+
+Para garantir harmonia estética e alternância de temas sem quebras visuais:
+
+1. **Proibição de Hexadecimais Hardcoded**:
+   - É expressamente proibido injetar cores hexadecimais arbitrárias (`#10b981`, `#ef4444`, `rgb(...)`) diretamente em tags JSX ou classes utilitárias fora do tema.
+2. **Consumo de Variáveis Semânticas**:
+   - Toda cor, fundo, borda e raio deve ser referenciada por tokens semânticos:
+     - Superfícies: `var(--bg-canvas)`, `var(--surface-primary)`, `var(--surface-elevated)`
+     - Tipografia: `var(--text-primary)`, `var(--text-secondary)`, `var(--text-muted)`
+     - Ações Táticas: `var(--color-combat)`, `var(--color-theory)`, `var(--color-success)`, `var(--color-alert)`
+     - Bordas: `var(--border-subtle)`, `var(--border-strong)`
+3. **Micro-Estados Obrigatórios em Elementos Interativos**:
+   - Todo botão, card clicável ou tab deve definir explicitamente estados para:
+     - `:hover` (elevação suave e brilho sutil)
+     - `:active` (pressão táctil física `transform: scale(0.98)`)
+     - `:focus-visible` (anel de foco acessível para navegação por teclado)
+     - `[disabled]` (opacidade reduzida, cursor `not-allowed`, remoção de hover)
+
+---
+
+# 21. MECÂNICA DE INGESTÃO E PARSING DE DADOS RESILIENTE (AI JSON INGESTION GATE)
+
+Usuários frequentemente colam pacotes JSON gerados por modelos de IA (Gemini, Claude, GPT) que contêm imperfeições de formatação. O portal de importação deve ser blindado:
+
+1. **Pipeline de Sanitização Automática**:
+   Antes de acionar o `JSON.parse()`, o parser deve executar sequencialmente:
+   - **Remoção de Markdown**: Deletar blocos de cercamento ```` ```json ```` e ```` ``` ```` no início e fim da string.
+   - **Higienização de Caracteres Ocultos**: Eliminar marcas de ordem de byte (BOM `\uFEFF`), zero-width spaces e caracteres de controle invisíveis.
+   - **Tolerância a Quebras e Espaços**: Remover espaços em branco excedentes nas extremidades (`.trim()`).
+2. **Diagnóstico Cirúrgico de Erros de Sintaxe**:
+   - Proibido emitir erros genéricos como *"JSON Inválido"*.
+   - Se o parser falhar, localize a linha e coluna exatas da falha, destacando o fragmento de código quebrado para que o usuário ou o modelo de IA possa corrigir instantaneamente.
+3. **Validação de Contrato & Feedback Positivo**:
+   - Validar se o objeto importado possui a estrutura esperada.
+   - Apresentar resumo claro da operação: *"12 flashcards e 4 casos de combate importados com sucesso. 0 rejeitados."*
+
+---
+
+# 22. DIRETRIZES DE INÍCIO PARA PROJETOS DERIVADOS ("MESTRECARD ZEN")
+
+Ao iniciar uma nova versão ou projeto limpo baseado em um ecossistema existente:
+
+1. **Repositório Anterior como Cofre de Referência**:
+   - O projeto anterior deve ser tratado exclusivamente como catálogo e cofre de soluções técnicas comprovadas (catálogo de 598 PDFs, sintetizador de áudio, lógica de TRI, tipos TypeScript).
+2. **Proibição de Cópia Cega de Monólitos**:
+   - É expressamente proibido copiar arquivos massivos antigos diretamente para o novo projeto sem aplicar a **Arquitetura em Camadas** e a **Regra das 300 Linhas**.
+3. **Construção a Partir do Core Loop Minimalista (Filosofia Zen)**:
+   - O novo projeto deve nascer pelo seu ciclo essencial (Core Loop):
+     1. Leitor e Dossiê de Conteúdo Limpo.
+     2. Flashcards com MathRenderer blindado.
+     3. Persistência IndexedDB e Smart Merge.
+   - Módulos satélites (Acervo 598 PDFs, Arcade Papers Please, Constelação 3D) só devem ser introduzidos como pacotes isolados após o Core Loop estar impecável, responsivo e 100% testado.
+
+---
+
+# 23. PROTOCOLO DE TESTES UNITÁRIOS COM TEST RUNNER NATIVO (ZERO-BLOAT TDD)
+
+Para manter o repositório leve e livre de dependências gigantescas de testes:
+
+1. **Uso do Test Runner Nativo do Node.js**:
+   - Para testar motores de lógica (`/lib/engines`), utilize a API nativa `node:test` e `node:assert/strict`:
+     ```js
+     import test from 'node:test';
+     import assert from 'node:assert/strict';
+     import { calculateXp } from './xp-engine.js';
+
+     test('calcula XP correto para acerto de primeira tentativa', () => {
+       const xp = calculateXp({ attempts: 1, difficulty: 'hard' });
+       assert.equal(xp, 150);
+     });
+     ```
+   - Execute os testes no terminal com velocidade instantânea: `node --test src/lib/engines/*.test.mjs`.
+2. **Proibição de Boilerplate Excessivo**:
+   - Não instale Jest, Babel ou suítes complexas de configuração apenas para validar funções puras de negócio.
+3. **Casos Limites Mandatórios**:
+   - Toda suíte de teste de um motor deve cobrir no mínimo:
+     - Entrada com coleção vazia (`[]`).
+     - Valores nulos ou `undefined` em campos opcionais.
+     - Strings com caracteres especiais e fórmulas matemáticas.
+
+
