@@ -143,3 +143,131 @@ Quando instruído a utilizar o DevTools MCP na aba ativa (`http://localhost:8000
 - Qualquer operação que destrua dados persistidos (IndexedDB, localStorage, arquivos) **deve** ser precedida de um `confirm()` nativo ou modal de confirmação.
 - A lista de itens deve ser re-renderizada automaticamente após a exclusão, sem reload da página.
 - Nunca exponha um botão de delete sem um mecanismo de `undo` ou pelo menos a confirmação dialógica.
+
+---
+
+# 11. BLINDAGEM DE RENDERIZAÇÃO MATEMÁTICA E SINTAXE SEMÂNTICA (KATEX & MATHJAX)
+
+Para evitar quebras de renderização, texto cru exposto e crashes de parser:
+
+1. **Delimitadores Matemáticos Estritos**:
+   - Todo fragmento de LaTeX deve estar estritamente envelopado em `$ ... $` (inline) ou `$$ ... $$` (bloco).
+   - **Proibição Absoluta**: Nunca injetar comandos puros de LaTeX (como `\times`, `\frac`, `\ge`, `\pm`, `\approx`) diretamente em tags HTML, badges, chips ou spans sem os delimitadores reconhecidos pelo parser.
+2. **Parsing Não-Destrutivo (Regex Safety)**:
+   - Proibido o uso de expressões regulares gananciosas (`.*`) ou métodos `.replace()` em cascata sobre strings brutas que contenham fórmulas matemáticas.
+   - Símbolos reservados do LaTeX (`\`, `{`, `}`, `_`, `^`, `&`) não devem ser corrompidos por sanitizadores HTML.
+   - Elementos de marcação semântica da plataforma (`==destaque==`, `!!alerta!!`, `[cor]texto[/cor]`) devem ser isolados e processados por tokenizadores seguros antes da injeção no motor matemático.
+3. **Resiliência a Erros de Sintaxe**:
+   - O renderizador KaTeX deve ser configurado obrigatoriamente com `{ throwOnError: false }`.
+   - Se uma expressão matemática contiver erro de sintaxe gerado por IA ou pelo usuário, ela deve ser exibida como texto monoespaçado com destaque de aviso, **nunca** lançando uma exceção fatal que derrube o componente React.
+
+---
+
+# 12. RESILIÊNCIA DE RECONCILIAÇÃO REACT 18 & ERRORBOUNDARY TRI-NÍVEL (ADR-18)
+
+Bibliotecas que manipulam nós do DOM diretamente (como KaTeX, D3, Canvas, CodeMirror) causam conflito com o motor de reconciliação virtual do React 18, resultando no erro fatal `NotFoundError: Failed to execute 'insertBefore' on 'Node'` ou `removeChild`.
+
+Para blindar projetos contra essa falha:
+
+1. **Isolamento de Nós Folha (Leaf Containment)**:
+   - Todo conteúdo processado externamente via DOM nativo ou `dangerouslySetInnerHTML` deve residir em um elemento folha exclusivo (`<div>` ou `<span>`), sem filhos React gerenciados no mesmo nível.
+2. **Chaves Estáticas e Determinísticas (Deterministic Keys)**:
+   - **Proibido** usar o índice numérico do array (`index`) como `key` em listas de itens que possam sofrer filtragem, busca, reordenação ou remoção.
+   - Use identificadores imutáveis (`item.id`) ou um hash do conteúdo imutável.
+3. **Hierarquia Tri-Nível de ErrorBoundary**:
+   - **Nível 1 (Root / App Boundary)**: Captura falhas catastróficas da aplicação, exibindo botão de restauração segura e mecanismo de download de backup de emergência dos dados locais.
+   - **Nível 2 (View / Page Boundary)**: Envelopa cada rota ou portal principal (Dossiês, Radar, Constelação). Uma quebra no motor 3D ou em uma aba específica isola o erro e mantém o restante da aplicação 100% acessível.
+   - **Nível 3 (Micro-Component / Leaf Boundary)**: Envelopa renderizadores matemáticos, flashcards individuais ou editores de texto rico. Um card com sintaxe corrompida exibe um card de fallback localizado, preservando a navegação de todos os outros cards do deck.
+
+---
+
+# 13. ENGENHARIA DE ÁUDIO PROCEDURAL SEM DEPENDÊNCIA DE REDE (WEB AUDIO API)
+
+Para feedback háptico/sonoro em interfaces modernas e mecânicas de gamificação:
+
+1. **Zero Assets Externos**:
+   - **Proibido** adicionar arquivos `.mp3`, `.ogg` ou `.wav` para sons curtos de interface (cliques, alertas, acertos, erros, fanfarras).
+   - O tráfego de rede, erros de CORS, arquivos binários pesados no repositório e latência de carregamento no mobile são inaceitáveis para feedback de UI.
+2. **Síntese Sonora Matemática Pura**:
+   - Implemente sintetizadores procedurais leves utilizando a API nativa `AudioContext`.
+   - Modulação harmônica com osciladores senoidais, triangulares ou quadrados e envelopes de ganho exponenciais (`gain.gain.exponentialRampToValueAtTime`).
+3. **Desbloqueio por Gesto do Usuário (User Gesture Unlock)**:
+   - A inicialização ou resume do `AudioContext` deve ocorrer apenas no primeiro gesto de interação do usuário (`pointerdown`, `click`), respeitando as políticas de autoplay dos navegadores.
+   - Implementar fallback silencioso caso o hardware ou permissões não permitam reprodução de áudio.
+
+---
+
+# 14. PERSISTÊNCIA LOCAL ESCALÁVEL & SMART-MERGE NÃO-DESTRUTIVO (INDEXEDDB)
+
+Aplicações com alta densidade de dados sofrem com o teto de 5MB e o comportamento síncrono bloqueante do `localStorage`.
+
+1. **Segregação Arquitetural de Armazenamento**:
+   - **`localStorage`**: Reservado exclusivamente para preferências efêmeras de UI (< 100 KB): tema visual (dark/light), abas ativas, flags de onboarding.
+   - **`IndexedDB`**: Mandatório para todos os dados de domínio da aplicação (dossiês, decks de flashcards, histórico de revisões, notas e anexos).
+2. **Protocolo de Smart-Merge Não-Destrutivo**:
+   - Em operações de importação de JSON, backup ou sincronização, é **terminantemente proibido** executar substituição cega total (`overwriteAll`).
+   - O algoritmo de merge deve reconciliar os registros usando chaves primárias (`id`) e marcas temporais (`updatedAt` / `createdAt`).
+   - Registros locais não presentes no pacote de importação devem ser preservados. Itens conflitantes devem ser atualizados apenas se a versão importada possuir timestamp estritamente superior.
+3. **Resiliência a Quotas**:
+   - Trate explicitamente exceções de quota (`QuotaExceededError`) oferecendo ao usuário um utilitário de limpeza de histórico antigo ou exportação de segurança.
+
+---
+
+# 15. ERGONOMIA COGNITIVA, MICRO-CHUNKING & DESIGN ANTI-FADIGA
+
+Interfaces ricas devem ser desenhadas para combater a fadiga visual ("desânimo de usar") e a "leitura zumbi":
+
+1. **Fim da Rolagem Infinita (Arquitetura em Estágios Focados)**:
+   - Fluxos de estudo, análise ou preenchimento com mais de 3.000px de altura vertical devem ser segmentados em **estágios focados e discretos** (ex: *Fundamentos* ➔ *Diagnóstico/Radar* ➔ *Combate/Casos* ➔ *Desafio Ágil*).
+   - O modo contínuo ("Ver Todos") deve existir apenas como toggle secundário de visão panorâmica.
+2. **Regra de Ouro do Micro-Chunking**:
+   - Nenhum bloco de texto explicativo em cards, modais ou dicas deve exceder **3 a 4 linhas de texto contínuo** sem quebra visual.
+   - Use sistematicamente marcadores (`•`), setas de causalidade (`➔`), operadores de contraste (`vs.`) e separadores de respiração.
+3. **Anatomia Tática em 4 Camadas**:
+   Todo conteúdo pedagógico ou técnico de alto rendimento deve seguir a sequência:
+   1. **Tese Central**: Definição ou conduta direta em 1-2 frases.
+   2. **Mecanismo / Critérios**: Tópicos curtos com setas (`➔`) e marcadores (`•`).
+   3. **Alerta de Pegadinha**: Destaque explícito de armadilhas de banca ou erros comuns (`!!atenção!!`).
+   4. **Marcação Tática**: Palavras-chave destacadas (`==foco==`).
+
+---
+
+# 16. PWA OFFLINE-FIRST & UNIVERSAL SPA ROUTING EM HOSTING ESTÁTICO
+
+Para garantir que a aplicação funcione como PWA de produção e em servidores estáticos (ex: GitHub Pages):
+
+1. **Caminho Base Relativo Seguro**:
+   - No Vite ou empacotador equivalente, utilize `base: './'` ou resolva o subdiretório do repositório via variáveis de ambiente, prevenindo caminhos absolutos quebrados no GitHub Pages.
+2. **Fallback Universal 404 (SPA Routing Gate)**:
+   - Em hostings estáticos sem roteador de backend (como GitHub Pages), qualquer recarregamento (F5) em sub-rotas ou caminhos profundos causa o erro 404 do servidor.
+   - A esteira de build deve automatizar a geração ou duplicação do `dist/index.html` como `dist/404.html` (ou script de redirecionamento SPA) para que qualquer rota seja capturada e resolvida pelo roteador da aplicação.
+3. **Service Worker e Cache Shell**:
+   - Os assets estáticos vitais (`index.html`, bundles JS, CSS e fontes) devem seguir a estratégia Cache-First para abertura instantânea mesmo sem conexão à internet.
+
+---
+
+# 17. ARQUITETURA DE ISOLAMENTO DE PERFORMANCE: CORE LOOP VS. SATÉLITES
+
+Projetos complexos acumulam bibliotecas pesadas de visualização, gráficos e jogos auxiliares:
+
+1. **Teto de Peso do Core Loop (< 300 kB inicial)**:
+   - O caminho crítico da aplicação (navegação principal, leitura e estudo básico) deve carregar instantaneamente.
+2. **Code-Splitting Mandatório (`React.lazy` / Dynamic Imports)**:
+   - Módulos pesados ou secundários (motores 3D/Three.js, visualizadores de canvas densos, exportadores de PDF, minigames arcade e gráficos complexos) **DEVEM** ser carregados sob demanda via `React.lazy()` e envelopados em `<Suspense>`.
+3. **Tolerância a Falhas de Módulo Satélite**:
+   - A falha de carregamento ou crash de um módulo satélite (ex: erro de WebGL no 3D) nunca deve comprometer a usabilidade do Core Loop. A aplicação deve degradar graciosamente oferecendo a versão em lista/tabela 2D.
+
+---
+
+# 18. RESILIÊNCIA E EVOLUÇÃO DE ESQUEMA DE DADOS (ZERO SCHEMA DRIFT CRASH)
+
+Para garantir que versões novas do aplicativo leiam dados legados sem quebrar:
+
+1. **Acesso Defensivo a Propriedades**:
+   - Ao ler objetos vindos do armazenamento local, JSONs de terceiros ou APIs, nunca acesse propriedades aninhadas sem encadeamento opcional (`?.`) e valores padrão com coalescência nula (`item.cards ?? []`, `item.metadata?.tags ?? []`).
+2. **Versionamento e Migração Automática de Schemas**:
+   - Todo esquema de dados deve conter um campo `schemaVersion: number`.
+   - Ao carregar dados no início da sessão, uma função de migração transparente deve verificar a versão e injetar valores padrão para novas propriedades antes de disponibilizar os dados para a UI.
+3. **Tipagem Estrita com Uniões Discriminadas**:
+   - No TypeScript, utilize uniões discriminadas (`kind: 'card' | 'quest' | 'radar'`) para garantir checagem estrita de tipos em tempo de compilação com exaustividade em instruções `switch/case`.
+
